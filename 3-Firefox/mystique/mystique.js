@@ -1,26 +1,24 @@
 //SAMPLE Code in order to run the functionality
  
-var links = getLinks(false);
+var links = getLinksDomain(true);
 selectLink(links);
  
 
 /**
 * getLinks is used to get a list of all links in the specified document link
 */
-//TODO untested
+
 function getLinks(){
 	var array = getLinks(true);
 	return array;
 }
 
-
 /**
-* getLinks is used to get a list of all links in the specified 
+* getLinksDomain is used to get a list of all links in the specified 
 @param document link
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-function getLinks(followLinkOnDomainOnly){
-	alert(followLinkOnDomainOnly);
+function getLinksDomain(followLinkOnDomainOnly){
 	var linksDetected = [];
 	var aTags = document.getElementsByTagName("a");
 	for(var i=0; i<aTags.length; i++) {
