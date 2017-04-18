@@ -1,6 +1,6 @@
 //SAMPLE Code in order to run the functionality
  
-var links = getLinks(true);
+var links = getLinks(false);
 selectLink(links);
  
 
@@ -8,14 +8,8 @@ selectLink(links);
 * getLinks is used to get a list of all links in the specified document link
 */
 //TODO untested
-function getLinksPure(){
-	var array = [];
-	var linksDetected = document.getElementsByTagName("a");
-	for(var i=0; i<linksDetected.length; i++) {
-		array.push(linksDetected[i].href);
-	}
-
-//TODO shorten with true
+function getLinks(){
+	var array = getLinks(true);
 	return array;
 }
 
@@ -25,15 +19,19 @@ function getLinksPure(){
 @param document link
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-//TODO untested
 function getLinks(followLinkOnDomainOnly){
-	var linksDetected = getLinksPure();
+	alert(followLinkOnDomainOnly);
+	var linksDetected = [];
+	var aTags = document.getElementsByTagName("a");
+	for(var i=0; i<aTags.length; i++) {
+		linksDetected.push(aTags[i].href);
+	}
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
 		if (isOnSameDomain(document.location.href,linksDetected[i])){
 			array.push(linksDetected[i]);
 		}
-		else if (!followLinkOnDomainOnly) {
+		else if (followLinkOnDomainOnly) {
 			array.push(linksDetected[i]);
 		}
 
@@ -45,10 +43,7 @@ function getLinks(followLinkOnDomainOnly){
 /**
 * select links is used to get a number of links based on the
 */
-
 function isOnSameDomain(currentPage,checkPage){
-	//TODO implement #11
-
 	var prefix = /^https?:\/\//i;
     	var domain = /^[^\/]+/;
     	// removing prefix
@@ -58,13 +53,13 @@ function isOnSameDomain(currentPage,checkPage){
 	if (url2.charAt(0) === "/") {
         	return true;
     	}
-	
-    	// now extract just the domain
-   	var part1 = url1.match(domain)
-   	var part2 = url1.match(domain)
-	return part1 = part2;
+    	// extract domain and compare
+   	var part1 = url1.match(domain).toString();
+	var part2 = url2.match(domain);
+	return part1.includes(part2);
 }
 
+//=========================================== 
 //Should select one link to be opened
 function selectLink(links){
 	window.alert("This page has got "+links.length+" links");
