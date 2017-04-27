@@ -31,6 +31,6 @@
 	},
 	
 	"options_ui": {
-  	"page": "mystique_settings.html"
+  		"page": "mystique_settings.html"
   	}
 }
