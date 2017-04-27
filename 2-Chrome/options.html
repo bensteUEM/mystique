@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><title>Settings - Mystique</title></head>
+<body>
+<h3>Settings for the Mystique extension</h3>
+<label>Activate extension:
+<input type='checkbox' name='activate' id='activate'/>
+</label>
+<br>
+<label>Follow links on same domain only:
+<input type='checkbox' name='linksOnDomainOnly' id='linksOnDomainOnly'/>
+</label>
+<br><label>Maximum of bytes:
+<br>
+<input type='text' name='maxBytes' id='maxBytes'/>
+</label>
+<br>
+<label>Follow % of links on page
+<br>
+<input type='number' name='linkCoveragePecentage' id='linkCoveragePecentage'/>
+</label>
+<br>
+<label>Follow links up to x times
+<br>
+<input type='number' name='linkDepth' id='linkDepth'/>
+</label>
+<br>
+<label>
+Blacklist (do not visit URLs containing these words):
+<br>
+<textarea id='blacklist'></textarea>
+</label>
+<br>
+Whitelist (prefer URLs containing these words):
+<br>
+<textarea id='whitelist'></textarea>
+<br>
+Personas:
+<br>
+<select id="personas">
+ <option value="0">Nerd</option>
+ <option value="1">Banker</option>
+ <option value="2">Scientist</option>
+ <option value="3">Athlete</option>
+</select>
+<br>
+<br>
+<div id="status"></div>
+<button id="save">Save</button>
+
+<script src="options.js"></script>
+</body>
+</html>

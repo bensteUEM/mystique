@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+
+  "name": "Mystique",
+  "description": "This extension generates random user profiles in order to confuse trackers",
+  "version": "1.0",
+  "options_page": "options.html",
+
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [{
+     "matches": [
+            "http://*/*",
+            "https://*/*"
+            ],
+    "js": ["contentScript.js"],
+    "run_at": "document_end"
+  }],
+  "permissions": [
+    "activeTab",
+  "storage"
+  ],
+   "icons": {
+    "128": "icon.png"
+  }
+}
