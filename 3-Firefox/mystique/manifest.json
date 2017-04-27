@@ -2,10 +2,11 @@
 
 	"manifest_version": 2,
 	"name": "Mystique-FF",
-	"version": "0.2",
+	"version": "0.3",
 	
 	"permissions": [
-  		"tabs"
+  		"tabs",
+		"storage"
   	],
 	
 	"description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
@@ -25,6 +26,11 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icons/DHBW_CAS_logo.png"
-	}
+		"default_icon": "icons/DHBW_CAS_logo.png",
+		"default_popup": "popup/mystique_popup.html"
+	},
+	
+	"options_ui": {
+    "page": "mystique_settings.html"
+  },
 }
