@@ -1,8 +1,19 @@
 //SAMPLE Code in order to run the functionality
  
-var links = getLinksDomain(true);
+var links = getLinksDomainPercentage(true,0.05);
 selectLink(links);
- 
+
+//Should select one link to be opened
+function selectLink(links){
+	window.alert("Returned "+links.length+" links");
+	alert(links);
+	//TODO this is not implemented yet
+}
+
+//=========================================== 
+//=========================================== 
+//=========================================== 
+//===========================================  
 
 /**
 * getLinks is used to get a list of all links in the specified document link
@@ -37,6 +48,30 @@ function getLinksDomain(followLinkOnDomainOnly){
 	return array;
 }
 
+/**
+* getLinksDomain is used to get a list of all links in the specified 
+@param document link
+@param followLinkOnDomainOnly to filter only to same Domain links
+*/
+function getLinksDomainPercentage(followLinkOnDomainOnly,numberOfLinksToClick_max){
+	var allLinks = getLinksDomain(followLinkOnDomainOnly);
+	var array = [];
+	alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
+	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
+	alert("Chose " + numberToChoose + " of "+ allLinks.length);
+	numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length)
+
+	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
+		return 	allLinks;
+	}
+	chosen = 0;
+	while (chosen < numberToChoose) {
+		pickIndex = Math.round(Math.random()*allLinks.length)
+    		array.push(allLinks[pickIndex]);
+    		chosen++;
+	}
+	return array;
+}
 
 /**
 * select links is used to get a number of links based on the
@@ -55,12 +90,5 @@ function isOnSameDomain(currentPage,checkPage){
    	var part1 = url1.match(domain).toString();
 	var part2 = url2.match(domain);
 	return part1.includes(part2);
-}
-
-//=========================================== 
-//Should select one link to be opened
-function selectLink(links){
-	window.alert("This page has got "+links.length+" links");
-	//TODO this is not implemented yet
 }
  
