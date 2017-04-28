@@ -6,7 +6,9 @@
 	
 	"permissions": [
   		"tabs",
-		"storage"
+		"storage",
+		"webRequest",
+		"webRequestBlocking"
   	],
 	
 	"description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
