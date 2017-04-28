@@ -8,7 +8,8 @@
   		"tabs",
 		"storage",
 		"webRequest",
-		"webRequestBlocking"
+		"webRequestBlocking",
+		"http://useragentstring.com/*"
   	],
 	
 	"description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",

@@ -92,14 +92,13 @@ from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewrit
 function rewriteUserAgentHeader(e) {
 	var uaStrings = generateUA();
 	var ua = uaStrings[Math.floor(Math.random()*uaStrings.length)];
-  for (var header of e.requestHeaders) {
-    if (header.name.toLowerCase() === "user-agent") {
-	
-	alert("old UA: "+header.value+" will be change to "+ua;
-      	header.value = ua;
-    }
-  }
-  return {requestHeaders: e.requestHeaders};
+	//ua = "Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4"];
+  	for (var header of e.requestHeaders) {
+    		if (header.name.toLowerCase() === "user-agent") {
+      		    header.value = ua;
+   		}
+ 	 }
+ 	return {requestHeaders: e.requestHeaders};
 }
 
 /*
@@ -108,27 +107,27 @@ only for the target page.
 Make it "blocking" so we can modify the headers.
 from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
 */
-browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,
-                                          {urls: [targetPage]},
-["blocking", "requestHeaders"]);
+var targetPage = "http://useragentstring.com/*";
+browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,{urls: [targetPage]},["blocking", "requestHeaders"]);
 
 /*
 Map browser names to UA strings.
 */
 function generateUA(){
+    
 	//WINDOWS Platform
 	var winVersions = ["10.0","6.3","6.2","6.1","6.0","5.2","5.1","5.0"];
 	var windows = [];
-	for (version:winVersions){
-		windows.push("Windows NT "version+";");
-		windows.push("Windows NT "version+"; Win64; x64;");
-		windows.push("Windows NT "version+"; WOW64;");
+	for (version of winVersions){
+		windows.push("Windows NT "+version+";");
+		windows.push("Windows NT "+version+"; Win64; x64;");
+		windows.push("Windows NT "+version+"; WOW64;");
 	}
 
 	//OSX Platform
 	var osxVersions = ["10.0","10.1","10.2","10.3","10.4","10.5","10.6","10.7","10.8","10.9","10.10","10.11","10.12"];
 	var apple = [];	
-	for (version:osxVersions){
+	for (version of osxVersions){
 		apple.push("Macintosh; Intel Mac OS X "+version+";");
 		apple.push("Macintosh; PPC Mac OS X "+version+";");
 	}
@@ -137,21 +136,21 @@ function generateUA(){
 	var linux = ["X11; Linux i686;","X11; Linux x86_64;","X11; Linux i686 on x86_64;","Maemo; Linux armv7l;","X11; Ubuntu; Linux i686;","X11; Ubuntu; Linux x86_64;","X11; Ubuntu; Linux i686 on x86_64;"];
 
 	//ANDROID Platform
-	var androidVersions = ["7.1","7.0","6.0","5.1","5.0","4.4","4.3","4.2","4.1"]	
+	var androidVersions = ["7.1","7.0","6.0","5.1","5.0","4.4","4.3","4.2","4.1"];
 	var android = ["Android; Mobile","Android; Tablet"];
-	for (version:osxVersions){
+	for (version in osxVersions){
 		android.push("Android "+version+"; Mobile;");
 		android.push("Android "+version+"; Tablet;");
 	}
 	
 	var allUseablePlatforms = [];
-	if (true) //TODO once personas do exist choose platform based on Persona #2 {
+	if (true) {//TODO once personas do exist choose platform based on Persona #2 {
 		allUseablePlatforms = allUseablePlatforms.concat(windows);
-	if (true) {
+	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(apple);
-	if (true) {
+	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(linux);
-	if (true) {
+	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(android);
 	}
 
@@ -162,12 +161,16 @@ function generateUA(){
 
 	var geckotrail = "Gecko/20100101" //20100101 for Desktops //TODO change for mobile #12 depending on #2
 	var firefoxversions = ["25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61"]
-	var firefoxversion = 	firefoxversions[Math.floor(Math.random()*firefoxversions.length)];	
+	var firefoxversion = firefoxversions[Math.floor(Math.random()*firefoxversions.length)];	
 
-	var generateUA = "Mozilla/5.0 (" + plaform + " rv:"+rv_geckoversion + ") "+ geckotrail + " Firefox/"+firefoxversion;
+	var generateUA = ["Mozilla/5.0 (" + platform + " rv:"+rv_geckoversion + ") "+ geckotrail + " Firefox/"+firefoxversion];
 
 	// COMPLETE UA Strings for special platforms
-	var iOSUA = ["Mozilla/5.0 (iPod touch; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4","Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4","Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4"];
-
-	return generatedUA;
+	var iOSUA = ["Mozilla/5.0 (iPod touch; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
+	            "Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
+	            "Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4"];
+	            
+	            //TODO decide which should be used based on personas #2
+    
+	return generateUA;
 }
