@@ -86,6 +86,33 @@ function onError(error) {
 //========================= USER AGENT Part
 
 /*
+Rewrite the User-Agent header to "ua".
+from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
+*/
+function rewriteUserAgentHeader(e) {
+	var uaStrings = generateUA();
+	var ua = uaStrings[Math.floor(Math.random()*uaStrings.length)];
+  for (var header of e.requestHeaders) {
+    if (header.name.toLowerCase() === "user-agent") {
+	
+	alert("old UA: "+header.value+" will be change to "+ua;
+      	header.value = ua;
+    }
+  }
+  return {requestHeaders: e.requestHeaders};
+}
+
+/*
+Add rewriteUserAgentHeader as a listener to onBeforeSendHeaders,
+only for the target page.
+Make it "blocking" so we can modify the headers.
+from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
+*/
+browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,
+                                          {urls: [targetPage]},
+["blocking", "requestHeaders"]);
+
+/*
 Map browser names to UA strings.
 */
 function generateUA(){
@@ -128,14 +155,14 @@ function generateUA(){
 		allUseablePlatforms = allUseablePlatforms.concat(android);
 	}
 
-	var platform = 	allUseablePlatforms[Math.round(Math.random()*allUseablePlatforms.length)];
+	var platform = 	allUseablePlatforms[Math.floor(Math.random()*allUseablePlatforms.length)];
 
 	var geckoversions = ["18.0","18.1","26.0","28.0","30","32","34","37","44"] //all link a Firefox OS version
-	var rv_geckoversion = geckoversions[Math.round(Math.random()*geckoversions.length)];
+	var rv_geckoversion = geckoversions[Math.floor(Math.random()*geckoversions.length)];
 
 	var geckotrail = "Gecko/20100101" //20100101 for Desktops //TODO change for mobile #12 depending on #2
 	var firefoxversions = ["25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61"]
-	var firefoxversion = 	firefoxversions[Math.round(Math.random()*firefoxversions.length)];	
+	var firefoxversion = 	firefoxversions[Math.floor(Math.random()*firefoxversions.length)];	
 
 	var generateUA = "Mozilla/5.0 (" + plaform + " rv:"+rv_geckoversion + ") "+ geckotrail + " Firefox/"+firefoxversion;
 
