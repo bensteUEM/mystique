@@ -8,10 +8,10 @@
   </head>
 
 <body>
-	<div class="header_container">
+	<!--<div class="header_container">
 			<img src="" alt="mystique_logo" />
 			<h1 class="main_header">Settings</h1>
-	</div>
+	</div>-->
 	
 	<div class="form_container">
 	<form>
@@ -35,15 +35,26 @@
 				<span class="description">How many levels do you want to step into the current page link structure ? More levels are ..., less levels are...</span>
 			</div>
 			<div class="settings_item">
-				<p class="label">Blacklist</p>
-				<textarea type="text" id="blackList" col="20" rows="8"></textarea>
-				<span class="description">Keywords that you don`t want to use in your queries</span>
+				<p class="label">Persona</p>
+				<select id="persona">
+					<option value="Persona1">Persona1</option>
+					<option value="Persona2">Persona2</option>
+					<option value="Persona3">Persona3</option>
+					<option value="Persona4">Persona4</option>
+				</select>
+				<span class="description">Who do you want to be?</span>
 			</div>
 			<div class="settings_item">
-				<p class="label">Wishlist</p>
-				<textarea type="text" id="wishList" col="20" rows="10"></textarea>
-				<span class="description">Keywords that you want to use in your queries</span>
-			</div>
+					<p class="label">Blacklist</p>
+					<textarea type="text" id="blackList" col="20" rows="7"></textarea>
+					<span class="description">Keywords that you don`t want to use in your queries</span>
+				</div>
+			<div class="settings_item">
+					<p class="label">Wishlist</p>
+					<textarea type="text" id="wishList" col="20" rows="7"></textarea>
+					<span class="description">Keywords that you want to use in your queries</span>
+				</div>			
+			
 		</div>
     </form>
 	<script src="mystique_settings.js"></script>

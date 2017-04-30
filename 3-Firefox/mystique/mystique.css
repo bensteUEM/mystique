@@ -4,7 +4,7 @@
   padding:0;
 }
 body, html {
-        margin:5px;
+        margin:0px;
 }
 
 .header_container img  {
@@ -23,25 +23,29 @@ body, html {
 .settings_summary {
 	  width:350px;
 	  height:400px;
-	  margin:10px;
+	  margin:5px;
 	
 }
 .settings_item {
         height:auto;
         padding:10px 0;
-        margin:5px;
+        margin:0;
         width:100%;
         vertical-align:middle;
 }
 
-.settings_item p {
-        margin:3px;
-        color:black;
+.settings_summary .settings_item {
+	margin-left:5px;
 }
 
-.settings_item .label, label {
+.settings_item .label {
 		float:left;
 		width:120px;
+		font-weight:600;
+}
+
+.settings_item span {
+		display:inline-block;
 }
 
 .settings_item .description {
@@ -50,24 +54,45 @@ body, html {
         margin:0;
         padding:0;
         display:block;
-		padding-left:120px;
+		/*padding-left:120px;*/
 }
 
-.power_button {
-	height:50px;
-	width:70px;
+.settings_item textarea {
+	width:167px;
+}
+
+#power_button {
+	height:33px;
+	width:60px;
 	text-align:center;
-	background-color:blue;
-	color:white;
+	vertical-align:middle;
 	margin:0 auto;
+	padding:5px;
+	cursor:pointer;
 }
 
-.power_button:hover {
-	font-weight:bold;
+#power_button:hover {
+	color:white;
 }
 
-.settings_link {
+.activated {
+	background-color:green;
+	color:lightgreen;
+}
+
+.deactivated {
+	background-color:darkred;
+	color:lightred;
+}
+
+#settings_link {
+	color:grey;
 	text-align:center;
+	cursor:pointer;
+}
+
+#settings_link:hover {
+	color:black;
 }
 
 form {

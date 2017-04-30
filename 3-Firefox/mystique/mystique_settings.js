@@ -1,15 +1,16 @@
 function saveSettings(e) {
 	e.preventDefault();
 	
-	let settings = {
+	var settings = {
 		maxBytes: document.querySelector("#maxBytes").value,
 		linkCountPercent: document.querySelector("#linkCountPercent").value,
 		linkDepthMax: document.querySelector("#linkDepthMax").value,
+		persona: document.querySelector("#persona").value,
 		blackList: document.querySelector("#blackList").value,
 		wishList: document.querySelector("#wishList").value
 	}
   
-	let setting = browser.storage.local.set({settings});
+	var setting = browser.storage.local.set({settings});
 	setting.then(null, onError);
 	
 	function onError(error) {
@@ -21,14 +22,28 @@ function saveSettings(e) {
 function restoreSettings() {
 
   function loadValues(result) {
-    document.querySelector("#maxBytes").value = result.settings.maxBytes || "25";
-	document.querySelector("#linkCountPercent").value = result.settings.linkCountPercent || "20";
-	document.querySelector("#linkDepthMax").value = result.settings.linkDepthMax || "2";
-	document.querySelector("#blackList").value = result.settings.blackList || "black1";
-	document.querySelector("#wishList").value = result.settings.wishList || "wish1";
+	  
+	  var settings = result.settings;
+	  if(settings == null) {
+		  settings = {
+				maxBytes: "25",
+				linkCountPercent: "20",
+				linkDepthMax: "2",
+				persona: "Persona1",
+				blackList: "black1",
+				wishList: "wish1"
+		}
+	  }
+
+    document.querySelector("#maxBytes").value = settings.maxBytes;
+	document.querySelector("#linkCountPercent").value = settings.linkCountPercent;
+	document.querySelector("#linkDepthMax").value = settings.linkDepthMax;
+	document.querySelector("#persona").value = settings.persona;
+	document.querySelector("#blackList").value = settings.blackList;
+	document.querySelector("#wishList").value = settings.wishList;
   }
   
-  let getting = browser.storage.local.get("settings");
+  var getting = browser.storage.local.get("settings");
   getting.then(loadValues, onError);
   
   function onError(error) {

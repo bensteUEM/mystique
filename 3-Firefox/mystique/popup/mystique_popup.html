@@ -4,7 +4,6 @@
   <head>
     <meta charset="utf-8">
 	<link rel="stylesheet" href="../mystique.css"/>
-	  <script src="mystique_popup.js"></script>
   </head>
 
 <body>
@@ -12,31 +11,47 @@
 			<img src="" alt="mystique_logo" />
 			<h1 class="main_header">Settings</h1>
 	</div>
-	<div class="power_button">Status</div>
+	<div id="power_button" class=""></div>
 
 	<div class="settings_summary">
 		<div class="settings_item">
 			<p class="label">Max Bytes</p>
-			<p id="maxBytes"></p>
+			<span id="maxBytes"></span>
+			<span class="description">Description...</span>
+
 		</div>
 		<div class="settings_item">
-			<p class="label">Linkanzahl %</p>
-			<p id="linkCountPercent"></p>
+			<p class="label">Link Count %</p>
+			<span id="linkCountPercent"></span>
+			<span class="description">Description...</span>
+
 		</div>
 		<div class="settings_item">
-			<p class="label">Linktiefe (max)</p>
-			<p id="linkDepthMax"></p>
+			<p class="label">Link Depth (max)</p>
+			<span id="linkDepthMax"></span>
+			<span class="description">Description...</span>
+
+		</div>
+		<div class="settings_item">
+			<p class="label">Persona</p>
+			<span id="persona"></span>
+			<span class="description">The character you are while browsing</span>
+
 		</div>
 		<div class="settings_item">
 			<p class="label">Blacklist</p>
-			<p id="blackList"></p>
+			<span id="blackList"></span>
+			<span class="description">Keywords your character doesn`t like</span>
+
 		</div>
 		<div class="settings_item">
 			<p class="label">Wishlist</p>
-			<p id="wishList"></p>
+			<span id="wishList"></span>
+			<span class="description">Keywords your character likes</span>
 		</div>
 	</div>
-	<!--<div id="settings_link">Settings</div>-->
+		<div id="settings_link">Change Settings</div>
+	<script src="mystique_popup.js"></script>
 </body>
 
 </html>
