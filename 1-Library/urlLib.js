@@ -171,13 +171,16 @@ var urlLib = {
   // If the url is not valid the function mus return false
   _approveUrl: function(url, config) {
     return new Promise(function(resolve, reject) {
-      if (new Date().getTime() % 2) {
+      /*if (new Date().getTime() % 2) {
         console.log("URL IS VALID");
         resolve(url);
         return;
       }
       console.log("URL IS NOT VALID");
-      resolve(false);
+      resolve(false);*/
+       
+      resolve(url);
+      return;
 
     })
   }
