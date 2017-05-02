@@ -188,12 +188,3 @@ var urlLib = {
 
 
 };
-
-var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
-
-
-urlLib.generateURL({
-  wordlist: wl
-}).then(function(url) {
-  console.log(url);
-});
