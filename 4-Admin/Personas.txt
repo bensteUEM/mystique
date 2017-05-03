@@ -1,5 +1,10 @@
 Personas 
-•	junge Familie (Kindergarten, Windeln, Spielzeug, Kinderbuch, Babysitter, Schwangerschaftsstreifen, abnehmen, Yogaübungen, Kita, Babynahrung, )
-•	Frührentner (Altersteilzeit, Frührente, Weltreise, Rentenrechner, Urlaub, Rente, Auszeit, Bootsführerschein)
-•	Student (Studium, Studiumsgebühren, Studentenwohnung, Hochschule, BAFÖG,  ..
-•	Fußballfan (Bundesliga, MLS, Champions Leage, FC Bayern, BVB, Fußballweltmeister, Fifa, DFB, Spieltag, Bier, Sky)
+â€¢	junge Familie (Kindergarten, Windeln, Spielzeug, Kinderbuch, Babysitter, Schwangerschaftsstreifen, abnehmen, YogaÃ¼bungen, Kita, Babynahrung, )
+â€¢	FrÃ¼hrentner/in (Altersteilzeit, FrÃ¼hrente, Weltreise, Rentenrechner, Urlaub, Rente, Auszeit, BootsfÃ¼hrerschein)
+â€¢	Student/in (Studium, StudiumsgebÃ¼hren, Studentenwohnung, Hochschule, BAFÃ–G, Studententicket, Bachelorthesis, Masterthesis)
+â€¢	FuÃŸballfan (Bundesliga, MLS, Champions Leage, FC Bayern, BVB, FuÃŸballweltmeister, Fifa, DFB, Spieltag, Bier, Sky)
+â€¢	Fitnessjunkie (Fitnessprogramm, Fitnessstudio, abnehmen, Sixpack, Proteine, EiweiÃŸ, Fitnesstracker, Fitness-App, Low-Carb, Muskelaufbau)
+â€¢	Proffesor/in (
+â€¢	AktionÃ¤r (Aktien, ETF, Dividende, Broker, Rendite, Aktiengesellschaft, Anleihen, Hauptversammlung, DAX, NASDAQ, Dividendenrendite)
+â€¢	Lottospieler/in (Lottogewinn, Gewinnspiel, Lottozahlen, ...)
+â€¢	
