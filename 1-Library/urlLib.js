@@ -7,6 +7,14 @@
 */
 
 
+
+//var jQuery = document.createElement('script');
+//jQuery.src = 'https://code.jquery.com/jquery-3.2.1.min.js';
+//jQuery.type = 'text/javascript';
+//document.getElementsByTagName('head')[0].appendChild(jQuery);
+
+var fake_test_data='lauzsdlazusbdöbö<div class="rc"><h3 class="r"><a href="LINK_A" onmousedown="...", ...>DESCRIPTION</a></h3>öanwdäöanwdän <div class="rc"><h3 class="r"><a href="http://www.getraenke-holz.de/getraenkewissen~8a81811d400f785601400f81c6fe0041.de.html" onmousedown="...", ...>DESCRIPTION</a></h3>öiuahwüdawüdawdüawdüawdn'
+
 var urlLib = {
 
   // This is our main public function which returns the final approved url
@@ -31,6 +39,35 @@ var urlLib = {
 
   },
 
+  hello: function() {
+    console.log("Hello World")
+  },
+
+    _get_links: function() {
+        //data = fake_test_data;
+        var result_link=/<div class="rc"><h3 class="r"><a href="([\S])+"/g;
+        var trim_html=/<div class="rc"><h3 class="r"><a href=/g
+        var trim_ticks=/"/g
+
+        var all_links = [];
+        var single_link
+
+        do {
+            var match = result_link.exec(fake_test_data);
+            if(match != null) {
+                //This is the whole link. Now the matches need to be replace
+                single_link = match[0];
+                single_link = single_link.replace(trim_html, "");
+                single_link = single_link.replace(trim_ticks, "");
+
+                //store the link
+                all_links.push(single_link);
+                console.log(single_link)
+            }
+        } while (match != null)
+
+        console.log(all_links)
+  },
 
   //------------- evolutionary algorithm------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------------
@@ -149,6 +186,9 @@ var urlLib = {
     }
   },
 
+
+    //example: <div class="rc"><h3 class="r"><a href="http://www.getraenke-holz.de/getraenkewissen~8a81811d400f785601400f81c6fe0041.de.html" onmousedown="return rwt(this,'','','','11','AFQjCNE6DhktwFPAo1AVm1IrKQ6bJ5oWjQ','BpZ5-KhkO_2ZeHc3Ldm02Q','0ahUKEwijgMOk9dvTAhWLcBoKHe8CBE4QFghQMAo','','',event)">Getränkewissen: Mineralwasser, Bier, Saft, Wein ... - Getränke Holz</a></h3>
+    //<div class="rc"><h3 class="r"><a href=LINK onmousedown="..." ...>DESCRIPTION</a></h3>
   _getUrl: function(searchString) {
     console.log("Search String is: " + searchString)
     return new Promise(function(resolve, reject) {
@@ -156,7 +196,7 @@ var urlLib = {
       var url = "https://www.google.com/search?q=" + encodeURIComponent(searchString);
       $.get({
         url: url,
-        success: function(d) {
+        success: function(data) {
           resolve(url);
         },
         error: function(e) {
@@ -166,6 +206,7 @@ var urlLib = {
 
     })
   },
+
 
   // This Method must return the url if valid
   // If the url is not valid the function mus return false
@@ -188,3 +229,9 @@ var urlLib = {
 
 
 };
+
+
+var lib = urlLib
+lib.hello()
+
+lib._getUrl("asdasd")
