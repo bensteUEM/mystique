@@ -6,15 +6,6 @@
 	https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.js
 */
 
-
-
-//var jQuery = document.createElement('script');
-//jQuery.src = 'https://code.jquery.com/jquery-3.2.1.min.js';
-//jQuery.type = 'text/javascript';
-//document.getElementsByTagName('head')[0].appendChild(jQuery);
-
-var fake_test_data='lauzsdlazusbdöbö<div class="rc"><h3 class="r"><a href="LINK_A" onmousedown="...", ...>DESCRIPTION</a></h3>öanwdäöanwdän <div class="rc"><h3 class="r"><a href="http://www.getraenke-holz.de/getraenkewissen~8a81811d400f785601400f81c6fe0041.de.html" onmousedown="...", ...>DESCRIPTION</a></h3>öiuahwüdawüdawdüawdüawdn'
-
 var urlLib = {
 
   // This is our main public function which returns the final approved url
@@ -156,9 +147,9 @@ var urlLib = {
     }
   },
 
-//------------- _getURL Begin ------------------------------------------------------------------
+//------------- _getUrlModule Begin ------------------------------------------------------------------
 
-    _urlModule: {
+    _getUrlModule: {
         /**
          * Parses the returned google page for the shown links. They follow a specific schema, are matched and stored in an array
          * Schema for links: <div class="rc"><h3 class="r"><a href="LINK" onmousedown="..." ...>DESCRIPTION</a></h3>
@@ -188,7 +179,7 @@ var urlLib = {
          * @return a single URL of the search results
          * */
         _get_random_URL: function(data) {
-            var links = urlLib._urlModule._get_links(data);
+            var links = urlLib._getUrlModule._get_links(data);
             return links[Math.floor(Math.random() * links.length)];
         },
     },
@@ -200,12 +191,14 @@ var urlLib = {
             $.get({
                 url: url,
                 success: data => {
-                    url = urlLib._urlModule._get_random_URL(data);
+                    url = urlLib._getUrlModule._get_random_URL(data);
                     console.log("Created URL is: " + url);
                     resolve(url);
                 },
                 error: e =>{
-                    //url = urlLib._urlModule._get_random_URL(fake_test_data);
+                    //var fake_test_data='lauzsdlazusbdöbö<div class="rc"><h3 class="r"><a href="LINK_A" onmousedown="...", ...>DESCRIPTION</a></h3>öanwdäöanwdän \
+                    // <div class="rc"><h3 class="r"><a href="http://www.getraenke-holz.de/getraenkewissen~8a81811d400f785601400f81c6fe0041.de.html" onmousedown="...", ...>DESCRIPTION</a></h3>öiuahwüdawüdawdüawdüawdn'
+                    //url = urlLib._getUrlModule._get_random_URL(fake_test_data);
                     //console.log("Created URL from fake_test_data is: " + url);
                     reject(e);
                 }
@@ -214,7 +207,7 @@ var urlLib = {
         })
     },
 
-//------------- _getURL End --------------------------------------------------------------------
+//------------- _getUrlModule End --------------------------------------------------------------------
 
 
   // This Method must return the url if valid
