@@ -231,9 +231,3 @@ var urlLib = {
 
 
 };
-
-
-var lib = urlLib
-lib.hello()
-
-lib._getUrl("asdasd")
