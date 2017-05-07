@@ -39,36 +39,6 @@ var urlLib = {
 
   },
 
-  hello: function() {
-    console.log("Hello World")
-  },
-
-    _get_links: function() {
-        //data = fake_test_data;
-        var result_link=/<div class="rc"><h3 class="r"><a href="([\S])+"/g;
-        var trim_html=/<div class="rc"><h3 class="r"><a href=/g
-        var trim_ticks=/"/g
-
-        var all_links = [];
-        var single_link
-
-        do {
-            var match = result_link.exec(fake_test_data);
-            if(match != null) {
-                //This is the whole link. Now the matches need to be replace
-                single_link = match[0];
-                single_link = single_link.replace(trim_html, "");
-                single_link = single_link.replace(trim_ticks, "");
-
-                //store the link
-                all_links.push(single_link);
-                console.log(single_link)
-            }
-        } while (match != null)
-
-        console.log(all_links)
-  },
-
   //------------- evolutionary algorithm------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------------
 
@@ -186,26 +156,65 @@ var urlLib = {
     }
   },
 
+//------------- _getURL Begin ------------------------------------------------------------------
 
-    //example: <div class="rc"><h3 class="r"><a href="http://www.getraenke-holz.de/getraenkewissen~8a81811d400f785601400f81c6fe0041.de.html" onmousedown="return rwt(this,'','','','11','AFQjCNE6DhktwFPAo1AVm1IrKQ6bJ5oWjQ','BpZ5-KhkO_2ZeHc3Ldm02Q','0ahUKEwijgMOk9dvTAhWLcBoKHe8CBE4QFghQMAo','','',event)">Getränkewissen: Mineralwasser, Bier, Saft, Wein ... - Getränke Holz</a></h3>
-    //<div class="rc"><h3 class="r"><a href=LINK onmousedown="..." ...>DESCRIPTION</a></h3>
-  _getUrl: function(searchString) {
-    console.log("Search String is: " + searchString)
-    return new Promise(function(resolve, reject) {
-      // ADD btnI& for Lucky Search
-      var url = "https://www.google.com/search?q=" + encodeURIComponent(searchString);
-      $.get({
-        url: url,
-        success: function(data) {
-          resolve(url);
+    _urlModule: {
+        /**
+         * Parses the returned google page for the shown links. They follow a specific schema, are matched and stored in an array
+         * Schema for links: <div class="rc"><h3 class="r"><a href="LINK" onmousedown="..." ...>DESCRIPTION</a></h3>
+         * @param page source of a google search
+         * @return an array with all search results of this page, so usually 10 entries
+         * */
+        _get_links: function(data) {
+            var result_link=/<div class="rc"><h3 class="r"><a href="([\S])+"/g;
+            var trim_html=/<div class="rc"><h3 class="r"><a href=/g;
+            var trim_ticks=/"/g;
+            var all_links = [];
+
+            do {
+                var match = result_link.exec(data);
+                if(match != null) {
+                    //Extract only the link itself from the matched parts and store it in an array
+                    all_links.push(match[0].replace(trim_html, "").replace(trim_ticks, ""));
+                }
+            } while (match != null);
+
+            return all_links;
         },
-        error: function(e) {
-          reject(e);
-        }
-      });
 
-    })
-  },
+        /**
+         * Randomly retrieves one entry of the provided array. This is used to prevent fraud detection because always
+         * the first shown result is clicked. Instead this simulates behaviour that some link on the first page is clicked.
+         * @return a single URL of the search results
+         * */
+        _get_random_URL: function(data) {
+            var links = urlLib._urlModule._get_links(data);
+            return links[Math.floor(Math.random() * links.length)];
+        },
+    },
+
+    _getUrl: function(searchString) {
+        console.log("Search String is: " + searchString)
+        return new Promise(function(resolve, reject) {
+            var url = "https://www.google.com/search?q=" + encodeURIComponent(searchString);
+            $.get({
+                url: url,
+                success: data => {
+                    url = urlLib._urlModule._get_random_URL(data);
+                    console.log("Created URL is: " + url);
+                    resolve(url);
+                },
+                error: e =>{
+                    //url = urlLib._urlModule._get_random_URL(fake_test_data);
+                    //console.log("Created URL from fake_test_data is: " + url);
+                    reject(e);
+                }
+            });
+
+        })
+    },
+
+//------------- _getURL End --------------------------------------------------------------------
 
 
   // This Method must return the url if valid
