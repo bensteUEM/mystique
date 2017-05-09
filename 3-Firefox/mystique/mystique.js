@@ -1,7 +1,7 @@
 //SAMPLE Code in order to run the functionality
  
 var links = getLinksDomainPercentage(true,0.05);
-selectLink(links);
+//selectLink(links);
 
 //Should select one link to be opened
 function selectLink(links){
@@ -56,17 +56,16 @@ function getLinksDomain(followLinkOnDomainOnly){
 function getLinksDomainPercentage(followLinkOnDomainOnly,numberOfLinksToClick_max){
 	var allLinks = getLinksDomain(followLinkOnDomainOnly);
 	var array = [];
-	alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
+	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
 	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
-	alert("Chose " + numberToChoose + " of "+ allLinks.length);
-	numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length)
+	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
 
 	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
 		return 	allLinks;
 	}
 	chosen = 0;
 	while (chosen < numberToChoose) {
-		pickIndex = Math.round(Math.random()*allLinks.length)
+		pickIndex = Math.floor(Math.random()*allLinks.length)
     		array.push(allLinks[pickIndex]);
     		chosen++;
 	}

@@ -6,7 +6,10 @@
 	
 	"permissions": [
   		"tabs",
-		"storage"
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"http://useragentstring.com/*"
   	],
 	
 	"description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
@@ -26,11 +29,12 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icons/DHBW_CAS_logo.png",
+		"default_icon": "icons/DHBW_CAS_logo_blur-96.png",
 		"default_popup": "popup/mystique_popup.html"
 	},
 	
 	"options_ui": {
-    "page": "mystique_settings.html"
-  },
+
+  		"page": "mystique_settings.html"
+  	}
 }
