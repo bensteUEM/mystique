@@ -1,6 +1,8 @@
 // for testing purposes
 var urlList = ["https://www.google.de", "https://wikipedia.de", "https://ebay.de", "https://kansdf.de"]
 var i = 0
+var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
+var interval = 5000;
 
 function urlProvider() {
 	
@@ -18,6 +20,25 @@ browser.browserAction.onClicked.addListener(urlProvider);
 
 var tabId = -1
 var lastUrlOpened
+
+
+//ToDo Listener to cancel interval if plugin is turned off
+function callTimer(){
+	setInterval(callLibary,interval);
+	console.log(interval);
+}
+
+//function calls the libary to generate a random URL from the wordlist
+function callLibary(){
+
+	//ToDo place libary at the right place
+	urlLib.generateURL({
+		wordlist: wl
+		}).then(function(url) {
+			console.log(url);
+			openUrl(url);
+			});
+}
 
 /**
  * Opens the given URL in a new tab. If the function has already been called at least once 
