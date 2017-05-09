@@ -4,7 +4,7 @@ var i = 0
 
 function urlProvider() {
 	
-	openUrl(urlList[i++])
+	openUrl(urlList[i++], true)
 	
 	if (i == urlList.length) {
 		i = 0
@@ -13,74 +13,169 @@ function urlProvider() {
 
 browser.browserAction.onClicked.addListener(urlProvider);
 
-
 // functionality to open a given URL in a separate tab object 
 
 var tabId = -1
-var lastUrlOpened
+var windowId = -1
+var lastUrlRequested
+var runInNewWindow
 
 /**
  * Opens the given URL in a new tab. If the function has already been called at least once 
- * the tab that was initially created will be reused in every subsequent function call to open the given URL.  
+ * the tab that was initially created will be reused in every subsequent function call to open the given URL.
+ * The new tab can either be opened in the current window or in a new one alternatively.
  * 
  * @param url the URL to be opened
+ * @param inNewWindow specifies whether the URL shall be opened in a new window 
  */
-function openUrl(url) {
-	console.log("Button clicked - load URL in separate tab")
+function openUrl(url, inNewWindow) {
+	runInNewWindow = inNewWindow
+	
+	if(inNewWindow) {
+		
+		if (windowId < 0) {
+			console.log("Creating new window to run addon inside")
+			
+			lastUrlRequested = url
+			
+			windowCreating = browser.windows.create({
+				incognito: true,
+				state: "minimized"
+			});
+			
+			windowCreating.then(onWindowCreated, onError);
+		}
+		else {
+			maintainAddOnTab(url, windowId)
+		}
+	}
+	else {
+		maintainAddOnTab(url, null)
+	}
+}
+
+/**
+ * Helper function that keeps track of the single tab which is supposed to serve the add-on for URL calls only.
+ * Therefore a tab object is created, updated or reopened if necessary. 
+ * 
+ * @param url
+ * @param windowId
+ */
+function maintainAddOnTab(url, windowId) {
+	lastUrlRequested = url
 	
 	if (tabId < 0) {
-		var creating = browser.tabs.create({
-			url: url,
-			active: false,
-			index: 0,
-			pinned: true
-		});
+		if (windowId == null){
+			var creating = browser.tabs.create({
+				url: url,
+				active: false,
+				index: 0,
+				pinned: true
+			});
+		}
+		else {
+			var creating = browser.tabs.create({
+				url: url,
+				active: true,
+				index: 0,
+				windowId: windowId
+			});
+		}
 		
-		creating.then(onCreated, onError);
+		creating.then(onTabCreated, onError);
 	} else {
 		
 		var updatingTab = browser.tabs.update(tabId, {
 			url: url
 		});
 		
-		updatingTab.then(onUpdated, onError)
+		updatingTab.then(onTabUpdated, onUpdateTabError)
 	}
 }
 
-function onCreated(tab) {
+function injectContentScript(script){
+	
+	var executing = browser.tabs.executeScript(tabId, {
+		allFrames: true,
+		file: script,
+		runAt: "document_end"
+	});
+	
+	executing.then(onExecuted, onExecutionError)
+}
+
+function onExecuted(result){
+	console.log('Script has been injected sucessfully - ' + result)
+}
+
+function onExecutionError(error){
+	console.log('Error occured on script injection - ' + error)
+}
+
+function onWindowCreated(window) {
+	windowId = window.id
+	
+	console.log('New window created - ID: ' + window.id +
+			' / FOCUSED: ' + window.focused)
+			
+	maintainAddOnTab(lastUrlRequested, windowId)
+}
+
+function onTabCreated(tab) {
  
 	tabId = tab.id
-	lastUrlOpened = tab.url
 	
 	console.log('New tab created - ID: ' + tab.id +
 			' / SELECTED: ' + tab.selected +
 			' / PINNED: ' + tab.pinned +
 			' / TITLE: ' + tab.title +
 			' / STATUS: ' + tab.status +
+			' / WINDOW-ID: ' + tab.windowId +
 			' / URL: ' + tab.url)
+	
+	injectContentScript("/mystique.js")
 }
 
-function onUpdated(tab) {
-	
-	lastUrlOpened = tab.url
-	
+function onTabUpdated(tab) {
+		
 	console.log('Tab updated - ID: ' + tab.id +
 			' / SELECTED: ' + tab.selected +
 			' / PINNED: ' + tab.pinned +
 			' / TITLE: ' + tab.title +
 			' / STATUS: ' + tab.status +
+			' / WINDOW-ID: ' + tab.windowId +
 			' / URL: ' + tab.url)
+	
+	injectContentScript("/mystique.js")
+}
+
+function reopenTab(){
+	tabId = -1
+	openUrl(lastUrlRequested, runInNewWindow)
+}
+
+function onUpdateTabError(error){
+	console.log(error)
+	
+	if (runInNewWindow) {
+		// check whether the separate window still exists - otherwise open again 
+		getting = browser.windows.get(windowId)
+		
+		getting.then(reopenTab, onGetWindowError)
+	}
+	else {
+		reopenTab()
+	}
+}
+
+function onGetWindowError(error) {
+	console.log(error)
+	windowId = -1
+	reopenTab()
 }
 
 function onError(error) {
 	console.log(error)
-	 
-	if (tabId >=0 ){
-		// tab already existed when error occurred
-		console.log("Trying to create new tab")
-		tabId = -1
-		openUrl(lastUrlOpened)
-	}
 }
 
 //========================= USER AGENT Part
