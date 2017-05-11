@@ -9,7 +9,8 @@
 		"storage",
 		"webRequest",
 		"webRequestBlocking",
-		"http://useragentstring.com/*"
+		"http://useragentstring.com/*",
+		"<all_urls>"
   	],
 	
 	"description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
@@ -29,8 +30,7 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icons/DHBW_CAS_logo_blur-96.png",
-		"default_popup": "popup/mystique_popup.html"
+		"default_icon": "icons/DHBW_CAS_logo_blur-96.png"
 	},
 	
 	"options_ui": {

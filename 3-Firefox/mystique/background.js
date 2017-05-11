@@ -19,6 +19,8 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow
+var comPort
+var isInjected = false
 
 /**
  * Opens the given URL in a new tab. If the function has already been called at least once 
@@ -98,7 +100,7 @@ function injectContentScript(script){
 	var executing = browser.tabs.executeScript(tabId, {
 		allFrames: true,
 		file: script,
-		runAt: "document_end"
+		runAt: "document_idle"
 	});
 	
 	executing.then(onExecuted, onExecutionError)
@@ -106,7 +108,24 @@ function injectContentScript(script){
 
 function onExecuted(result){
 	console.log('Script has been injected sucessfully - ' + result)
+	//isInjected = true
+	
+//	comPort = browser.tabs.connect(tabId, {name: "background_script"})
+//	comPort.postMessage({action: "execute"})
+//	
+//	comPort.onMessage.addListener(messageReceived)
+	
+	browser.tabs.sendMessage(
+		tabId,
+		{action: "execute"}
+	).then(response => {
+		console.log("BackgroundScript - message received from content: " + response.response)
+	});
 }
+
+//function messageReceived(message){
+//	console.log("BackgroundScript - message received from content: " + message.response)
+//}
 
 function onExecutionError(error){
 	console.log('Error occured on script injection - ' + error)
@@ -131,9 +150,11 @@ function onTabCreated(tab) {
 			' / TITLE: ' + tab.title +
 			' / STATUS: ' + tab.status +
 			' / WINDOW-ID: ' + tab.windowId +
-			' / URL: ' + tab.url)
+			' / URL: ' + tab.url);
 	
-	injectContentScript("/mystique.js")
+	if(! isInjected){
+		injectContentScript("/mystique.js")
+	}
 }
 
 function onTabUpdated(tab) {
@@ -144,13 +165,17 @@ function onTabUpdated(tab) {
 			' / TITLE: ' + tab.title +
 			' / STATUS: ' + tab.status +
 			' / WINDOW-ID: ' + tab.windowId +
-			' / URL: ' + tab.url)
+			' / URL: ' + tab.url);
 	
-	injectContentScript("/mystique.js")
+	if(! isInjected){
+		injectContentScript("/mystique.js")
+	}
 }
 
 function reopenTab(){
 	tabId = -1
+	isInjected = false
+	
 	openUrl(lastUrlRequested, runInNewWindow)
 }
 
@@ -170,6 +195,7 @@ function onUpdateTabError(error){
 
 function onGetWindowError(error) {
 	console.log(error)
+	
 	windowId = -1
 	reopenTab()
 }
