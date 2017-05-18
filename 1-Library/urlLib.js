@@ -263,24 +263,26 @@ var urlLib = {
         })
     },
 
-    initializeConfig: function () {
+       initializeConfig: function () {
         return {
             "blacklist": ["bild"],
             "whishlist": [],
-            "personas": [{
-                "key": "Banker",
-                "Keywords": [
-                    { "word": "DAX", "score": 0 },
-                    { "word": "Börsenkurs", "score": 5 },
-                    { "word": "Aktien", "score": 10 },
-                    { "word": "Wechselkurse", "score": 3 },
-                    { "word": "Goldpreis", "score": 7 }
-                ],
-                "defaultURLs": [
-                    "http://www.boerse.de/",
-                    "http://www.faz.net/aktuell/finanzen/"
-                ]
-            }],
+            "personas": {                
+                "Banker": {
+                    "key": "Banker",
+                    "Keywords": [
+                        { "word": "DAX", "score": 0 },
+                        { "word": "Börsenkurs", "score": 5 },
+                        { "word": "Aktien", "score": 10 },
+                        { "word": "Wechselkurse", "score": 3 },
+                        { "word": "Goldpreis", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.boerse.de/",
+                        "http://www.faz.net/aktuell/finanzen/"
+                    ]
+                }
+            },
             "settings": {
                 "maxBytes": 5000,
                 "functionlity": true,
