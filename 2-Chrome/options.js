@@ -2,7 +2,8 @@
 function save_options() {
   var activate = document.getElementById('activate').checked;
   var followLinkOnDomainOnly = document.getElementById('followLinkOnDomainOnly').checked;
-  var maxBytes = document.getElementById('maxBytes').value;
+  var maxMegaBytes = document.getElementById('maxMegaBytes').value;
+  var maxBytes = (maxMegaBytes * (1024*1024));	// convert from MegaBytes to Bytes
   var numberOfLinksToClick_max = document.getElementById('numberOfLinksToClick_max').value;
   var linkDepth_max = document.getElementById('linkDepth_max').value;
   var minVisitTime = document.getElementById('minVisitTime').value;
@@ -38,11 +39,10 @@ function save_options() {
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-  // Use default value maxBytes = '100' and likesColor = true.
   chrome.storage.sync.get({
     activate: "true", 
 	followLinkOnDomainOnly: "false",
-	maxBytes: '100', 
+	maxBytes: '104857600', 
 	numberOfLinksToClick_max: 10, 
 	linkDepth_max: 5, 
 	minVisitTime: 3, 
@@ -55,7 +55,8 @@ function restore_options() {
 	usedBytes: 0
   }, function(items) {
     document.getElementById('activate').checked = items.activate;
-    document.getElementById('maxBytes').value = items.maxBytes;
+	var maxMegaBytes = (items.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
+	document.getElementById('maxMegaBytes').value = maxMegaBytes;
     document.getElementById('numberOfLinksToClick_max').value = items.numberOfLinksToClick_max;
     document.getElementById('linkDepth_max').value = items.linkDepth_max;
     document.getElementById('minVisitTime').value = items.minVisitTime;
@@ -65,9 +66,12 @@ function restore_options() {
     document.getElementById('whitelist').value = items.whitelist;
     document.getElementById('personas').value = items.personas;
 	document.getElementById('history').value = items.history;
-	document.getElementById('usedBytes').textContent = items.usedBytes;
+	console.log("Used bytes: " + items.usedBytes);
+	var sizeInMB = (items.usedBytes / (1024*1024)).toFixed(2);	// convert from Bytes to MegaBytes
+	document.getElementById('usedBytes').textContent = sizeInMB;
   });
 }
+
 
 // Clear History
 function clear_history(){
