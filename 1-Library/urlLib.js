@@ -47,14 +47,12 @@ var urlLib = {
               var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
               var searchWord = persona.keywords[randomNumber];
 
-              var resultList;
+              var resultList = [];
               var foundResult = false;
               var counter = 0;
 
               var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
-                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";
-              
-              console.log(urlCall);
+                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";                          
 
               while(foundResult == false && counter < 10)
               {
@@ -79,11 +77,15 @@ var urlLib = {
                           }
                       }, 
                       error: function(xhr, status, error){ 
+                          randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+                          searchWord = persona.keywords[randomNumber];
                           console.log("Error " + status + ": " + error);
                       } 
                   });
               }
               
+              console.log("updateLexicon - After While");
+
               persona.keywords.sort(urlLib._evolutionModule.wordSorter);
               
               return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
@@ -278,10 +280,10 @@ var urlLib = {
                     "key": "Banker",
                     "keywords": [
                         { "word": "DAX", "score": 0 },
-                        { "word": "Börsenkurs", "score": 5 },
+                        { "word": "Börse", "score": 5 },
                         { "word": "Aktien", "score": 10 },
-                        { "word": "Wechselkurse", "score": 3 },
-                        { "word": "Goldpreis", "score": 7 }
+                        { "word": "Kurs", "score": 3 },
+                        { "word": "Gold", "score": 7 }
                     ],
                     "defaultURLs": [
                         "http://www.boerse.de/",
