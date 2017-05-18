@@ -9,11 +9,11 @@
 var urlLib = {
 
     // This is our main public function which returns the final approved url
-    generateURL: function (config) {
+    generateURL: function (personaKey, config) {
         console.log("Received Config:");
         console.log(config);
         return new Promise((resolve, reject) => {
-            this._buildSearchString(config)
+            this._buildSearchString(personaKey, config)
                 .then(this._getUrl)
                 .then(this._approveUrl)
                 .then((url) => {
@@ -21,7 +21,7 @@ var urlLib = {
                         resolve(url);
                         return;
                     }
-                    resolve(this.generateURL(config));
+                    resolve(this.generateURL(personaKey, config));
                 }).catch((err) => {
                     console.log("Regenerate");
                     //return this.generateURL(config);
@@ -38,23 +38,52 @@ var urlLib = {
         wordSorter: function (a, b) {
             return a.score - b.score
         },
-        updateLexicon: function (config) {
+        updateLexicon: function personaKey(personaKey, config) {
             return new Promise(function (resolve, reject) {
-                //TODO: find new words (score can be zero in the first iteration)
+                
+              var language = "de_DE";
+              var persona = config.Persona[personaKey];
 
-                var wordsWithScores = [{
-                    name: "Geld",
-                    score: 2
-                }, {
-                    name: "Finanzen",
-                    score: 0
-                }];
-                var personaKey = "Bank";
-                wordsWithScores.sort(urlLib._evolutionModule.wordSorter);
-                    //
-                 urlLib._evolutionModule.insertWordIfFitEnough("Holz", wordsWithScores, personaKey).then(function(d) {
-                     resolve(d);
-                 });
+              var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+              var searchWord = persona.keywords[randomNumber];
+
+              var resultList;
+              var foundResult = false;
+              var counter = 0;
+
+              while(foundResult == false || counter < 10)
+              {
+                counter++;
+                  $.ajax({ 
+                      url: "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord
+                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30",
+                      success: function(data){ 
+                          if (data.length != 0) { 
+                              for (key in data.response) { 
+                                  var synonyms = data.response[key].list.synonyms.split("|");        
+                                  for (synonymKey in synonyms)
+                                  {
+                                      var result;
+                                      result.word = synonyms[synonymKey].split(" (");
+
+                                      resultList.push(result);
+                                      foundResult = true;
+                                  }
+                              } 
+                          }
+                      }, 
+                      error: function(xhr, status, error){ 
+                          console.log("Error " + status + ": " + error);
+                      } 
+                  });
+              }
+
+                persona.keywords.sort(urlLib._evolutionModule.wordSorter);
+                
+                return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
+                                      resolve(d);
+                                  })
+                                });
             });
         },
         insertWordIfFitEnough: function (word, words, masterWord) {
@@ -138,10 +167,10 @@ var urlLib = {
     },
 
 
-    _buildSearchString(config) {
+    _buildSearchString(personaKey, config) {
         return new Promise(function (resolve, reject) {
             console.log("build search string" + urlLib._evolutionModule);
-            urlLib._evolutionModule.updateLexicon(config).then(function (d) {
+            urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (d) {
                 console.log("updated lexicon");
                 var allWords = d.map(function(e) {
                     return e.name;
