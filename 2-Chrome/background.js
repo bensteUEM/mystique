@@ -22,6 +22,8 @@ var nextUrl = null;
 
 var tabId = null;
 
+var usedBytes = 0;
+
 // Wordlist copied from urlLib to call generateURL
 var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 
@@ -31,10 +33,14 @@ chrome.storage.sync.get({
     maxBytes: '100',
     linkCoveragePecentage: 10,
     linkDepth: 5,
+    usedBytes: 0, 
+    lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
     linkCoveragePecentage = items.linkCoveragePecentage;
+    usedBytes = items.usedBytes;
+
     run();
 });
 
@@ -131,6 +137,13 @@ chrome.runtime.onMessage.addListener(
 
         if (sender.tab.id === tabId && currLinkDepth > 0) {
             console.log("Links ", request.links);
+            console.log("Bytes ", request.bytes);
+
+            usedBytes += request.bytes;
+
+            chrome.storage.sync.set({
+                usedBytes: usedBytes
+            });
 
             // add one (maybe multiple) subUrls from the called url (randomized)
             let followLinks = processLinks(request.links);
