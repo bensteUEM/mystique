@@ -1,12 +1,12 @@
 // We need to get them from the urlLib later
-var urls = ["http://google.de", "http://amazon.de", "http://ebay.de"];
-var subUrl;
+var urls = [];
 
 // We need to load this from the settings
 var runMystique = true;
 
 var maxLinkDepth;
 var currLinkDepth = 0;
+var linkCoveragePecentage;
 
 // Reference for tab, which loads the given urls
 var urlWindow;
@@ -34,18 +34,23 @@ chrome.storage.sync.get({
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
+    linkCoveragePecentage = items.linkCoveragePecentage;
 });
 
 loadUrlInterval = setInterval(function () {
     if (runMystique) {
-        if (!subUrl || currLinkDepth >= maxLinkDepth) {
-            openUrl(urls[index]);
-            index++;
-            currLinkDepth = 0;
-        } else {
-            openUrl(subUrl);
-            currLinkDepth++;
+        if (urls.length === 0) {
+            urls.unshift({
+                url: "http://wikipedia.de",
+                level: maxLinkDepth
+            });
+            currLinkDepth = maxLinkDepth;
         }
+        let url = urls[0];
+        currLinkDepth =  url.level;
+        console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
+        urls = urls.splice(1, urls.length);
+        openUrl(url.url);
     } else {
         clearInterval(loadUrlInterval);
     }
@@ -98,16 +103,40 @@ let _updateTab = function (url) {
 };
 
 
+let processLinks = function (links) {
+    let followLinksCount = Math.floor(((linkCoveragePecentage / 100) * links.length) + 1);
+    let idx, url;
+    let i = 0;
+    let followLinks = [];
+
+    while (i < followLinksCount) {
+        idx = Math.floor(Math.random() * links.length);
+        url = links[idx];
+        // Check url
+        // urlLib._approveUrl(url);
+        followLinks.push(url);
+        i++;
+    }
+    return followLinks;
+};
+
 // Get HTML DOM from page -> TO BE Checked ...
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
 
-        if (sender.tab.id === tabId) {
+        if (sender.tab.id === tabId && currLinkDepth > 0) {
             console.log("Links ", request.links);
 
             // add one (maybe multiple) subUrls from the called url (randomized)
-
-            subUrl = request.links[getRandomInt(0, request.links.length)];
+            let followLinks = processLinks(request.links);
+            currLinkDepth--;
+            followLinks = followLinks.map((url) => {
+                return {
+                    url: url,
+                    level: currLinkDepth
+                };
+            });
+            urls = followLinks.concat(urls);
             console.log("Call: ", sender.url);
             var HistVar = "";
             chrome.storage.sync.get("history", function (items) {
