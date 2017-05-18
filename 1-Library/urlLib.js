@@ -51,11 +51,15 @@ var urlLib = {
               var foundResult = false;
               var counter = 0;
 
-              var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
-                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";                          
+                                   
 
-              while(foundResult == false && counter < 10)
-              {
+              //while(foundResult == false && counter < 10)
+              //{
+                randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+                searchWord = persona.keywords[randomNumber];
+                var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
+                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";     
+
                 counter++;
                   $.ajax({ 
                       url: urlCall,
@@ -64,44 +68,64 @@ var urlLib = {
                         console.log("updateLexicon - success");
                           if (data.length != 0) { 
                               for (key in data.response) { 
-                                  var synonyms = data.response[key].list.synonyms.split("|");        
-                                  for (synonymKey in synonyms)
+                                  var synonyms = data.response[key].list.synonyms.split("|");     
+
+                                  for (synonymKey in synonyms.slice(1,3))
                                   {
                                       var result = {};
-                                      result.word = synonyms[synonymKey].split(" (");
+                                      var tmp = synonyms[synonymKey].split(" (");
+                                      result.word = tmp[0];
+                                      result.score = 0;
 
                                       resultList.push(result);
                                       foundResult = true;
                                   }
-                              } 
+                              }
+
+                            //persona.keywords.sort(urlLib._evolutionModule.wordSorter);
+                            console.log(JSON.stringify(resultList));
+                            return Promise.each(resultList, item => { urlLib._evolutionModule.insertWordIfFitEnough(item.word, 
+                                                                          config, personaKey).then(function(newConfig) {
+                                                  console.log("New Config: " + JSON.stringify(newConfig.personas[personaKey].keywords));
+                                                  resolve(newConfig);
+                                              }).catch((e) => {
+                                                console.log("updateLexicon - Error ");
+                                                console.log("updateLexicon - Config: " + JSON.stringify(config.personas[personaKey].keywords));
+                                                resolve(config);
+                                              })
+                                            }).catch((e) => {
+                                                console.log("updateLexicon2 - Error ");
+                                                console.log("updateLexicon2 - Config: " + JSON.stringify(config.personas[personaKey].keywords));
+                                                resolve(config);
+                                            }); 
                           }
                       }, 
                       error: function(xhr, status, error){ 
-                          randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
-                          searchWord = persona.keywords[randomNumber];
                           console.log("Error " + status + ": " + error);
+                          resolve(config);
                       } 
                   });
-              }
-              
-              console.log("updateLexicon - After While");
+              //}
 
-              persona.keywords.sort(urlLib._evolutionModule.wordSorter);
-              
-              return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
-                                    resolve(d);
-                                })
-                              });
 
+
+          }).then(function(newConfig) {
+              console.log("New Config outer: " + JSON.stringify(newConfig.personas[personaKey].keywords));
+              resolve(newConfig);
+          }).catch((e) => {
+            console.log("updateLexicon - outer- Error " + JSON.stringify(config));
+            resolve(config);
           });
         },
-        insertWordIfFitEnough: function (word, words, masterWord) {
-
+        insertWordIfFitEnough: function (word, config, masterWord) {
+            console.log("Word: " + word);
+            console.log("keywords " + JSON.stringify(config.personas[masterWord].keywords));
             return new Promise(function (resolve, reject) {
 
                 var getNumOfResults = function (search) {
-                    return new Promise(function (resolve, reject) {
+                    return new Promise(function (resolve, reject) {                        
                         var url = "https://www.google.com/search?q=" + encodeURIComponent(search);
+                        console.log(url);
                         $.get({
                             url: url,
                             success: function (data) {
@@ -115,6 +139,8 @@ var urlLib = {
                                 resolve(numberOfResults);
                             },
                             error: function (e) {
+                                //reject(e);
+                                //resolve(config);
                                 reject(e);
                             }
                         });
@@ -125,6 +151,7 @@ var urlLib = {
 
 
                 function buildScoresIfNotThere(words) {
+
                     if (words[0].score > 0) {
                         // assume all scores are there
                         return new Promise(function (resolve, reject) {
@@ -133,9 +160,11 @@ var urlLib = {
                     }
                     //get all scores
                     return Promise.each(words, item => {
-                        return getNumOfResults(item.name + " " + masterWord)
+                        return getNumOfResults(item.word + " " + masterWord)
                             .then((score) => {
                                 item.score = score;
+                            }).catch((e) => {
+                              reject(e);
                             })
                     }).then((words) => {
                         console.log("Built all word scores!");
@@ -143,34 +172,44 @@ var urlLib = {
                         return Promise.resolve(words);
                     })
                 };
-
-                buildScoresIfNotThere(words).then(function () {
-                    console.log(JSON.stringify(words));
+                
+                console.log(JSON.stringify(config.personas[masterWord].keywords));
+                buildScoresIfNotThere(config.personas[masterWord].keywords).then(function (words) {
+                    console.log("buildScoresIfNotThere: " + JSON.stringify(words));
 
                     //get worst word in words
                     var worstWord = words.shift();
+                    console.log("buildScoresIfNotThere-Worstword: " + JSON.stringify(worstWord));
+
                     getNumOfResults(word + " " + masterWord).then(function (scoreNew) {
                         //give the oldWord a last chance
-                        getNumOfResults(worstWord.name + " " + masterWord).then(function (scoreOld) {
-                            //console.log("Fitnessfunction("+word+"): "+worstWord .name+" "+masterWord+": "+scoreOld+ " vs. "+word +" "+masterWord+": "+scoreNew);
+                        getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) {
+                            //console.log("Fitnessfunction("+word+"): "+worstWord .word+" "+masterWord+": "+scoreOld+ " vs. "+word +" "+masterWord+": "+scoreNew);
                             if (scoreNew > scoreOld) {
                                 words.push({
                                     name: word,
                                     score: scoreNew
                                 });
-                                console.log("Fitnessfunction: " + worstWord.name + " replaced by " + word + "(" + scoreNew + ")");
+                                console.log("Fitnessfunction: " + worstWord.word + " replaced by " + word + "(" + scoreNew + ")");
                             } else {
                                 //update oldWord
                                 worstWord.score = scoreOld;
                                 words.push(worstWord);
-                                console.log("Fitnessfunction: " + word + "(" + scoreNew + ")" + " was not able to replace " + worstWord.name);
+                                console.log("Fitnessfunction: " + word + "(" + scoreNew + ")" + " was not able to replace " + worstWord.word);
                             }
                             words.sort(urlLib._evolutionModule.wordSorter);
-                            resolve(words);
+                            config.personas[masterWord].keywords = words;
+                            resolve(config);
                         });
+                    }).catch((e) => {
+                     // resolveO(config);
+                     reject(e);
                     });
                 });
 
+            }).catch((e) => {        
+                console.log("insertWordIfFitEnough - error ");
+                resolve(config);
             });
         }
     },
@@ -178,14 +217,20 @@ var urlLib = {
 
     _buildSearchString(personaKey, config) {
         return new Promise(function (resolve, reject) {
-            console.log("build search string" + urlLib._evolutionModule);
-            urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (d) {
-                console.log("updated lexicon");
-                var allWords = d.map(function (e) {
-                    return e.name;
-                })
-                var searchString = allWords.join(" and ");
-                resolve(searchString);
+            urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (newConfig) {
+                console.log("updated lexicon " + JSON.stringify(newConfig));
+
+                //TODO: Choose random word
+                var searchString = newConfig.personas[personaKey].keywords[0];
+                console.log(searchString.word);
+                resolve(searchString.word);
+            }).catch((e) => {
+                console.log("_buildSearchString - error " + JSON.stringify(e));
+                
+                //TODO: Choose random word
+                var searchString = config.personas[personaKey].keywords[0];
+                console.log(searchString.word);
+                resolve(searchString.word);
             });
         });
 
