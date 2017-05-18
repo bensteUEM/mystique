@@ -84,6 +84,7 @@ var urlLib = {
                                       resolve(d);
                                   })
                                 });
+
             });
         },
         insertWordIfFitEnough: function (word, words, masterWord) {
@@ -172,7 +173,7 @@ var urlLib = {
             console.log("build search string" + urlLib._evolutionModule);
             urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (d) {
                 console.log("updated lexicon");
-                var allWords = d.map(function(e) {
+                var allWords = d.map(function (e) {
                     return e.name;
                 })
                 var searchString = allWords.join(" and ");
@@ -260,6 +261,36 @@ var urlLib = {
             return;
 
         })
+    },
+
+    initializeConfig: function () {
+        return {
+            "blacklist": ["bild"],
+            "whishlist": [],
+            "personas": [{
+                "key": "Banker",
+                "Keywords": [
+                    { "word": "DAX", "score": 0 },
+                    { "word": "Börsenkurs", "score": 5 },
+                    { "word": "Aktien", "score": 10 },
+                    { "word": "Wechselkurse", "score": 3 },
+                    { "word": "Goldpreis", "score": 7 }
+                ],
+                "defaultURLs": [
+                    "http://www.boerse.de/",
+                    "http://www.faz.net/aktuell/finanzen/"
+                ]
+            }],
+            "settings": {
+                "maxBytes": 5000,
+                "functionlity": true,
+                "tracing": true,
+                "followLinkOnDomainOnly": true,
+                "linkDepth_max": 5,
+                "maxNumberOfLinksToClick": 10,
+                "maxVisitTime": 10
+            }
+        };
     }
 
 
