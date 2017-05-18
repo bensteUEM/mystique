@@ -1,63 +1,121 @@
 <!DOCTYPE html>
 <html>
+<!-- TODO: Hilftetext, last updated, Intervalldauer -->
+<!-- initializeConfig() to get initial config object with default values -> only if settings object does not yet exist-->
+<!-- generateURL(selectedPersonaKey, completeConfig);
+<!-- check min and max in JS file -->
 <head>
-<title>Settings - Mystique</title>
-<center><img src="icon.png" style="width: 40px;" /></center>
+	<title>Settings - Mystique</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="options.css"/>
 </head>
 <body>
+<div>
+<div style='text-align: center;'>
+<img src="icon.png" style="width: 60px;" />
+</div>
 <h3>Settings for the Mystique extension</h3>
-<label>Activate extension:
-<input type='checkbox' name='activate' id='activate'/>
-</label>
+<div class="settings_item">
+	<div class="label">
+		<label>Activate extension:
+			<input type='checkbox' name='activate' id='activate'/>
+		</label>
+	</div>
+	<div class="description">Check if you want to activate the extension</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Same domain only:
+			<input type='checkbox' name='followLinkOnDomainOnly' id='followLinkOnDomainOnly'/>
+		</label>
+	</div>
+	<div class="description">Follow only links that lead to a page of the same domain</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Maximum of bytes:
+			<br>
+			<input type='text' name='maxBytes' id='maxBytes'/>
+		</label>
+	</div>
+	<div class="description">Maximum of bytes that can be transmitted when accessing a new domain.</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Follow % of links on page
+			<br>
+			<input type='number' name='numberOfLinksToClick_max' id='numberOfLinksToClick_max'/>
+		</label>
+	</div>
+	<div class="description">Follow only links that lead to a page of the same domain</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Follow links up to x times
+			<br>
+			<input type='number' name='linkDepth_max' id='linkDepth_max'/>
+		</label>
+	</div>
+	<div class="description">Follow only links that lead to a page of the same domain</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Maximum visit time
+			<br>
+			<input type='number' name='maxVisitTime' id='maxVisitTime'/>
+		</label>
+	</div>
+	<div class="description">Maximum time before the addon automatically clicks on the next link</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Blacklist:
+			<br>
+			<textarea id='blacklist'></textarea>
+		</label>
+	<div class="description">Do not visit URLs containing these words</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Whitelist:
+			<br>
+			<textarea id='whitelist'></textarea>
+		</label>
+	</div>
+	<div class="description">Prefer URLs containing these words</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+	<label>Personas:
+		<br>
+		<select id="personas">
+		 <option value="0">Nerd</option>
+		 <option value="1">Banker</option>
+		 <option value="2">Scientist</option>
+		 <option value="3">Athlete</option>
+		</select>
+	</label>
+	<div class="description">Emulate a person with this typical profile (preferred keywords in brackets)</div>
+	</div>
+</div>
 <br>
-<label>Follow links on same domain only:
-<input type='checkbox' name='linksOnDomainOnly' id='linksOnDomainOnly'/>
-</label>
-<br><label>Maximum of bytes:
 <br>
-<input type='text' name='maxBytes' id='maxBytes'/>
-</label>
-<br>
-<label>Follow % of links on page
-<br>
-<input type='number' name='linkCoveragePecentage' id='linkCoveragePecentage'/>
-</label>
-<br>
-<label>Follow links up to x times
-<br>
-<input type='number' name='linkDepth' id='linkDepth'/>
-</label>
-<br>
-<label>
-Blacklist (do not visit URLs containing these words):
-<br>
-<textarea id='blacklist'></textarea>
-</label>
-<br>
-Whitelist (prefer URLs containing these words):
-<br>
-<textarea id='whitelist'></textarea>
-<br>
-Personas:
-<br>
-<select id="personas">
- <option value="0">Nerd</option>
- <option value="1">Banker</option>
- <option value="2">Scientist</option>
- <option value="3">Athlete</option>
-</select>
 <br>
 <br>
 <div id="status"></div>
 <button id="save">Save</button>
 <br>
 <br>
-History:
+<button id="toggleHistory">Show history </button>
+<div id='history' style='visibility: hidden;'>
+<h3>History:</h3>
 <br>
-<textarea id='history'></textarea>
+<textarea style="width: 100%; height: 200px;" id='history'></textarea>
 <br>
-<button id="clear">Clear</button><button id="set">Set</button>
 <br>
+<button id="clear">Clear</button>
+<br>
+</div>
 <script src="options.js"></script>
 </body>
 </html>
