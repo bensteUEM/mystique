@@ -287,6 +287,132 @@ var urlLib = {
                         "http://www.boerse.de/",
                         "http://www.faz.net/aktuell/finanzen/"
                     ]
+                },
+                "Familie": {
+                    "key": "Familie",
+                    "keywords": [
+                        { "word": "Kindergarten", "score": 0 },
+                        { "word": "Windeln", "score": 0 },
+                        { "word": "Spielzeug", "score": 0 },
+                        { "word": "Kinderbuch", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                    ],
+                    "defaultURLs": []
+                },
+                "Fruehrentner": {
+                    "key": "Fruehrentner",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },                
+                "Student": {
+                    "key": "Student",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Fußballfan": {
+                    "key": "",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Fitnessjunkie": {
+                    "key": "Fitnessjunkie",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Professor": {
+                    "key": "Professor",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Aktionaer": {
+                    "key": "Aktionaer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Lottospieler": {
+                    "key": "Lottospieler",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Snowboarder": {
+                    "key": "Snowboarder",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Yachtfahrer": {
+                    "key": "Yachtfahrer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "DINKS": {
+                    "key": "DINKS",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Ingenieur": {
+                    "key": "Ingenieur",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Lehrer": {
+                    "key": "Lehrer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Onlineshopper": {
+                    "key": "Onlineshopper",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Hundebesitzer": {
+                    "key": "Hundebesitzer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Bauer": {
+                    "key": "Bauer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Surfer": {
+                    "key": "Surfer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
                 }
             },
             "settings": {
