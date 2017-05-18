@@ -2,7 +2,7 @@
 
 	"manifest_version": 2,
 	"name": "Mystique-FF",
-	"version": "0.3",
+	"version": "0.4",
 	
 	"permissions": [
   		"tabs",
@@ -16,12 +16,12 @@
 	"description": "Browse the web while your user profile is obscured by fake activity!/n Next-generation anti-tracking tool features:   Random traffic is generated to obscure your real user profile You pick what your fake profile should look like Illegal traffic is prevented by using up-to-date blacklists. If you have no data flat: define the limit of traffic generated!/n/nSchütze Deine Privatsphäre mithilfe dieses Addons! Features dieses Next-Gen Anti-Tracking-Tools: /n/n Zufallsgenerator erzeugt Fake-Seitenaufrufe /n Du definierst wie Dein Fake-Profil aussehen soll/n Mithilfe einer aktuellen Blacklist werden illegale Seitenbesuche verhindert/n Falls Du keine Daten-Flatrate hast: definiere Dein eigenes Datenlimit!/nExperimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
 
 	"icons": {
-		"48": "icons/DHBW_CAS_logo_blur-48.png",
-		"96": "icons/DHBW_CAS_logo_blur-96.png"
+		"48": "icons/logo-48.png",
+		"96": "icons/logo-96.png"
 	},
-	
-	"content_scripts": [{
-		"matches": ["*://*.wiedenest.de/*"],
+
+  	"content_scripts": [{
+		"matches": ["*://*/*"],
 		"js": ["mystique.js"]
 	}],
   	
@@ -30,7 +30,7 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icons/DHBW_CAS_logo_blur-96.png"
+		"default_icon": "icons/logo-96.png"
 	},
 	
 	"options_ui": {
