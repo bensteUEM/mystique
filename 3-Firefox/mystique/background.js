@@ -25,9 +25,13 @@ function notify(message, sender, sendResponse){
 		
 		setTimeout(selectNextLink,5000);
 	}
-	
+
 	function selectNextLink() {
-		openUrl(message[3], false)
+        urls = [];
+        urls = getLinksDomainPercentage(message,false,0.1)
+        pickIndex = Math.floor(Math.random()*urls.length)
+
+		openUrl(urls[pickIndex], false)
 	}
 }
 
@@ -148,9 +152,7 @@ function maintainAddOnTab(url, windowId) {
 				' / STATUS: ' + tab.status +
 				' / WINDOW-ID: ' + tab.windowId +
 				' / URL: ' + tab.url);
-		
-		
-		
+
 		//injectContentScript("/mystique.js")
 	}
 
@@ -258,8 +260,7 @@ function getLinksDomain(followLinkOnDomainOnly){
 @param document link
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-function getLinksDomainPercentage(followLinkOnDomainOnly,numberOfLinksToClick_max){
-	var allLinks = getLinksDomain(followLinkOnDomainOnly);
+function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,numberOfLinksToClick_max){
 	var array = [];
 	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
 	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
