@@ -1,20 +1,22 @@
 // Saves options to chrome.storage
 function save_options() {
   var activate = document.getElementById('activate').checked;
-  var linksOnDomainOnly = document.getElementById('linksOnDomainOnly').checked;
+  var followLinkOnDomainOnly = document.getElementById('followLinkOnDomainOnly').checked;
   var maxBytes = document.getElementById('maxBytes').value;
-  var linkCoveragePecentage = document.getElementById('linkCoveragePecentage').value;
-  var linkDepth = document.getElementById('linkDepth').value;
+  var numberOfLinksToClick_max = document.getElementById('numberOfLinksToClick_max').value;
+  var linkDepth_max = document.getElementById('linkDepth_max').value;
+  var maxVisitTime = document.getElementById('maxVisitTime').value;
   var blacklist = document.getElementById('blacklist').value;
   var whitelist = document.getElementById('whitelist').value;
   var personas = document.getElementById('personas').value;
   var history = document.getElementById('history').value;
   chrome.storage.sync.set({
     activate: activate, 
-	linksOnDomainOnly: linksOnDomainOnly, 
+	followLinkOnDomainOnly: followLinkOnDomainOnly, 
 	maxBytes: maxBytes, 
-	linkCoveragePecentage: linkCoveragePecentage, 
-	linkDepth: linkDepth, 
+	numberOfLinksToClick_max: numberOfLinksToClick_max, 
+	linkDepth_max: linkDepth_max, 
+	maxVisitTime: maxVisitTime, 
 	blacklist: blacklist, 
 	whitelist: whitelist, 
 	personas: personas,
@@ -35,20 +37,21 @@ function restore_options() {
   // Use default value maxBytes = '100' and likesColor = true.
   chrome.storage.sync.get({
     activate: "true", 
-	linksOnDomainOnly: "false",
+	followLinkOnDomainOnly: "false",
 	maxBytes: '100', 
-	linkCoveragePecentage: 10, 
-	linkDepth: 5, 
+	numberOfLinksToClick_max: 10, 
+	linkDepth_max: 5, 
+	maxVisitTime: 30, 
 	blacklist: "", 
 	whitelist: "", 
 	personas: 1,
 	history: "",
   }, function(items) {
     document.getElementById('activate').checked = items.activate;
-    document.getElementById('activate').checked = items.activate;
     document.getElementById('maxBytes').value = items.maxBytes;
-    document.getElementById('linkCoveragePecentage').value = items.linkCoveragePecentage;
-    document.getElementById('linkDepth').value = items.linkDepth;
+    document.getElementById('numberOfLinksToClick_max').value = items.numberOfLinksToClick_max;
+    document.getElementById('linkDepth_max').value = items.linkDepth_max;
+    document.getElementById('maxVisitTime').value = items.maxVisitTime;
     document.getElementById('blacklist').value = items.blacklist;
     document.getElementById('whitelist').value = items.whitelist;
     document.getElementById('personas').value = items.personas;
@@ -68,24 +71,20 @@ function clear_history(){
     }, 750);	
 });
 }
-// Fill History
-function fill_history(){
-	var history = document.getElementById('history').value;
-	history = history + "\n" + "test";	
-	chrome.storage.sync.set({
-		history: history
-	}, function() {
-	// Update history box
-	document.getElementById('history').value= history;
-    //setTimeout(function() {
-    //  document.getElementById('history').value= "";
-    //}, 750);	
-});
+
+function toggle_history(){
+	if(document.getElementById('history').style.visibility == 'hidden')
+	{
+		document.getElementById('history').style.visibility='visible';
+		document.getElementById('toggleHistory').textContent='Hide history';
+	}
+	else 
+	{
+		document.getElementById('history').style.visibility='hidden';
+		document.getElementById('toggleHistory').textContent='Show history';
+	}
 }
 document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click',
-    save_options);
-document.getElementById('clear').addEventListener('click',
-    clear_history);
-document.getElementById('set').addEventListener('click',
-    fill_history);
+document.getElementById('save').addEventListener('click', save_options);
+document.getElementById('clear').addEventListener('click', clear_history);
+document.getElementById('toggleHistory').addEventListener('click', toggle_history);
