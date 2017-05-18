@@ -35,34 +35,39 @@ chrome.storage.sync.get({
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
     linkCoveragePecentage = items.linkCoveragePecentage;
+    run();
 });
 
-loadUrlInterval = setInterval(function () {
-    if (runMystique) {
-        if (urls.length === 0) {
-            urls.unshift({
-                url: "http://wikipedia.de",
-                level: maxLinkDepth
-            });
-            currLinkDepth = maxLinkDepth;
+let run = function () {
+    loadUrlInterval = setInterval(function () {
+        if (runMystique) {
+            if (urls.length === 0) {
+                urls.unshift({
+                    url: "http://wikipedia.de",
+                    level: maxLinkDepth
+                });
+                currLinkDepth = maxLinkDepth;
+            }
+            let url = urls[0];
+            currLinkDepth = url.level;
+            console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
+            urls = urls.splice(1, urls.length);
+            openUrl(url.url);
+            intervalDuration = 10000;
+        } else {
+            clearInterval(loadUrlInterval);
         }
-        let url = urls[0];
-        currLinkDepth =  url.level;
-        console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
-        urls = urls.splice(1, urls.length);
-        openUrl(url.url);
-    } else {
-        clearInterval(loadUrlInterval);
-    }
 
-    /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
-     if(url) {
-     urls.push(url);
-     }
-     }).catch((err) => {
-     console.log("Error ", err);
-     }); */
-}, intervalDuration);
+        /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
+         if(url) {
+         urls.push(url);
+         }
+         }).catch((err) => {
+         console.log("Error ", err);
+         }); */
+    }, intervalDuration);
+
+};
 
 let openUrl = function (url, config) {
     return _getOrCreateTabId()
