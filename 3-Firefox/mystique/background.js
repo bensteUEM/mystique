@@ -22,13 +22,17 @@ var tabId = -1
 var lastUrlOpened
 
 
-//ToDo Listener to cancel interval if plugin is turned off
+/**
+* ToDo Listener to cancel interval if plugin is turned off
+*/
 function callTimer(){
-	setInterval(callLibary,interval);
+	setInterval(urlProvider,interval);
 	console.log(interval);
 }
 
-//function calls the libary to generate a random URL from the wordlist
+/**
+* function calls the libary to generate a random URL from the wordlist
+*/
 function callLibary(){
 
 	//ToDo place libary at the right place
@@ -38,6 +42,25 @@ function callLibary(){
 			console.log(url);
 			openUrl(url);
 			});
+}
+//Testing purpose function whitelisting
+var wert= "//...dadd"
+
+/**
+* Checks the url if it fits the whitelist conditions to disregard 
+* relative links thta start with text only
+*	@param url the URL to be checked
+*/
+function whiteListing(url){
+       const pattern = /(^http)|(^https)|[^/]|[^./]|[^../]|(^javascript)/;
+       let match = pattern.exec(wert);
+       if (match)
+        //ToDo call the openurl function  
+		console.log("da");
+	  else{
+		  //ToDo What happens if the whitelist check is not positive
+		  console.log("weg");
+	  }
 }
 
 /**
