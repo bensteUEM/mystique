@@ -59,7 +59,6 @@ var urlLib = {
               while(foundResult == false && counter < 10)
               {
                 counter++;
-                console.log("updateLexico" + counter);
                   $.ajax({ 
                       url: urlCall,
                       type: "GET",
@@ -70,7 +69,7 @@ var urlLib = {
                                   var synonyms = data.response[key].list.synonyms.split("|");        
                                   for (synonymKey in synonyms)
                                   {
-                                      var result;
+                                      var result = {};
                                       result.word = synonyms[synonymKey].split(" (");
 
                                       resultList.push(result);
