@@ -19,6 +19,11 @@
 		"48": "icons/logo-48.png",
 		"96": "icons/logo-96.png"
 	},
+
+  	"content_scripts": [{
+		"matches": ["*://*/*"],
+		"js": ["mystique.js"]
+	}],
   	
   	"background": {
 		"scripts": ["urlLib.js","background.js"]

@@ -6,14 +6,30 @@ var interval = 5000;
 
 function urlProvider() {
 	
-	openUrl(urlList[i++], true)
+//	openUrl(urlList[i++], false)
+//	
+//	if (i == urlList.length) {
+//		i = 0
+//	}
 	
-	if (i == urlList.length) {
-		i = 0
-	}
+	openUrl("https://www.google.de", false)
 }
 
+browser.runtime.onMessage.addListener(notify)
+//browser.browserAction.onClicked.addListener(urlProvider);
 browser.browserAction.onClicked.addListener(urlProvider);
+
+function notify(message, sender, sendResponse){
+	if (sender.tab.id == tabId) {
+		console.log(message.length + " Links received from CS")
+		
+		setTimeout(selectNextLink,5000);
+	}
+	
+	function selectNextLink() {
+		openUrl(message[3], false)
+	}
+}
 
 // functionality to open a given URL in a separate tab object 
 
@@ -21,8 +37,6 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow
-var comPort
-var isInjected = false
 
 
 //ToDo Listener to cancel interval if plugin is turned off
@@ -75,6 +89,15 @@ function openUrl(url, inNewWindow) {
 	else {
 		maintainAddOnTab(url, null)
 	}
+	
+	function onWindowCreated(window) {
+		windowId = window.id
+		
+		console.log('New window created - ID: ' + window.id +
+				' / FOCUSED: ' + window.focused)
+				
+		maintainAddOnTab(lastUrlRequested, windowId)
+	}
 }
 
 /**
@@ -107,13 +130,56 @@ function maintainAddOnTab(url, windowId) {
 		
 		creating.then(onTabCreated, onError);
 	} else {
-		
 		var updatingTab = browser.tabs.update(tabId, {
 			url: url
 		});
 		
 		updatingTab.then(onTabUpdated, onUpdateTabError)
 	}
+	
+	function onTabCreated(tab) {
+		 
+		tabId = tab.id
+		
+		console.log('New tab created - ID: ' + tab.id +
+				' / SELECTED: ' + tab.selected +
+				' / PINNED: ' + tab.pinned +
+				' / TITLE: ' + tab.title +
+				' / STATUS: ' + tab.status +
+				' / WINDOW-ID: ' + tab.windowId +
+				' / URL: ' + tab.url);
+		
+		
+		
+		//injectContentScript("/mystique.js")
+	}
+
+	function onTabUpdated(tab) {
+		
+		console.log('Tab updated - ID: ' + tab.id +
+				' / SELECTED: ' + tab.selected +
+				' / PINNED: ' + tab.pinned +
+				' / TITLE: ' + tab.title +
+				' / STATUS: ' + tab.status +
+				' / WINDOW-ID: ' + tab.windowId +
+				' / URL: ' + tab.url);
+		
+		//injectContentScript("/mystique.js")
+	}
+	
+	function onError(error){
+		console.log(error)
+	}
+}
+
+function sendMessageToContentScript(command){
+	
+	browser.tabs.sendMessage(
+			tabId,
+			{action: command}
+		).then(response => {
+			console.log("BackgroundScript - message received from content: " + response.response)
+		});
 }
 
 function injectContentScript(script){
@@ -121,82 +187,20 @@ function injectContentScript(script){
 	var executing = browser.tabs.executeScript(tabId, {
 		allFrames: true,
 		file: script,
-		runAt: "document_idle"
+		runAt: "document_start"
 	});
 	
-	executing.then(onExecuted, onExecutionError)
-}
-
-function onExecuted(result){
-	console.log('Script has been injected sucessfully - ' + result)
-	//isInjected = true
+	executing.then(onExecuted, onError)
 	
-//	comPort = browser.tabs.connect(tabId, {name: "background_script"})
-//	comPort.postMessage({action: "execute"})
-//	
-//	comPort.onMessage.addListener(messageReceived)
-	
-	browser.tabs.sendMessage(
-		tabId,
-		{action: "execute"}
-	).then(response => {
-		console.log("BackgroundScript - message received from content: " + response.response)
-	});
-}
-
-//function messageReceived(message){
-//	console.log("BackgroundScript - message received from content: " + message.response)
-//}
-
-function onExecutionError(error){
-	console.log('Error occured on script injection - ' + error)
-}
-
-function onWindowCreated(window) {
-	windowId = window.id
-	
-	console.log('New window created - ID: ' + window.id +
-			' / FOCUSED: ' + window.focused)
-			
-	maintainAddOnTab(lastUrlRequested, windowId)
-}
-
-function onTabCreated(tab) {
- 
-	tabId = tab.id
-	
-	console.log('New tab created - ID: ' + tab.id +
-			' / SELECTED: ' + tab.selected +
-			' / PINNED: ' + tab.pinned +
-			' / TITLE: ' + tab.title +
-			' / STATUS: ' + tab.status +
-			' / WINDOW-ID: ' + tab.windowId +
-			' / URL: ' + tab.url);
-	
-	if(! isInjected){
-		injectContentScript("/mystique.js")
-	}
-}
-
-function onTabUpdated(tab) {
+	function onExecuted(result){
+		console.log('Script has been injected sucessfully - ' + result)
 		
-	console.log('Tab updated - ID: ' + tab.id +
-			' / SELECTED: ' + tab.selected +
-			' / PINNED: ' + tab.pinned +
-			' / TITLE: ' + tab.title +
-			' / STATUS: ' + tab.status +
-			' / WINDOW-ID: ' + tab.windowId +
-			' / URL: ' + tab.url);
-	
-	if(! isInjected){
-		injectContentScript("/mystique.js")
+		sendMessageToContentScript("execute")
 	}
 }
 
 function reopenTab(){
 	tabId = -1
-	isInjected = false
-	
 	openUrl(lastUrlRequested, runInNewWindow)
 }
 
@@ -212,13 +216,13 @@ function onUpdateTabError(error){
 	else {
 		reopenTab()
 	}
-}
-
-function onGetWindowError(error) {
-	console.log(error)
 	
-	windowId = -1
-	reopenTab()
+	function onGetWindowError(error) {
+		console.log(error)
+		
+		windowId = -1
+		reopenTab()
+	}
 }
 
 function onError(error) {

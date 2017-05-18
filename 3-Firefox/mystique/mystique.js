@@ -1,52 +1,30 @@
-//SAMPLE Code in order to run the functionality
- 
-//var links = getLinksDomainPercentage(true,0.05);
-//selectLink(links);
+//=========================================== TESTING
 
-//Should select one link to be opened
+
+/**
+Testing method for validating selectLink
+*/
 function selectLink(links){
 	console.log("Returned "+links.length+" links");
 	
-	for (link of links){
-		console.log(link);
-	}
-	
-	//window.alert("Returned "+links.length+" links");
-	//alert(links);
+	logLinks(links)
+
 	//TODO this is not implemented yet
 }
 
-//=========================================== 
-//=========================================== 
-//=========================================== 
-//===========================================  
+/**
+Logging method for testing validating selectLink
+*/
+function logLinks(links){
+	for (link of links){
+		console.log(link);
+	}
+}
 
-//var comPort
-//
-//browser.runtime.onConnect.addListener(connected)
-//
-//function connected(port){
-//	console.log("Content script received connection from background script")	
-//	comPort = port
-//	
-//	port.postMessage({response: "ContentScript - This is me"})
-//	port.onMessage.addListener(messageReceived)
-//	
-//	document.addEventListener("DOMContentLoaded", domLoaded)
-//}
-//
-//function messageReceived(message){
-//	console.log("ContentScript - message received from background: " + message.action)
-//	
-//	if (message.action == "execute"){
-//		var links = getLinksDomainPercentage(true,0.05);
-//		selectLink(links);
-//		
-//		console.log("ContentScript - action triggered")
-//	}
-//}
+//=========================================== START
 
 browser.runtime.onMessage.addListener(notify)
+window.onload = run()
 
 function notify(message, sender, sendResponse){
 	console.log("ContentScript - message received from background: " + message)
@@ -57,11 +35,13 @@ function notify(message, sender, sendResponse){
 	}
 }
 
+/**
+Run method which extracts all links and sends to background */
 function run(){
 	console.log("ContentScript - action triggered")
 	
-	var links = getLinksDomainPercentage(true,0.05);
-	selectLink(links);
+	var links = getLinks();
+	var sending = browser.runtime.sendMessage(links);
 }
 
 /**
@@ -74,6 +54,8 @@ function getLinks(){
 	for(var i=0; i<aTags.length; i++) {
 		linksDetected.push(aTags[i].href);
 	}
+	console.log("Total links found: " + linksDetected.length)
+
 	return linksDetected;
 }
 
