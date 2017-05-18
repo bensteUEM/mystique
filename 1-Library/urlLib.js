@@ -270,7 +270,7 @@ var urlLib = {
             "personas": {                
                 "Banker": {
                     "key": "Banker",
-                    "Keywords": [
+                    "keywords": [
                         { "word": "DAX", "score": 0 },
                         { "word": "Börsenkurs", "score": 5 },
                         { "word": "Aktien", "score": 10 },
