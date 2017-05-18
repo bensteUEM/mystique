@@ -7,7 +7,8 @@ var runMystique = true;
 var maxLinkDepth;
 var currLinkDepth = 0;
 var linkCoveragePecentage;
-
+var minVisitTime;
+var maxVisitTime;
 // Reference for tab, which loads the given urls
 var urlWindow;
 // count index to get the current url from the urls lib
@@ -22,6 +23,7 @@ var nextUrl = null;
 
 var tabId = null;
 
+var maxBytes = 0;
 var usedBytes = 0;
 
 // Wordlist copied from urlLib to call generateURL
@@ -29,21 +31,30 @@ var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad"
 
 chrome.storage.sync.get({
     activate: "true",
-    linksOnDomainOnly: "false",
+    followLinkOnDomainOnly: "false",
     maxBytes: '100',
     linkCoveragePecentage: 10,
-    linkDepth: 5,
-    usedBytes: 0, 
+    linkDepth_max: 5,
+    minVisitTime: 3,
+    maxVisitTime: 10,
+    maxPageViewsFromRoot: 30,
+    blacklist: "",
+    whitelist: "",
+    personas: 1,
+    history: "",
+    usedBytes: 0,
     lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
+    maxBytes = items.maxBytes;
+
     linkCoveragePecentage = items.linkCoveragePecentage;
     if(items.lastSyncDate === getYesterday(items.lastSyncDate)) {
-        usedBytes = 0; 
+        usedBytes = 0;
         chrome.storage.sync.set({lastSyncDate: new Date() });
     }  else {
-        usedBytes = items.lastSyncDate;
+        usedBytes = items.usedBytes;
     }
 
     run();
@@ -52,7 +63,7 @@ chrome.storage.sync.get({
 let run = function () {
 
     loadUrlInterval = setInterval(function () {
-        if (runMystique) {
+        if (runMystique && (usedBytes <= maxBytes)) {
             if (urls.length === 0) {
                 urls.unshift({
                     url: "http://wikipedia.de",
@@ -77,8 +88,7 @@ let run = function () {
          }).catch((err) => {
          console.log("Error ", err);
          }); */
-    }, intervalDuration);
-
+    })
 };
 
 let openUrl = function (url, config) {
@@ -141,7 +151,8 @@ let processLinks = function (links) {
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
 
-        if (sender.tab.id === tabId && currLinkDepth > 0) {
+        if (sender.tab.id === tabId) {
+            if (currLinkDepth > 0) {
             console.log("Links ", request.links);
             console.log("Bytes ", request.bytes);
 
@@ -151,30 +162,31 @@ chrome.runtime.onMessage.addListener(
                 usedBytes: usedBytes
             });
 
-            // add one (maybe multiple) subUrls from the called url (randomized)
-            let followLinks = processLinks(request.links);
-            currLinkDepth--;
-            followLinks = followLinks.map((url) => {
-                return {
-                    url: url,
-                    level: currLinkDepth
-                };
-            });
-            urls = followLinks.concat(urls);
-            console.log("Call: ", sender.url);
-            var HistVar = "";
-            chrome.storage.sync.get("history", function (items) {
-                HistVar = items.history;
-                console.log("History: ", HistVar);
-            });
+                // add one (maybe multiple) subUrls from the called url (randomized)
+                let followLinks = processLinks(request.links);
+                currLinkDepth--;
+                followLinks = followLinks.map((url) => {
+                    return {
+                        url: url,
+                        level: currLinkDepth
+                    };
+                });
+                urls = followLinks.concat(urls);
+                console.log("Call: ", sender.url);
+                var HistVar = "";
+                chrome.storage.sync.get("history", function (items) {
+                    HistVar = items.history;
+                    console.log("History: ", HistVar);
+                });
 
-            //trouble to save history
-            HistVar = HistVar + sender.url + "\n";
-            chrome.storage.sync.set({
-                'history': HistVar
-            }, function () {
-            });
-            // console.log(request.dom);
+                //trouble to save history
+                HistVar = HistVar + sender.url + "\n";
+                chrome.storage.sync.set({
+                    'history': HistVar
+                }, function () {
+                });
+                // console.log(request.dom);
+            }
         }
     });
 
