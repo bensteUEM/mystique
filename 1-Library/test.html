@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Title of the document</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.js"></script>
+    <script src="app.js"></script>
+
+    <script>
+        $(function () {
+            console.log("ready!");
+            urlLib.generateURL("Banker", urlLib.initializeConfig()).then((d) => {
+                console.log(d);
+            })
+        });
+
+    </script>
+</head>
+
+<body>
+    The content of the document......
+</body>
+
+</html>
