@@ -14,7 +14,6 @@ var urlLib = {
         console.log(config);
         return new Promise((resolve, reject) => {
             this._buildSearchString(personaKey, config)
-                .then(xy)
                 .then(this._getUrl)
                 .then(this._approveUrl)
                 .then((url) => {
@@ -28,12 +27,6 @@ var urlLib = {
                     //return this.generateURL(config);
                 });
         })
-
-        function xy() {
-            console.log("xy");
-        }
-
-
     },
 
     approveURL: function(url, config) {
@@ -390,7 +383,11 @@ var urlLib = {
                     "Professor": {
                         "key": "Professor",
                         "keywords": [
-
+                            {"word": "Vorlesung", "score": 0},
+                            {"word": "Universität", "score": 0},
+                            {"word": "Hochschule", "score": 0},
+                            {"word": "Hiwi", "score": 0},
+                            {"word": "Latex", "score": 0},
                         ],
                         "defaultURLs": []
                     },
