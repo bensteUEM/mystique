@@ -13,14 +13,17 @@ function loadSettings() {
   function getValues(result) {
 	  
 	  var settings = result.settings;
-	  if(settings == null) {
+	  if(settings == null) { //TODO init will be done by library in future
 		  settings = {
 				maxBytes: "25",
 				linkCountPercent: "20",
 				linkDepthMax: "2",
 				persona: "Persona1",
 				blackList: "black1",
-				wishList: "wish1"
+				wishList: "wish1",
+				minVisitTime : "60",
+				maxVisitTime: "660",
+				maxPageviewsFromRoot: "100"
 		}
 	  }
 
@@ -30,6 +33,9 @@ function loadSettings() {
 	document.querySelector("#persona").textContent = settings.persona;
 	document.querySelector("#blackList").textContent = settings.blackList;
 	document.querySelector("#wishList").textContent = settings.wishList;
+	document.querySelector("#minVisitTime").textContent = settings.minVisitTime;
+    document.querySelector("#maxVisitTime").textContent = settings.maxVisitTime;
+    document.querySelector("#maxPageviewsFromRoot").textContent = settings.maxPageviewsFromRoot;
   }
   
   var getting = browser.storage.local.get("settings");
