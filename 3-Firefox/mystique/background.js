@@ -225,6 +225,73 @@ function onError(error) {
 	console.log(error)
 }
 
+
+//========================= Link handling part
+
+/**
+* getLinksDomain is used to get a list of all links in the specified 
+@param document link
+@param followLinkOnDomainOnly to filter only to same Domain links
+*/
+
+function getLinksDomain(followLinkOnDomainOnly){
+    linksDetected = CONTENTSCRIPT.getLinks(); //TODO
+	var array = [];
+	for(var i=0; i<linksDetected.length; i++) {
+		if (isOnSameDomain(document.location.href,linksDetected[i])){
+			array.push(linksDetected[i]);
+		}
+		else if (followLinkOnDomainOnly) {
+			array.push(linksDetected[i]);
+		}
+
+	}
+	return array;
+}
+
+/**
+* getLinksDomain is used to get a list of all links in the specified 
+@param document link
+@param followLinkOnDomainOnly to filter only to same Domain links
+*/
+function getLinksDomainPercentage(followLinkOnDomainOnly,numberOfLinksToClick_max){
+	var allLinks = getLinksDomain(followLinkOnDomainOnly);
+	var array = [];
+	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
+	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
+	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
+
+	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
+		return 	allLinks;
+	}
+	chosen = 0;
+	while (chosen < numberToChoose) {
+		pickIndex = Math.floor(Math.random()*allLinks.length)
+    		array.push(allLinks[pickIndex]);
+    		chosen++;
+	}
+	return array;
+}
+
+/**
+* select links is used to get a number of links based on the
+*/
+function isOnSameDomain(checkPage){
+	var prefix = /^https?:\/\//i;
+    var domain = /^[^\/]+/;
+    // removing prefix
+    url1 = window.location.href.replace(prefix, "");
+	url2 = checkPage.replace(prefix, "");
+    	// if link starts with / it is on the current page
+	if (url2.charAt(0) === "/") {
+        	return true;
+    	}
+    	// extract domain and compare
+   	var part1 = url1.match(domain).toString();
+	var part2 = url2.match(domain);
+	return part1.includes(part2);
+}
+
 //========================= USER AGENT Part
 
 /*
