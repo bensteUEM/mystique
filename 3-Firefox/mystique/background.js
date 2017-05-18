@@ -2,9 +2,11 @@
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
+var startingUrl = "https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"
 
 function urlProvider() {
-	openUrl("https://www.google.de", runInNewWindow)
+	maintainLinksToFollow()
+	openUrl(urls[0].url, runInNewWindow)
 }
 
 // functionality to open a given URL in a separate tab object 
@@ -13,6 +15,8 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow = false
+var maxLinkDepth = 5
+var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
 browser.browserAction.onClicked.addListener(urlProvider);
@@ -21,15 +25,63 @@ function messageReceived(message, sender, sendResponse){
 	if (sender.tab.id == tabId) {
 		console.log(message.length + " Links received from CS")
 		
-		setTimeout(selectNextLink,5000);
+		let filteredLinks = getLinksDomainPercentage(message,false,0.1)
+		maintainLinksToFollow(filteredLinks)
+		setTimeout(callNextUrl,5000);
 	}
 
-	function selectNextLink() {
-        urls = [];
-        urls = getLinksDomainPercentage(message,false,0.1)
-        pickIndex = Math.floor(Math.random()*urls.length)
+	function callNextUrl() {
+		openUrl(urls[0].url, runInNewWindow)
+	}
+}
 
-		openUrl(urls[pickIndex], runInNewWindow)
+function maintainLinksToFollow(newLinks) {
+	
+	if (urls.length == 0) {
+		// TODO this is when a very new URL from the library has to be requested 
+		urls.unshift({
+			url: startingUrl,
+			level: maxLinkDepth
+		});
+		
+		logLinkList();
+	}
+	else if (urls[0].level > 0) {
+		let nextLevel = urls[0].level - 1
+		
+		newLinks = newLinks.map((link) => {
+            return {
+                url: link,
+                level: nextLevel
+            };
+        });
+		urls = newLinks.concat(urls)
+		
+		logLinkList();
+	}
+	else {
+		let lastLevel
+		do {
+			lastLevel = urls[0].level
+			urls.splice(0, 1)
+		} while (urls.length > 0 && urls[0].level != lastLevel);
+		
+		if (urls.length == 0) {
+			// TODO this is when a very new URL from the library has to be requested 
+			urls.unshift({
+				url: startingUrl,
+				level: maxLinkDepth
+			});
+		}
+		
+		logLinkList();
+	}
+	
+	function logLinkList(){
+		console.info(urls)
+//		for (url in urls){
+//			console.info("URL: " + url.url + " - LVL: " + url.level);
+//		}
 	}
 }
 
