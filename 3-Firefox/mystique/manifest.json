@@ -19,9 +19,9 @@
 		"48": "icons/DHBW_CAS_logo_blur-48.png",
 		"96": "icons/DHBW_CAS_logo_blur-96.png"
 	},
-	
-	"content_scripts": [{
-		"matches": ["*://*.wiedenest.de/*"],
+  	
+  	"content_scripts": [{
+		"matches": ["*://*/*"],
 		"js": ["mystique.js"]
 	}],
   	

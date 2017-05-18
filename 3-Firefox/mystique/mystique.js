@@ -7,13 +7,15 @@
 function selectLink(links){
 	console.log("Returned "+links.length+" links");
 	
+	logLinks(links)
+
+	//TODO this is not implemented yet
+}
+
+function logLinks(links){
 	for (link of links){
 		console.log(link);
 	}
-	
-	//window.alert("Returned "+links.length+" links");
-	//alert(links);
-	//TODO this is not implemented yet
 }
 
 //=========================================== 
@@ -21,32 +23,8 @@ function selectLink(links){
 //=========================================== 
 //===========================================  
 
-//var comPort
-//
-//browser.runtime.onConnect.addListener(connected)
-//
-//function connected(port){
-//	console.log("Content script received connection from background script")	
-//	comPort = port
-//	
-//	port.postMessage({response: "ContentScript - This is me"})
-//	port.onMessage.addListener(messageReceived)
-//	
-//	document.addEventListener("DOMContentLoaded", domLoaded)
-//}
-//
-//function messageReceived(message){
-//	console.log("ContentScript - message received from background: " + message.action)
-//	
-//	if (message.action == "execute"){
-//		var links = getLinksDomainPercentage(true,0.05);
-//		selectLink(links);
-//		
-//		console.log("ContentScript - action triggered")
-//	}
-//}
-
 browser.runtime.onMessage.addListener(notify)
+window.onload = run()
 
 function notify(message, sender, sendResponse){
 	console.log("ContentScript - message received from background: " + message)
@@ -60,8 +38,10 @@ function notify(message, sender, sendResponse){
 function run(){
 	console.log("ContentScript - action triggered")
 	
-	var links = getLinksDomainPercentage(true,0.05);
-	selectLink(links);
+	var links = getLinksDomainPercentage(true, 1);
+	//selectLink(links);
+	
+	var sending = browser.runtime.sendMessage(links);
 }
 
 /**
@@ -106,6 +86,8 @@ function getLinksDomainPercentage(followLinkOnDomainOnly,numberOfLinksToClick_ma
 	var allLinks = getLinksDomain(followLinkOnDomainOnly);
 	var array = [];
 	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
+	console.log("Total links found: " + allLinks.length)
+	logLinks(allLinks)
 	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
 	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
 
