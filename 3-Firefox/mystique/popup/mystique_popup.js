@@ -16,8 +16,8 @@ function loadSettings() {
 	  if(settings == null) { //TODO init will be done by library in future
 		  settings = {
 				maxBytes: "25",
-				linkCountPercent: "20",
-				linkDepthMax: "2",
+				maxNumberOfLinksToClick: "20",
+				maxLinkDepth: "2",
 				persona: "Persona1",
 				blackList: "black1",
 				wishList: "wish1",
@@ -28,8 +28,8 @@ function loadSettings() {
 	  }
 
     document.querySelector("#maxBytes").textContent = settings.maxBytes;
-	document.querySelector("#linkCountPercent").textContent = settings.linkCountPercent;
-	document.querySelector("#linkDepthMax").textContent = settings.linkDepthMax;
+	document.querySelector("#maxNumberOfLinksToClick").textContent = settings.maxNumberOfLinksToClick;
+	document.querySelector("#maxLinkDepth").textContent = settings.maxLinkDepth;
 	document.querySelector("#persona").textContent = settings.persona;
 	document.querySelector("#blackList").textContent = settings.blackList;
 	document.querySelector("#wishList").textContent = settings.wishList;
