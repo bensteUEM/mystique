@@ -30,6 +30,18 @@ var urlLib = {
 
     },
 
+    approveURL: function(url, config) {
+    	// Check if the URL has a valid pattern
+    	var const pattern = /^http|^https|^\/|^.\/|^..\/|^javascript/;
+    	var match = pattern.test(url);
+    	if(!match) {
+    		return false;
+    	}
+
+    	// check if the url is not contained in blacklist
+    	return this._isNotBlacklisted(url, config)
+    },
+
     //------------- evolutionary algorithm------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------------
 
@@ -216,21 +228,21 @@ var urlLib = {
 
 
     // This Method must return the url if valid
-    // If the url is not valid the function mus return false
-    _approveUrl: function (url, config) {
-        return new Promise(function (resolve, reject) {
-            /*if (new Date().getTime() % 2) {
-              console.log("URL IS VALID");
-              resolve(url);
-              return;
-            }
-            console.log("URL IS NOT VALID");
-            resolve(false);*/
+    // If the url is not in blacklist the function must return true
+    _isNotBlacklisted: function (url, config) {
+    	if(typeof(config.blacklist) === "undefined") {
+    		return true; // no blacklist found --> url is valid
+    	}
+    	if(config.blacklist.length <= 0) {
+    		return true; //no blacklist entry --> url is valid
+    	}
+    	
+    	var regex = ":\/\/w?w?w?\\.?" + config.blacklist[0] + "\\.";
+    	for (var i=1; i<config.blacklist.length; ++i) {
+    		regex = regex + "|" + ":\/\/w?w?w?\\.?" + config.blacklist[i] + "\\.";
+    	}
 
-            resolve(url);
-            return;
-
-        })
+    	return new RegExp(regex).test(url);
     }
 
 
