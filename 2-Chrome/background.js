@@ -20,6 +20,8 @@ var intervalDuration = 5000;
 // Could be null at the moment because the urlLib is very slow at generating new urls!"
 var nextUrl = null;
 
+var tabId = null;
+
 // Wordlist copied from urlLib to call generateURL
 var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 
@@ -29,68 +31,101 @@ chrome.storage.sync.get({
     maxBytes: '100',
     linkCoveragePecentage: 10,
     linkDepth: 5,
-}, function(items) {
+}, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
 });
 
-loadUrlInterval = setInterval(function() {
-	if(!urlWindow){
-		urlWindow = window.open();
-	}
-	if(runMystique) {
-        if(!subUrl || currLinkDepth >= maxLinkDepth) {
-	        urlWindow.location.href = urls[index];
+loadUrlInterval = setInterval(function () {
+    if (runMystique) {
+        if (!subUrl || currLinkDepth >= maxLinkDepth) {
+            openUrl(urls[index]);
             index++;
             currLinkDepth = 0;
         } else {
-            urlWindow.location.href = subUrl;
+            openUrl(subUrl);
             currLinkDepth++;
         }
-
-
-	} else {
+    } else {
         clearInterval(loadUrlInterval);
-	}
+    }
 
     /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
-        if(url) {
-            urls.push(url);
-        }
-    }).catch((err) => {
-        console.log("Error ", err);
-    }); */
+     if(url) {
+     urls.push(url);
+     }
+     }).catch((err) => {
+     console.log("Error ", err);
+     }); */
 }, intervalDuration);
+
+let openUrl = function (url, config) {
+    return _getOrCreateTabId()
+        .then(() => {
+            return _updateTab(url);
+        });
+};
+
+let _getOrCreateTabId = function () {
+    return new Promise((resolve) => {
+        if (tabId !== null) {
+            resolve(tabId);
+        } else {
+            chrome.tabs.create({}, function (tab) {
+                tabId = tab.id;
+                chrome.tabs.onRemoved.addListener((currentTabId, changeInfo, tab) => {
+                    if (currentTabId === tabId) {
+                        tabId = null;
+                    }
+                });
+                resolve(tab.id);
+            })
+        }
+    });
+};
+
+
+let _updateTab = function (url) {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.tabs.update(tabId, {
+                url: url
+            }, resolve);
+        } catch (exception) {
+            reject(exception)
+        }
+    });
+};
 
 
 // Get HTML DOM from page -> TO BE Checked ...
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-	console.log("Links ", request.links);
+    function (request, sender, sendResponse) {
+        console.log("Links ", request.links);
 
-    // add one (maybe multiple) subUrls from the called url (randomized)
+        // add one (maybe multiple) subUrls from the called url (randomized)
 
-    subUrl = request.links[getRandomInt(0, request.links.length)];
-    console.log("Call: ",sender.url);
-	var HistVar = "";
-	chrome.storage.sync.get("history", function(items) {
-        HistVar = items.history;
-		console.log("History: ",HistVar);
+        subUrl = request.links[getRandomInt(0, request.links.length)];
+        console.log("Call: ", sender.url);
+        var HistVar = "";
+        chrome.storage.sync.get("history", function (items) {
+            HistVar = items.history;
+            console.log("History: ", HistVar);
+        });
+
+        //trouble to save history
+        HistVar = HistVar + sender.url + "\n";
+        chrome.storage.sync.set({
+            'history': HistVar
+        }, function () {
+        });
+        // console.log(request.dom);
     });
-
-	//trouble to save history
-	HistVar = HistVar +  sender.url + "\n";
-	chrome.storage.sync.set({
-        'history': HistVar
-    }, function() {
-    });
-	// console.log(request.dom);
-  });
 
 // Get changes from settings
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-	let active = 'activate';
-	if (changes.hasOwnProperty(active)) {
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+    let active = 'activate';
+    if (changes.hasOwnProperty(active)) {
         let storageChange = changes[active];
         runMystique = storageChange.newValue
     }
@@ -98,5 +133,5 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 
 
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
