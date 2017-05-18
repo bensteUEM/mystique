@@ -76,13 +76,14 @@ let run = function () {
             clearInterval(loadUrlInterval);
         }
 
-    /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
-     if(url) {
-     urls.push(url);
-     }
-     }).catch((err) => {
-     console.log("Error ", err);
-     }); */
+        /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
+         if(url) {
+         urls.push(url);
+         }
+         }).catch((err) => {
+         console.log("Error ", err);
+         }); */
+    })
 };
 
 let openUrl = function (url, config) {
