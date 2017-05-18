@@ -42,7 +42,7 @@ function restore_options() {
   chrome.storage.sync.get({
     activate: "true", 
 	followLinkOnDomainOnly: "false",
-	maxBytes: '104857600', 
+	maxBytes: 104857600, 
 	numberOfLinksToClick_max: 10, 
 	linkDepth_max: 5, 
 	minVisitTime: 3, 
