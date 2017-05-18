@@ -7,10 +7,10 @@
   "options_page": "options.html",
 
   "browser_action": {
-    "default_popup": "popup.html"
+    "default_popup": "options.html"
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js", "libs/bluebird.js","libs/jquery-3.2.1.min.js","libs/urlLib.js"]
   },
   "content_scripts": [{
      "matches": [
