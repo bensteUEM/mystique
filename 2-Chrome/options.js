@@ -52,6 +52,7 @@ function restore_options() {
 	whitelist: "", 
 	personas: 1,
 	history: "",
+	usedBytes: 0
   }, function(items) {
     document.getElementById('activate').checked = items.activate;
     document.getElementById('maxBytes').value = items.maxBytes;
@@ -64,6 +65,7 @@ function restore_options() {
     document.getElementById('whitelist').value = items.whitelist;
     document.getElementById('personas').value = items.personas;
 	document.getElementById('history').value = items.history;
+	document.getElementById('usedBytes').textContent = items.usedBytes;
   });
 }
 
