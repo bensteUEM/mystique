@@ -39,12 +39,18 @@ chrome.storage.sync.get({
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
     linkCoveragePecentage = items.linkCoveragePecentage;
-    usedBytes = items.usedBytes;
+    if(items.lastSyncDate === getYesterday(items.lastSyncDate)) {
+        usedBytes = 0; 
+        chrome.storage.sync.set({lastSyncDate: new Date() });
+    }  else {
+        usedBytes = items.lastSyncDate;
+    }
 
     run();
 });
 
 let run = function () {
+
     loadUrlInterval = setInterval(function () {
         if (runMystique) {
             if (urls.length === 0) {
@@ -184,4 +190,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getYesterday(d) {
+  return d && d.getDate && new Date(d.setDate(d.getDate() - 1));
 }
