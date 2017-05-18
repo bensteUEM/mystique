@@ -5,7 +5,9 @@ function save_options() {
   var maxBytes = document.getElementById('maxBytes').value;
   var numberOfLinksToClick_max = document.getElementById('numberOfLinksToClick_max').value;
   var linkDepth_max = document.getElementById('linkDepth_max').value;
+  var minVisitTime = document.getElementById('minVisitTime').value;
   var maxVisitTime = document.getElementById('maxVisitTime').value;
+  var maxPageViewsFromRoot = document.getElementById('maxPageViewsFromRoot').value;
   var blacklist = document.getElementById('blacklist').value;
   var whitelist = document.getElementById('whitelist').value;
   var personas = document.getElementById('personas').value;
@@ -16,7 +18,9 @@ function save_options() {
 	maxBytes: maxBytes, 
 	numberOfLinksToClick_max: numberOfLinksToClick_max, 
 	linkDepth_max: linkDepth_max, 
+	minVisitTime: minVisitTime, 
 	maxVisitTime: maxVisitTime, 
+	maxPageViewsFromRoot: maxPageViewsFromRoot, 
 	blacklist: blacklist, 
 	whitelist: whitelist, 
 	personas: personas,
@@ -41,7 +45,9 @@ function restore_options() {
 	maxBytes: '100', 
 	numberOfLinksToClick_max: 10, 
 	linkDepth_max: 5, 
-	maxVisitTime: 30, 
+	minVisitTime: 3, 
+	maxVisitTime: 60, 
+	maxPageViewsFromRoot: 30,
 	blacklist: "", 
 	whitelist: "", 
 	personas: 1,
@@ -51,7 +57,9 @@ function restore_options() {
     document.getElementById('maxBytes').value = items.maxBytes;
     document.getElementById('numberOfLinksToClick_max').value = items.numberOfLinksToClick_max;
     document.getElementById('linkDepth_max').value = items.linkDepth_max;
+    document.getElementById('minVisitTime').value = items.minVisitTime;
     document.getElementById('maxVisitTime').value = items.maxVisitTime;
+    document.getElementById('maxPageViewsFromRoot').value = items.maxPageViewsFromRoot;
     document.getElementById('blacklist').value = items.blacklist;
     document.getElementById('whitelist').value = items.whitelist;
     document.getElementById('personas').value = items.personas;
