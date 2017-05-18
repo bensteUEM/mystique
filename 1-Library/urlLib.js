@@ -9,11 +9,11 @@
 var urlLib = {
 
     // This is our main public function which returns the final approved url
-    generateURL: function (config) {
+    generateURL: function (personaKey, config) {
         console.log("Received Config:");
         console.log(config);
         return new Promise((resolve, reject) => {
-            this._buildSearchString(config)
+            this._buildSearchString(personaKey, config)
                 .then(this._getUrl)
                 .then(this._approveUrl)
                 .then((url) => {
@@ -21,7 +21,7 @@ var urlLib = {
                         resolve(url);
                         return;
                     }
-                    resolve(this.generateURL(config));
+                    resolve(this.generateURL(personaKey, config));
                 }).catch((err) => {
                     console.log("Regenerate");
                     //return this.generateURL(config);
@@ -50,24 +50,60 @@ var urlLib = {
         wordSorter: function (a, b) {
             return a.score - b.score
         },
-        updateLexicon: function (config) {
+        updateLexicon: function personaKey(personaKey, config) {
             return new Promise(function (resolve, reject) {
-                //TODO: find new words (score can be zero in the first iteration)
+                
+              var language = "de_DE";
+              var persona = config.personas[personaKey];
 
-                var wordsWithScores = [{
-                    name: "Geld",
-                    score: 2
-                }, {
-                    name: "Finanzen",
-                    score: 0
-                }];
-                var personaKey = "Bank";
-                wordsWithScores.sort(urlLib._evolutionModule.wordSorter);
-                    //
-                 urlLib._evolutionModule.insertWordIfFitEnough("Holz", wordsWithScores, personaKey).then(function(d) {
-                     resolve(d);
-                 });
-            });
+              var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+              var searchWord = persona.keywords[randomNumber];
+
+              var resultList;
+              var foundResult = false;
+              var counter = 0;
+
+              var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
+                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";
+              
+              console.log(urlCall);
+
+              while(foundResult == false && counter < 10)
+              {
+                counter++;
+                  $.ajax({ 
+                      url: urlCall,
+                      type: "GET",
+                      success: function(data){ 
+                        console.log("updateLexicon - success");
+                          if (data.length != 0) { 
+                              for (key in data.response) { 
+                                  var synonyms = data.response[key].list.synonyms.split("|");        
+                                  for (synonymKey in synonyms)
+                                  {
+                                      var result = {};
+                                      result.word = synonyms[synonymKey].split(" (");
+
+                                      resultList.push(result);
+                                      foundResult = true;
+                                  }
+                              } 
+                          }
+                      }, 
+                      error: function(xhr, status, error){ 
+                          console.log("Error " + status + ": " + error);
+                      } 
+                  });
+              }
+              
+              persona.keywords.sort(urlLib._evolutionModule.wordSorter);
+              
+              return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
+                                    resolve(d);
+                                })
+                              });
+
+          });
         },
         insertWordIfFitEnough: function (word, words, masterWord) {
 
@@ -150,12 +186,12 @@ var urlLib = {
     },
 
 
-    _buildSearchString(config) {
+    _buildSearchString(personaKey, config) {
         return new Promise(function (resolve, reject) {
             console.log("build search string" + urlLib._evolutionModule);
-            urlLib._evolutionModule.updateLexicon(config).then(function (d) {
+            urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (d) {
                 console.log("updated lexicon");
-                var allWords = d.map(function(e) {
+                var allWords = d.map(function (e) {
                     return e.name;
                 })
                 var searchString = allWords.join(" and ");
@@ -208,7 +244,7 @@ var urlLib = {
     _getUrl: function (searchString) {
         console.log("Search String is: " + searchString)
         return new Promise(function (resolve, reject) {
-            var url = "https://www.google.com/search?q=" + encodeURIComponent(searchString);
+            var url = "https://www.google.com/search?safe=active&num=25&q=" + encodeURIComponent(searchString);
             $.get({
                 url: url,
                 success: data => {
@@ -243,6 +279,166 @@ var urlLib = {
     	}
 
     	return new RegExp(regex).test(url);
+    },
+
+
+    initializeConfig: function () {
+        return {
+            "blacklist": ["bild"],
+            "whishlist": [],
+            "personas": {                
+                "Banker": {
+                    "key": "Banker",
+                    "keywords": [
+                        { "word": "DAX", "score": 0 },
+                        { "word": "Börsenkurs", "score": 5 },
+                        { "word": "Aktien", "score": 10 },
+                        { "word": "Wechselkurse", "score": 3 },
+                        { "word": "Goldpreis", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.boerse.de/",
+                        "http://www.faz.net/aktuell/finanzen/"
+                    ]
+                },
+                "Familie": {
+                    "key": "Familie",
+                    "keywords": [
+                        { "word": "Kindergarten", "score": 0 },
+                        { "word": "Windeln", "score": 0 },
+                        { "word": "Spielzeug", "score": 0 },
+                        { "word": "Kinderbuch", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                        { "word": "Babysitter", "score": 0 },
+                    ],
+                    "defaultURLs": []
+                },
+                "Fruehrentner": {
+                    "key": "Fruehrentner",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },                
+                "Student": {
+                    "key": "Student",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Fußballfan": {
+                    "key": "",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Fitnessjunkie": {
+                    "key": "Fitnessjunkie",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Professor": {
+                    "key": "Professor",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Aktionaer": {
+                    "key": "Aktionaer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Lottospieler": {
+                    "key": "Lottospieler",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Snowboarder": {
+                    "key": "Snowboarder",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Yachtfahrer": {
+                    "key": "Yachtfahrer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "DINKS": {
+                    "key": "DINKS",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Ingenieur": {
+                    "key": "Ingenieur",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Lehrer": {
+                    "key": "Lehrer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Onlineshopper": {
+                    "key": "Onlineshopper",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Hundebesitzer": {
+                    "key": "Hundebesitzer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Bauer": {
+                    "key": "Bauer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                },
+                "Surfer": {
+                    "key": "Surfer",
+                    "keywords": [
+
+                    ],
+                    "defaultURLs": []
+                }
+            },
+            "settings": {
+                "maxBytes": 5000,
+                "functionlity": true,
+                "tracing": true,
+                "followLinkOnDomainOnly": true,
+                "linkDepth_max": 5,
+                "maxNumberOfLinksToClick": 10,
+                "maxVisitTime": 10
+            }
+        };
+
     }
 
 
