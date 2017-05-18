@@ -226,7 +226,7 @@ var urlLib = {
     _getUrl: function (searchString) {
         console.log("Search String is: " + searchString)
         return new Promise(function (resolve, reject) {
-            var url = "https://www.google.com/search?q=" + encodeURIComponent(searchString);
+            var url = "https://www.google.com/search?safe=active&num=25&q=" + encodeURIComponent(searchString);
             $.get({
                 url: url,
                 success: data => {
