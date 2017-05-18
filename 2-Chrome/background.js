@@ -22,6 +22,7 @@ var nextUrl = null;
 
 var tabId = null;
 
+var maxBytes = 0;
 var usedBytes = 0;
 
 // Wordlist copied from urlLib to call generateURL
@@ -30,7 +31,7 @@ var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad"
 chrome.storage.sync.get({
     activate: "true",
     linksOnDomainOnly: "false",
-    maxBytes: '100',
+    maxBytes: 104857600,
     linkCoveragePecentage: 10,
     linkDepth: 5,
     usedBytes: 0, 
@@ -38,12 +39,14 @@ chrome.storage.sync.get({
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth;
+    maxBytes = items.maxBytes;
+
     linkCoveragePecentage = items.linkCoveragePecentage;
     if(items.lastSyncDate === getYesterday(items.lastSyncDate)) {
         usedBytes = 0; 
         chrome.storage.sync.set({lastSyncDate: new Date() });
     }  else {
-        usedBytes = items.lastSyncDate;
+        usedBytes = items.usedBytes;
     }
 
     run();
@@ -52,7 +55,7 @@ chrome.storage.sync.get({
 let run = function () {
 
     loadUrlInterval = setInterval(function () {
-        if (runMystique) {
+        if (runMystique && (usedBytes <= maxBytes)) {
             if (urls.length === 0) {
                 urls.unshift({
                     url: "http://wikipedia.de",
