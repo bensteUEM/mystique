@@ -51,13 +51,20 @@ var urlLib = {
               var foundResult = false;
               var counter = 0;
 
-              while(foundResult == false || counter < 10)
+              var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
+                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";
+              
+              console.log(urlCall);
+
+              while(foundResult == false && counter < 10)
               {
                 counter++;
+                console.log("updateLexico" + counter);
                   $.ajax({ 
-                      url: "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord
-                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30",
+                      url: urlCall,
+                      type: "GET",
                       success: function(data){ 
+                        console.log("updateLexicon - success");
                           if (data.length != 0) { 
                               for (key in data.response) { 
                                   var synonyms = data.response[key].list.synonyms.split("|");        
@@ -77,7 +84,7 @@ var urlLib = {
                       } 
                   });
               }
-
+              
               persona.keywords.sort(urlLib._evolutionModule.wordSorter);
               
               return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
