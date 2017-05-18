@@ -101,25 +101,28 @@ let _updateTab = function (url) {
 // Get HTML DOM from page -> TO BE Checked ...
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        console.log("Links ", request.links);
 
-        // add one (maybe multiple) subUrls from the called url (randomized)
+        if (sender.tab.id === tabId) {
+            console.log("Links ", request.links);
 
-        subUrl = request.links[getRandomInt(0, request.links.length)];
-        console.log("Call: ", sender.url);
-        var HistVar = "";
-        chrome.storage.sync.get("history", function (items) {
-            HistVar = items.history;
-            console.log("History: ", HistVar);
-        });
+            // add one (maybe multiple) subUrls from the called url (randomized)
 
-        //trouble to save history
-        HistVar = HistVar + sender.url + "\n";
-        chrome.storage.sync.set({
-            'history': HistVar
-        }, function () {
-        });
-        // console.log(request.dom);
+            subUrl = request.links[getRandomInt(0, request.links.length)];
+            console.log("Call: ", sender.url);
+            var HistVar = "";
+            chrome.storage.sync.get("history", function (items) {
+                HistVar = items.history;
+                console.log("History: ", HistVar);
+            });
+
+            //trouble to save history
+            HistVar = HistVar + sender.url + "\n";
+            chrome.storage.sync.set({
+                'history': HistVar
+            }, function () {
+            });
+            // console.log(request.dom);
+        }
     });
 
 // Get changes from settings
