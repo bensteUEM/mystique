@@ -3,7 +3,7 @@ var urlList = ["https://www.google.de", "https://wikipedia.de", "https://ebay.de
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
-
+//callLibary();
 function urlProvider() {
 	
 	openUrl(urlList[i++])
@@ -36,11 +36,9 @@ function callTimer(){
 function callLibary(){
 
 	//ToDo place libary at the right place
-	urlLib.generateURL({
-		wordlist: wl
-		}).then(function(url) {
+	urlLib.generateURL("Banker", urlLib.initializeConfig()).then(function(url) {
 			console.log(url);
-			openUrl(url);
+			//openUrl(url);
 			});
 }
 //Testing purpose function whitelisting
@@ -87,7 +85,7 @@ function openUrl(url) {
 			url: url
 		});
 		
-		updatingTab.then(onUpdated, onError)
+		updatingTab.then(onUpdated, onError);
 	}
 }
 
