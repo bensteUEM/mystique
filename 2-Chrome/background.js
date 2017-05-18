@@ -23,6 +23,8 @@ var nextUrl = null;
 
 var tabId = null;
 
+var usedBytes = 0;
+
 // Wordlist copied from urlLib to call generateURL
 var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 
@@ -30,7 +32,7 @@ chrome.storage.sync.get({
     activate: "true",
     followLinkOnDomainOnly: "false",
     maxBytes: '100',
-    numberOfLinksToClick_max: 10,
+    linkCoveragePecentage: 10,
     linkDepth_max: 5,
     minVisitTime: 3,
     maxVisitTime: 10,
@@ -39,32 +41,40 @@ chrome.storage.sync.get({
     whitelist: "",
     personas: 1,
     history: "",
-    usedBytes: 0
+    usedBytes: 0,
+    lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
-    maxLinkDepth = items.linkDepth_max;
-    linkCoveragePecentage = items.numberOfLinksToClick_max;
-    minVisitTime = parseInt(items.minVisitTime);
-    maxVisitTime = parseInt(items.maxVisitTime);
+    maxLinkDepth = items.linkDepth;
+    linkCoveragePecentage = items.linkCoveragePecentage;
+    if(items.lastSyncDate === getYesterday(items.lastSyncDate)) {
+        usedBytes = 0;
+        chrome.storage.sync.set({lastSyncDate: new Date() });
+    }  else {
+        usedBytes = items.lastSyncDate;
+    }
     run();
 });
 
 let run = function () {
-    if (runMystique) {
-        if (urls.length === 0) {
-            urls.unshift({
-                url: "http://wikipedia.de",
-                level: maxLinkDepth
-            });
+    loadUrlInterval = setInterval(function () {
+        if (runMystique) {
+            if (urls.length === 0) {
+                urls.unshift({
+                    url: "http://wikipedia.de",
+                    level: maxLinkDepth
+                });
+                currLinkDepth = maxLinkDepth;
+            }
+            let url = urls[0];
+            currLinkDepth = url.level;
+            console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
+            urls = urls.splice(1, urls.length);
+            openUrl(url.url);
+            intervalDuration = 10000;
+        } else {
+            clearInterval(loadUrlInterval);
         }
-        let url = urls[0];
-        currLinkDepth = url.level;
-        console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
-        urls = urls.splice(1, urls.length);
-        openUrl(url.url).then(() => {
-            setTimeout(run, getRandomInt(minVisitTime, maxVisitTime + 1) * 1000);
-        });
-    }
 
     /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
      if(url) {
@@ -137,7 +147,14 @@ chrome.runtime.onMessage.addListener(
 
         if (sender.tab.id === tabId) {
             if (currLinkDepth > 0) {
-                console.log("Links ", request.links);
+            console.log("Links ", request.links);
+            console.log("Bytes ", request.bytes);
+
+            usedBytes += request.bytes;
+
+            chrome.storage.sync.set({
+                usedBytes: usedBytes
+            });
 
                 // add one (maybe multiple) subUrls from the called url (randomized)
                 let followLinks = processLinks(request.links);
@@ -179,4 +196,8 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getYesterday(d) {
+  return d && d.getDate && new Date(d.setDate(d.getDate() - 1));
 }
