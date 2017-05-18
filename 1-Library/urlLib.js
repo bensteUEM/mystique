@@ -42,7 +42,7 @@ var urlLib = {
             return new Promise(function (resolve, reject) {
                 
               var language = "de_DE";
-              var persona = config.Persona[personaKey];
+              var persona = config.personas[personaKey];
 
               var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
               var searchWord = persona.keywords[randomNumber];
@@ -78,14 +78,14 @@ var urlLib = {
                   });
               }
 
-                persona.keywords.sort(urlLib._evolutionModule.wordSorter);
-                
-                return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
-                                      resolve(d);
-                                  })
-                                });
+              persona.keywords.sort(urlLib._evolutionModule.wordSorter);
+              
+              return Promise.each(words, word => { urlLib._evolutionModule.insertWordIfFitEnough(word, persona.keywords, personaKey).then(function(d) {
+                                    resolve(d);
+                                })
+                              });
 
-            });
+          });
         },
         insertWordIfFitEnough: function (word, words, masterWord) {
 
