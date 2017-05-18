@@ -14,6 +14,7 @@ var urlLib = {
         console.log(config);
         return new Promise((resolve, reject) => {
             this._buildSearchString(personaKey, config)
+                .then(xy)
                 .then(this._getUrl)
                 .then(this._approveUrl)
                 .then((url) => {
@@ -28,11 +29,16 @@ var urlLib = {
                 });
         })
 
+        function xy() {
+            console.log("xy");
+        }
+
+
     },
 
     approveURL: function(url, config) {
     	// Check if the URL has a valid pattern
-    	var const pattern = /^http|^https|^\/|^.\/|^..\/|^javascript/;
+    	var pattern = /^http|^https|^\/|^.\/|^..\/|^javascript/;
     	var match = pattern.test(url);
     	if(!match) {
     		return false;
@@ -231,13 +237,53 @@ var urlLib = {
         },
 
         /**
+         * Randomly retrieves a URL from all URL on the page until one is found that is not blacklisted.
+         * Does not guarantee that some links might not be used multiple times.
+         * @param links Array of possible URLs
+         * @param config Configuration file that contains the blacklist that should be checked against
+         * @returns a URL that is not blacklisted
+         */
+        _getNotBlacklistedURL: function(links, config, personaKey) {
+            var url;
+            var foundValidURL = false;
+            for(var i=0;i<links.length;i++) {
+                url = links[Math.floor(Math.random() * links.length)];
+                if(urlib._isNotBlacklisted(url, config)) {
+                    foundValidURL = true;
+                    break;
+                }
+            }
+
+            //check if there was a valid URL. Otherwise use one of the defaultURLs 
+            var URLs = config.personas[personaKey].defaultURLs;
+            if(URLs.lenght > 0) {
+                url = URLs[Math.floor(Math.random() * URLs.lenght)];
+            }
+
+            return url;
+        },
+
+        /**
+         * Adds the URL to the defaultURLs of the persona. If the defaultURLs already contain 10 URLs, the oldest one is removed.
+         */
+        _storeURLforPersona: function(url, config, personaKey) {
+            var URLs = config.personas[personaKey].defaultURLs;
+            //do not store more than 10 URLs per Persona
+            if(URLs.length >= 10) {
+                URLs = URLs.slice(1, URLs.lenght);
+            }
+
+            URLs.push(url);
+        },
+
+        /**
          * Randomly retrieves one entry of the provided array. This is used to prevent fraud detection because always
          * the first shown result is clicked. Instead this simulates behaviour that some link on the first page is clicked.
          * @return a single URL of the search results
          * */
-        _get_random_URL: function (data) {
+        _get_random_URL: function (data, personaKey, config) {
             var links = urlLib._getUrlModule._get_links(data);
-            return links[Math.floor(Math.random() * links.length)];
+            return urlLib._getUrlModule._getNotBlacklistedURL(links, config, personaKey);
         },
     },
 
@@ -248,12 +294,24 @@ var urlLib = {
             $.get({
                 url: url,
                 success: data => {
-                    url = urlLib._getUrlModule._get_random_URL(data);
-                    console.log("Created URL is: " + url);
-                    resolve(url);
+                    url = urlLib._getUrlModule._get_random_URL(data, personaKey, config);
+                    if(url) {
+                        urlLib._getUrlModule._storeURLforPersona(url, config, personaKey);
+                        console.log("Created URL is: " + url);
+                        resolve(url);
+                    } else {
+                        reject("Could not find valid URL");
+                    }
                 },
                 error: e => {
-                    reject(e);
+                    //If the GET fails, retrieve a defaultURL 
+                    var URLs = config.personas[personaKey].defaultURLs;
+                    if(URLs.lenght > 0) {
+                        url = URLs[Math.floor(Math.random() * URLs.lenght)];
+                        resolve(url);
+                    } else {
+                        reject(e);
+                    }
                 }
             });
 
