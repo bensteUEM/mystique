@@ -282,163 +282,128 @@ var urlLib = {
     },
 
 
-    initializeConfig: function () {
-        return {
-            "blacklist": ["bild"],
-            "whishlist": [],
-            "personas": {                
-                "Banker": {
-                    "key": "Banker",
-                    "keywords": [
-                        { "word": "DAX", "score": 0 },
-                        { "word": "Börsenkurs", "score": 5 },
-                        { "word": "Aktien", "score": 10 },
-                        { "word": "Wechselkurse", "score": 3 },
-                        { "word": "Goldpreis", "score": 7 }
-                    ],
-                    "defaultURLs": [
-                        "http://www.boerse.de/",
-                        "http://www.faz.net/aktuell/finanzen/"
-                    ]
-                },
-                "Familie": {
-                    "key": "Familie",
-                    "keywords": [
-                        { "word": "Kindergarten", "score": 0 },
-                        { "word": "Windeln", "score": 0 },
-                        { "word": "Spielzeug", "score": 0 },
-                        { "word": "Kinderbuch", "score": 0 },
-                        { "word": "Babysitter", "score": 0 },
-                        { "word": "Babysitter", "score": 0 },
-                        { "word": "Babysitter", "score": 0 },
-                        { "word": "Babysitter", "score": 0 },
-                    ],
-                    "defaultURLs": []
-                },
-                "Fruehrentner": {
-                    "key": "Fruehrentner",
-                    "keywords": [
+    initializeConfig: function (language) {
+        language = language || "de";
+        var configs = {
+            "de":
+            {
+                "blacklist": ["bild"],
+                "whishlist": [],
+                "personas": {
+                    "Banker": {
+                        "key": "Banker",
+                        "keywords": [
+                            { "word": "DAX", "score": 0 },
+                            { "word": "Börsenkurs", "score": 5 },
+                            { "word": "Aktien", "score": 10 },
+                            { "word": "Wechselkurse", "score": 3 },
+                            { "word": "Goldpreis", "score": 7 }
+                        ],
+                        "defaultURLs": [
+                            "http://www.boerse.de/",
+                            "http://www.faz.net/aktuell/finanzen/"
+                        ]
+                    },
+                    "Familie": {
+                        "key": "Familie",
+                        "keywords": [{ "word": "Kindergarten", "score": 0 }, { "word": "Windeln", "score": 0 }, { "word": "Spielzeug", "score": 0 }, { "word": "Kinderbuch", "score": 0 }, { "word": "Babysitter", "score": 0 }, { "word": "Schwangerschaftsstreifen", "score": 0 }, { "word": "abnehmen", "score": 0 }, { "word": "Yogaübungen", "score": 0 }, { "word": "Kita", "score": 0 }, { "word": "Babynahrung", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Fruehrentner": {
+                        "key": "Fruehrentner",
+                        "keywords": [{ "word": "Altersteilzeit", "score": 0 }, { "word": "Frührente", "score": 0 }, { "word": "Weltreise", "score": 0 }, { "word": "Rentenrechner", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Rente", "score": 0 }, { "word": "Auszeit", "score": 0 }, { "word": "Bootsführerschein", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Student": {
+                        "key": "Student",
+                        "keywords": [{ "word": "Studium", "score": 0 }, { "word": "Studiumsgebühren", "score": 0 }, { "word": "Studentenwohnung", "score": 0 }, { "word": "Hochschule", "score": 0 }, { "word": "BAFÖG", "score": 0 }, { "word": "Studententicket", "score": 0 }, { "word": "Bachelorthesis", "score": 0 }, { "word": "Masterthesis", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Fussballfan": {
+                        "key": "Fussballfan",
+                        "keywords": [{ "word": "Bundesliga", "score": 0 }, { "word": "MLS", "score": 0 }, { "word": "Champions Leage", "score": 0 }, { "word": "FC Bayern", "score": 0 }, { "word": "BVB", "score": 0 }, { "word": "Fußballweltmeister", "score": 0 }, { "word": "Fifa", "score": 0 }, { "word": "DFB", "score": 0 }, { "word": "Spieltag", "score": 0 }, { "word": "Bier", "score": 0 }, { "word": "Sky", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Fitnessjunkie": {
+                        "key": "Fitnessjunkie",
+                        "keywords": [{ "word": "Fitnessprogramm", "score": 0 }, { "word": "Fitnessstudio", "score": 0 }, { "word": "abnehmen", "score": 0 }, { "word": "Sixpack", "score": 0 }, { "word": "Proteine", "score": 0 }, { "word": "Eiweiß", "score": 0 }, { "word": "Fitnesstracker", "score": 0 }, { "word": "Fitness-App", "score": 0 }, { "word": "Low-Carb", "score": 0 }, { "word": "Muskelaufbau", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Professor": {
+                        "key": "Professor",
+                        "keywords": [
 
-                    ],
-                    "defaultURLs": []
-                },                
-                "Student": {
-                    "key": "Student",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
+                        ],
+                        "defaultURLs": []
+                    },
+                    "Aktionaer": {
+                        "key": "Aktionaer",
+                        "keywords": [{ "word": "Aktien", "score": 0 }, { "word": "ETF", "score": 0 }, { "word": "Dividende", "score": 0 }, { "word": "Broker", "score": 0 }, { "word": "Rendite", "score": 0 }, { "word": "Aktiengesellschaft", "score": 0 }, { "word": "Anleihen", "score": 0 }, { "word": "Hauptversammlung", "score": 0 }, { "word": "DAX", "score": 0 }, { "word": "NASDAQ", "score": 0 }, { "word": "Dividendenrendite", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Lottospieler": {
+                        "key": "Lottospieler",
+                        "keywords": [{ "word": "Lottogewinn", "score": 0 }, { "word": "Gewinnspiel", "score": 0 }, { "word": "Lottozahlen", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Snowboarder": {
+                        "key": "Snowboarder",
+                        "keywords": [{ "word": "Snowboard", "score": 0 }, { "word": "Wheelis", "score": 0 }, { "word": "Backside", "score": 0 }, { "word": "Snowboardtricks", "score": 0 }, { "word": "Skipiste", "score": 0 }, { "word": "Snowboardurlaub", "score": 0 }, { "word": "Cruise&Ride", "score": 0 }, { "word": "Skiträger", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Yachtfahrer": {
+                        "key": "Yachtfahrer",
+                        "keywords": [{ "word": "Bootsführerschein", "score": 0 }, { "word": "Schleusen", "score": 0 }, { "word": "Angelschein", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Bootsanhänger", "score": 0 }, { "word": "Yachthafen", "score": 0 }, { "word": "BVWW", "score": 0 }, { "word": "Segeln", "score": 0 }, { "word": "Schiffverkehrsregeln", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "DINKS": {
+                        "key": "DINKS",
+                        "keywords": [{ "word": "Karriere", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Wellness", "score": 0 }, { "word": "Hochschule", "score": 0 }, { "word": "Thermomix", "score": 0 }, { "word": "Sushi", "score": 0 }, { "word": "Essen gehen", "score": 0 }, { "word": "Shopping", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Ingenieur": {
+                        "key": "Ingenieur",
+                        "keywords": [{ "word": "Studium", "score": 0 }, { "word": "VDI", "score": 0 }, { "word": "VDA", "score": 0 }, { "word": "Elektronik", "score": 0 }, { "word": "Maschinenbau", "score": 0 }, { "word": "Konstruktion", "score": 0 }, { "word": "Zeichnung", "score": 0 }, { "word": "Schweißen", "score": 0 }, { "word": "Löten", "score": 0 }, { "word": "Fügen", "score": 0 }, { "word": "Drehen", "score": 0 }, { "word": "Fräsen", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Lehrer": {
+                        "key": "Lehrer",
+                        "keywords": [{ "word": "Kinder", "score": 0 }, { "word": "Erziehung", "score": 0 }, { "word": "Noten", "score": 0 }, { "word": "Hausaufgaben", "score": 0 }, { "word": "Zeugnisse", "score": 0 }, { "word": "Elterngespräch", "score": 0 }, { "word": "Schullandheim", "score": 0 }, { "word": "Lehrerausflug", "score": 0 }, { "word": "Tafel", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Onlineshopper": {
+                        "key": "Onlineshopper",
+                        "keywords": [{ "word": "alando", "score": 0 }, { "word": "Amazon", "score": 0 }, { "word": "DaWanda", "score": 0 }, { "word": "Conrad", "score": 0 }, { "word": "Notebooksbilliger", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Hundebesitzer": {
+                        "key": "Hundebesitzer",
+                        "keywords": [{ "word": "Hundefutter", "score": 0 }, { "word": "Hundesteuer", "score": 0 }, { "word": "Kotbeutel", "score": 0 }, { "word": "Halsband", "score": 0 }, { "word": "Hundeleine", "score": 0 }, { "word": "Tierarzt", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Bauer": {
+                        "key": "Bauer",
+                        "keywords": [{ "word": "Stall", "score": 0 }, { "word": "Rinder", "score": 0 }, { "word": "Schweine", "score": 0 }, { "word": "Tierarzt", "score": 0 }, { "word": "Heu", "score": 0 }, { "word": "Weizen", "score": 0 }, { "word": "Silo", "score": 0 }, { "word": "Mähdrescher", "score": 0 }, { "word": "Trecker", "score": 0 }, { "word": "Mais", "score": 0 }],
+                        "defaultURLs": []
+                    },
+                    "Surfer": {
+                        "key": "Surfer",
+                        "keywords": [{ "word": "Hawaii", "score": 0 }, { "word": "surfen", "score": 0 }, { "word": "Welle", "score": 0 }, { "word": "Wellenreiten", "score": 0 }, { "word": "Carve", "score": 0 }, { "word": "Cutback", "score": 0 }, { "word": "Meer", "score": 0 }, { "word": "Surfbrett", "score": 0 }, { "word": "Surfspots", "score": 0 }],
+                        "defaultURLs": []
+                    }
                 },
-                "Fußballfan": {
-                    "key": "",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Fitnessjunkie": {
-                    "key": "Fitnessjunkie",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Professor": {
-                    "key": "Professor",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Aktionaer": {
-                    "key": "Aktionaer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Lottospieler": {
-                    "key": "Lottospieler",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Snowboarder": {
-                    "key": "Snowboarder",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Yachtfahrer": {
-                    "key": "Yachtfahrer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "DINKS": {
-                    "key": "DINKS",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Ingenieur": {
-                    "key": "Ingenieur",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Lehrer": {
-                    "key": "Lehrer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Onlineshopper": {
-                    "key": "Onlineshopper",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Hundebesitzer": {
-                    "key": "Hundebesitzer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Bauer": {
-                    "key": "Bauer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
-                },
-                "Surfer": {
-                    "key": "Surfer",
-                    "keywords": [
-
-                    ],
-                    "defaultURLs": []
+                "settings": {
+                    "maxBytes": 5000,
+                    "functionlity": true,
+                    "tracing": true,
+                    "followLinkOnDomainOnly": true,
+                    "linkDepth_max": 5,
+                    "maxNumberOfLinksToClick": 10,
+                    "maxVisitTime": 10
                 }
-            },
-            "settings": {
-                "maxBytes": 5000,
-                "functionlity": true,
-                "tracing": true,
-                "followLinkOnDomainOnly": true,
-                "linkDepth_max": 5,
-                "maxNumberOfLinksToClick": 10,
-                "maxVisitTime": 10
             }
         };
-
+        return configs[language];
     }
 
 
