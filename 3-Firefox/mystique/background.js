@@ -1,25 +1,23 @@
 // for testing purposes
-var urlList = ["https://www.google.de", "https://wikipedia.de", "https://ebay.de", "https://kansdf.de"]
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
 
 function urlProvider() {
-	
-//	openUrl(urlList[i++], false)
-//	
-//	if (i == urlList.length) {
-//		i = 0
-//	}
-	
-	openUrl("https://www.google.de", false)
+	openUrl("https://www.google.de", runInNewWindow)
 }
 
-browser.runtime.onMessage.addListener(notify)
-//browser.browserAction.onClicked.addListener(urlProvider);
+// functionality to open a given URL in a separate tab object 
+
+var tabId = -1
+var windowId = -1
+var lastUrlRequested
+var runInNewWindow = false
+
+browser.runtime.onMessage.addListener(messageReceived)
 browser.browserAction.onClicked.addListener(urlProvider);
 
-function notify(message, sender, sendResponse){
+function messageReceived(message, sender, sendResponse){
 	if (sender.tab.id == tabId) {
 		console.log(message.length + " Links received from CS")
 		
@@ -31,17 +29,9 @@ function notify(message, sender, sendResponse){
         urls = getLinksDomainPercentage(message,false,0.1)
         pickIndex = Math.floor(Math.random()*urls.length)
 
-		openUrl(urls[pickIndex], false)
+		openUrl(urls[pickIndex], runInNewWindow)
 	}
 }
-
-// functionality to open a given URL in a separate tab object 
-
-var tabId = -1
-var windowId = -1
-var lastUrlRequested
-var runInNewWindow
-
 
 //ToDo Listener to cancel interval if plugin is turned off
 function callTimer(){
@@ -70,7 +60,6 @@ function callLibary(){
  * @param inNewWindow specifies whether the URL shall be opened in a new window 
  */
 function openUrl(url, inNewWindow) {
-	runInNewWindow = inNewWindow
 	
 	if(inNewWindow) {
 		
@@ -132,16 +121,16 @@ function maintainAddOnTab(url, windowId) {
 			});
 		}
 		
-		creating.then(onTabCreated, onError);
+		creating.then(onTabProcessed, onError);
 	} else {
 		var updatingTab = browser.tabs.update(tabId, {
 			url: url
 		});
 		
-		updatingTab.then(onTabUpdated, onUpdateTabError)
+		updatingTab.then(onTabProcessed, onUpdateTabError)
 	}
 	
-	function onTabCreated(tab) {
+	function onTabProcessed(tab) {
 		 
 		tabId = tab.id
 		
@@ -152,25 +141,26 @@ function maintainAddOnTab(url, windowId) {
 				' / STATUS: ' + tab.status +
 				' / WINDOW-ID: ' + tab.windowId +
 				' / URL: ' + tab.url);
-
-		//injectContentScript("/mystique.js")
-	}
-
-	function onTabUpdated(tab) {
-		
-		console.log('Tab updated - ID: ' + tab.id +
-				' / SELECTED: ' + tab.selected +
-				' / PINNED: ' + tab.pinned +
-				' / TITLE: ' + tab.title +
-				' / STATUS: ' + tab.status +
-				' / WINDOW-ID: ' + tab.windowId +
-				' / URL: ' + tab.url);
-		
-		//injectContentScript("/mystique.js")
 	}
 	
-	function onError(error){
+	function onUpdateTabError(error){
 		console.log(error)
+		
+		if (runInNewWindow) {
+			// check whether the separate window still exists - otherwise open again 
+			getting = browser.windows.get(windowId)
+			getting.then(reopenTab, onGetWindowError)
+		}
+		else {
+			reopenTab()
+		}
+		
+		function onGetWindowError(error) {
+			console.log(error)
+			
+			windowId = -1
+			reopenTab()
+		}
 	}
 }
 
@@ -184,47 +174,9 @@ function sendMessageToContentScript(command){
 		});
 }
 
-function injectContentScript(script){
-	
-	var executing = browser.tabs.executeScript(tabId, {
-		allFrames: true,
-		file: script,
-		runAt: "document_start"
-	});
-	
-	executing.then(onExecuted, onError)
-	
-	function onExecuted(result){
-		console.log('Script has been injected sucessfully - ' + result)
-		
-		sendMessageToContentScript("execute")
-	}
-}
-
 function reopenTab(){
 	tabId = -1
 	openUrl(lastUrlRequested, runInNewWindow)
-}
-
-function onUpdateTabError(error){
-	console.log(error)
-	
-	if (runInNewWindow) {
-		// check whether the separate window still exists - otherwise open again 
-		getting = browser.windows.get(windowId)
-		
-		getting.then(reopenTab, onGetWindowError)
-	}
-	else {
-		reopenTab()
-	}
-	
-	function onGetWindowError(error) {
-		console.log(error)
-		
-		windowId = -1
-		reopenTab()
-	}
 }
 
 function onError(error) {
