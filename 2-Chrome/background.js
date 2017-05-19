@@ -33,7 +33,7 @@ chrome.storage.sync.get({
     activate: "true",
     followLinkOnDomainOnly: "false",
     maxBytes: '100',
-    linkCoveragePecentage: 10,
+    numberOfLinksToClick_max: 10,
     linkDepth_max: 5,
     minVisitTime: 3,
     maxVisitTime: 10,
@@ -46,14 +46,16 @@ chrome.storage.sync.get({
     lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
-    maxLinkDepth = items.linkDepth;
+    maxLinkDepth = items.linkDepth_max;
     maxBytes = items.maxBytes;
+    minVisitTime = parseInt(items.minVisitTime);
+    maxVisitTime = parseInt(items.maxVisitTime);
 
-    linkCoveragePecentage = items.linkCoveragePecentage;
-    if(items.lastSyncDate === getYesterday(items.lastSyncDate)) {
+    linkCoveragePecentage = items.numberOfLinksToClick_max;
+    if (items.lastSyncDate === getYesterday(items.lastSyncDate)) {
         usedBytes = 0;
-        chrome.storage.sync.set({lastSyncDate: new Date() });
-    }  else {
+        chrome.storage.sync.set({lastSyncDate: new Date()});
+    } else {
         usedBytes = items.usedBytes;
     }
 
@@ -61,34 +63,29 @@ chrome.storage.sync.get({
 });
 
 let run = function () {
-
-    loadUrlInterval = setInterval(function () {
-        if (runMystique && (usedBytes <= maxBytes)) {
-            if (urls.length === 0) {
-                urls.unshift({
-                    url: "http://wikipedia.de",
-                    level: maxLinkDepth
-                });
-                currLinkDepth = maxLinkDepth;
-            }
-            let url = urls[0];
-            currLinkDepth = url.level;
-            console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
-            urls = urls.splice(1, urls.length);
-            openUrl(url.url);
-            intervalDuration = 10000;
-        } else {
-            clearInterval(loadUrlInterval);
+    if (runMystique) {
+        if (urls.length === 0) {
+            urls.unshift({
+                url: "http://wikipedia.de",
+                level: maxLinkDepth
+            });
         }
+        let url = urls[0];
+        currLinkDepth = url.level;
+        console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
+        urls = urls.splice(1, urls.length);
+        openUrl(url.url).then(() => {
+            setTimeout(run, getRandomInt(minVisitTime, maxVisitTime + 1) * 1000);
+        });
+    }
 
-        /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
-         if(url) {
-         urls.push(url);
-         }
-         }).catch((err) => {
-         console.log("Error ", err);
-         }); */
-    })
+    /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
+     if(url) {
+     urls.push(url);
+     }
+     }).catch((err) => {
+     console.log("Error ", err);
+     }); */
 };
 
 let openUrl = function (url, config) {
@@ -153,14 +150,14 @@ chrome.runtime.onMessage.addListener(
 
         if (sender.tab.id === tabId) {
             if (currLinkDepth > 0) {
-            console.log("Links ", request.links);
-            console.log("Bytes ", request.bytes);
+                console.log("Links ", request.links);
+                console.log("Bytes ", request.bytes);
 
-            usedBytes += request.bytes;
+                usedBytes += request.bytes;
 
-            chrome.storage.sync.set({
-                usedBytes: usedBytes
-            });
+                chrome.storage.sync.set({
+                    usedBytes: usedBytes
+                });
 
                 // add one (maybe multiple) subUrls from the called url (randomized)
                 let followLinks = processLinks(request.links);
@@ -205,5 +202,5 @@ function getRandomInt(min, max) {
 }
 
 function getYesterday(d) {
-  return d && d.getDate && new Date(d.setDate(d.getDate() - 1));
+    return d && d.getDate && new Date(d.setDate(d.getDate() - 1));
 }
