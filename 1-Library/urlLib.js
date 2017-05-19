@@ -10,8 +10,6 @@ var urlLib = {
 
     // This is our main public function which returns the final approved url
     generateURL: function (personaKey, config) {
-        console.log("Received Config:");
-        console.log(config);
         return new Promise((resolve, reject) => {
             this._buildSearchString(personaKey, config)
                 .then(this._getUrl)
@@ -72,7 +70,6 @@ var urlLib = {
                       url: urlCall,
                       type: "GET",
                       success: function(data){ 
-                        console.log("updateLexicon - success");
                           if (data.length != 0) { 
                               for (key in data.response) { 
                                   var synonyms = data.response[key].list.synonyms.split("|");     
@@ -88,27 +85,27 @@ var urlLib = {
                                       foundResult = true;
                                   }
                               }
+                            
+                            if(resultList.length == 0)
+                            {
+                                var result = {};
+                                result.word = searchWord;
+                                result.score = 0;
+                            }
 
-                            //persona.keywords.sort(urlLib._evolutionModule.wordSorter);
-                            console.log(JSON.stringify(resultList));
                             return Promise.each(resultList, item => { urlLib._evolutionModule.insertWordIfFitEnough(item.word, 
                                                                           config, personaKey).then(function(newConfig) {
-                                                  console.log("New Config: " + JSON.stringify(newConfig.personas[personaKey].keywords));
                                                   resolve(newConfig);
                                               }).catch((e) => {
-                                                console.log("updateLexicon - Error ");
-                                                console.log("updateLexicon - Config: " + JSON.stringify(config.personas[personaKey].keywords));
                                                 resolve(config);
                                               })
                                             }).catch((e) => {
-                                                console.log("updateLexicon2 - Error ");
-                                                console.log("updateLexicon2 - Config: " + JSON.stringify(config.personas[personaKey].keywords));
                                                 resolve(config);
                                             }); 
                           }
                       }, 
                       error: function(xhr, status, error){ 
-                          console.log("Error " + status + ": " + error);
+                          console.log("no synonyms found");
                           resolve(config);
                       } 
                   });
@@ -117,22 +114,17 @@ var urlLib = {
 
 
           }).then(function(newConfig) {
-              console.log("New Config outer: " + JSON.stringify(newConfig.personas[personaKey].keywords));
               resolve(newConfig);
           }).catch((e) => {
-            console.log("updateLexicon - outer- Error " + JSON.stringify(config));
             resolve(config);
           });
         },
         insertWordIfFitEnough: function (word, config, masterWord) {
-            console.log("Word: " + word);
-            console.log("keywords " + JSON.stringify(config.personas[masterWord].keywords));
             return new Promise(function (resolve, reject) {
 
                 var getNumOfResults = function (search) {
                     return new Promise(function (resolve, reject) {                        
                         var url = "https://www.google.com/search?q=" + encodeURIComponent(search);
-                        console.log(url);
                         $.get({
                             url: url,
                             success: function (data) {
@@ -146,8 +138,6 @@ var urlLib = {
                                 resolve(numberOfResults);
                             },
                             error: function (e) {
-                                //reject(e);
-                                //resolve(config);
                                 reject(e);
                             }
                         });
@@ -174,27 +164,21 @@ var urlLib = {
                               reject(e);
                             })
                     }).then((words) => {
-                        console.log("Built all word scores!");
                         words.sort(urlLib._evolutionModule.wordSorter);
                         return Promise.resolve(words);
                     })
                 };
                 
-                console.log(JSON.stringify(config.personas[masterWord].keywords));
                 buildScoresIfNotThere(config.personas[masterWord].keywords).then(function (words) {
-                    console.log("buildScoresIfNotThere: " + JSON.stringify(words));
-
                     //get worst word in words
                     var worstWord = words.shift();
-                    console.log("buildScoresIfNotThere-Worstword: " + JSON.stringify(worstWord));
 
                     getNumOfResults(word + " " + masterWord).then(function (scoreNew) {
                         //give the oldWord a last chance
-                        getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) {
-                            //console.log("Fitnessfunction("+word+"): "+worstWord .word+" "+masterWord+": "+scoreOld+ " vs. "+word +" "+masterWord+": "+scoreNew);
+                        getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) {                  
                             if (scoreNew > scoreOld) {
                                 words.push({
-                                    name: word,
+                                    word: word,
                                     score: scoreNew
                                 });
                                 console.log("Fitnessfunction: " + worstWord.word + " replaced by " + word + "(" + scoreNew + ")");
@@ -209,13 +193,11 @@ var urlLib = {
                             resolve(config);
                         });
                     }).catch((e) => {
-                     // resolveO(config);
                      reject(e);
                     });
                 });
 
             }).catch((e) => {        
-                console.log("insertWordIfFitEnough - error ");
                 resolve(config);
             });
         }
@@ -225,20 +207,11 @@ var urlLib = {
     _buildSearchString(personaKey, config) {
         return new Promise(function (resolve, reject) {
             urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (newConfig) {
-                console.log("updated lexicon " + JSON.stringify(newConfig));
-
-                //choose random word
-                /*var searchString = newConfig.personas[personaKey].keywords[Math.floor(Math.random() * newConfig.personas[personaKey].keywords.length)];
-                console.log(searchString.word);
-                var resultObj = {
-                    "searchString": searchString.word,
-                    "personaKey": personaKey,
-                    "config": config
-                };*/
 
                 //choose first and last word in ordered list (by score)
-                var searchStringFirstLast = newConfig.personas[personaKey].keywords[0].word + " " 
-                    + newConfig.personas[personaKey].keywords[newConfig.personas[personaKey].keywords.length - 1].word
+                var keywordLength = newConfig.personas[personaKey].keywords.length -1;
+                var searchStringFirstLast = newConfig.personas[keywordLength].word + " " 
+                    + newConfig.personas[personaKey].keywords[keywordLength].word
 
                 console.log(searchStringFirstLast);
                 var resultObj = {
@@ -249,22 +222,13 @@ var urlLib = {
 
                 resolve(resultObj);
             }).catch((e) => {
-                console.log("_buildSearchString - error " + JSON.stringify(e));
-                
-                //choose random word
-                //var searchString = config.personas[personaKey].keywords[Math.floor(Math.random() * config.personas[personaKey].keywords.length)];
-                /*console.log(searchString.word);
-                var resultObj = {
-                    "searchString": searchString.word,
-                    "personaKey": personaKey,
-                    "config": config
-                };*/
+                console.log("config not changed");
 
                 //choose first and last word in ordered list (by score)
-                var searchStringFirstLast = config.personas[personaKey].keywords[0].word + " " 
-                    + config.personas[personaKey].keywords[config.personas[personaKey].keywords.length - 1].word
+                var keywordLength = config.personas[personaKey].keywords.length -1;
+                var searchStringFirstLast = config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word + " " 
+                    + config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word
 
-                console.log(searchStringFirstLast);
                 var resultObj = {
                     "searchString": searchStringFirstLast,
                     "personaKey": personaKey,
@@ -358,7 +322,6 @@ var urlLib = {
     },
 
     _getUrl: function (paramsObject) {
-        console.log("Provided Object is: " + paramsObject)
         return new Promise(function (resolve, reject) {
             var url = "https://www.google.com/search?safe=active&num=25&q=" + encodeURIComponent(paramsObject.searchString);
             $.get({

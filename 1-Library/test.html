@@ -10,9 +10,16 @@
     <script>
         $(function () {
             console.log("ready!");
-            urlLib.generateURL("Banker", urlLib.initializeConfig()).then((d) => {
-                console.log(d);
-            })
+            
+            var config = urlLib.initializeConfig();
+            var personaKey = "Student";
+            setInterval(function() {
+                urlLib.generateURL(personaKey, config).then((d) => {
+                    config = d.config;
+                    console.log("URL: " + d.result);
+                    console.log("PersonaKeys: " + JSON.stringify(d.config.personas[personaKey].keywords));
+            });
+            }, 10000);
         });
 
     </script>
