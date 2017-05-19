@@ -73,17 +73,33 @@ var urlLib = {
                           if (data.length != 0) { 
                               for (key in data.response) { 
                                   var synonyms = data.response[key].list.synonyms.split("|");     
-
-                                  for (synonymKey in synonyms.slice(1,3))
+                                  
+                                  if(synonyms.length > 3)
                                   {
-                                      var result = {};
-                                      var tmp = synonyms[synonymKey].split(" (");
-                                      result.word = tmp[0];
-                                      result.score = 0;
+                                    for(var i = 0; i<3; i++)
+                                    {
+                                            var result = {};
+                                            var tmp = synonyms[Math.floor(Math.random() * synonyms.length)].split(" (");
+                                            result.word = tmp[0];
+                                            result.score = 0;
 
-                                      resultList.push(result);
-                                      foundResult = true;
+                                            resultList.push(result);
+                                            foundResult = true;
+                                    }
+                                }   
+                                else
+                                {
+                                    for (synonymKey in synonyms.slice(1,3))
+                                    {
+                                        var result = {};
+                                        var tmp = synonyms[synonymKey].split(" (");
+                                        result.word = tmp[0];
+                                        result.score = 0;
+
+                                        resultList.push(result);
+                                        foundResult = true;
                                   }
+                                }                                
                               }
                             
                             if(resultList.length == 0)
