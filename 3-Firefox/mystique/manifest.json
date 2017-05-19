@@ -30,7 +30,7 @@
 	},
 	
 	"browser_action": {
-		"default_icon": "icons/DHBW_CAS_logo_blur-96.png",
+		"default_icon": "icons/logo-96.png",
 		"default_popup": "popup/mystique_popup.html"
 	},
 	
