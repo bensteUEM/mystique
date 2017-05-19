@@ -532,13 +532,15 @@ var urlLib = {
                     }
                 },
                 "settings": {
-                    "maxBytes": 5000,
+                    "maxBytes": 104857600, //Per day -> equals 100MB
                     "functionlity": true,
                     "tracing": true,
                     "followLinkOnDomainOnly": true,
-                    "linkDepth_max": 5,
-                    "maxNumberOfLinksToClick": 10,
-                    "maxVisitTime": 10
+                    "maxLinkDepth": 45,
+                    "maxNumberOfLinksToClick": 30, // value is interpreted in percent, so no need for a float
+                    "minVisitTime": 3,
+                    "maxVisitTime": 120,
+                    "maxPageviewsFromRoot": 50
                 }
             }
         };
