@@ -1,14 +1,14 @@
 function saveConfig(e) {
 	e.preventDefault();
 	
-	var fakeConfig: {
-		blackList: document.querySelector("#blackList").value,
-		wishList: document.querySelector("#wishList").value,
+	var fakeConfig = {
+		blacklist: document.querySelector("#blacklist").value.split(","),
+		wishlist: document.querySelector("#wishlist").value.split(","),
 		persona: {
 			key: document.querySelector("#personaKey").value,
-			keywords: document.querySelector("#keywords").value,
-			defaultUrls: document.querySelector("#defaultUrls").value
-		}
+			//keywords: document.querySelector("#keywords").value,
+			defaultURLs: document.querySelector("#defaultURLs").value.split(",")
+		},
 		settings: {
 			maxBytes: document.querySelector("#maxBytes").value,
 			functionality: true,
@@ -39,8 +39,8 @@ function restoreConfig() {
 	  //Set default values of no config found in the storage
 	  if(config == null) {
 		  config = {
-            /*blacklist: ["bild"],
-            whishlist: [],
+            blacklist: ["bild", "test"],
+            wishlist: ["geld", "aktie"],
             persona: {                
                 key: "Banker",
                 keywords: [
@@ -54,9 +54,9 @@ function restoreConfig() {
                     "http://www.boerse.de/",
                     "http://www.faz.net/aktuell/finanzen/"
                 ]
-            },*/
+            },
             settings: {
-                maxBytes: 5000, //PER dAY
+                maxBytes: 5000,
                 functionality: true,
                 tracing: true,
                 followLinkOnDomainOnly: true,
@@ -69,12 +69,12 @@ function restoreConfig() {
         }
 	  }
 
-	//document.querySelector("#blackList").value = config.blackList;
-	//document.querySelector("#wishList").value = config.wishList;
-	//document.querySelector("#personaKey").value = config.persona.key;
+	document.querySelector("#blacklist").value = config.blacklist.join();
+	document.querySelector("#wishlist").value = config.wishlist.join();
+	document.querySelector("#personaKey").value = config.persona.key;
 	//document.querySelector("#keywords").value = config.persona.keywords;
-	//document.querySelector("#defaultUrls").value = config.persona.defaultUrls;
-	document.querySelector("#maxBytes").value = 5;//config.settings.maxBytes;
+	document.querySelector("#defaultURLs").value = config.persona.defaultURLs.join();
+	document.querySelector("#maxBytes").value = config.settings.maxBytes;
 	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
 	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
 	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;

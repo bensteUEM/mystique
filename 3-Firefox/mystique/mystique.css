@@ -5,6 +5,7 @@
 }
 body, html {
         margin:0px;
+		height:600px;
 }
 
 .header_container img  {
@@ -21,8 +22,8 @@ body, html {
 }
 
 .settings_summary {
-	  width:350px;
-	  height:400px;
+	  width:550px;
+	  height:550px;
 	  margin:5px;
 	
 }
@@ -40,7 +41,7 @@ body, html {
 
 .settings_item .label {
 		float:left;
-		width:200px;
+		width:235px;
 		font-weight:600;
 }
 

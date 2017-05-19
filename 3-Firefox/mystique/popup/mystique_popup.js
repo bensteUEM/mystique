@@ -18,11 +18,11 @@ function restoreConfig() {
 	  //TODO: Init will be done by library in future
 	  if(config == null) {
 		  config = {
-            blacklist: ["bild"],
-            whishlist: [],
+            blacklist: ["bild", "test"],
+            wishlist: ["geld", "aktie"],
             persona: {                
                 key: "Banker",
-                keywords: [
+                 keywords: [
                     { "word": "DAX", "score": 0 },
                     { "word": "Börsenkurs", "score": 5 },
                     { "word": "Aktien", "score": 10 },
@@ -48,17 +48,17 @@ function restoreConfig() {
         }
 	  }
 
-	document.querySelector("#blackList").value = config.blackList;
-	document.querySelector("#wishList").value = config.wishList;
-	document.querySelector("#personaKey").value = config.persona.key;
-	//document.querySelector("#keywords").value = config.persona.keywords;
-	//document.querySelector("#defaultUrls").value = config.persona.defaultUrls;
-	document.querySelector("#maxBytes").value = config.settings.maxBytes;
-	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
-	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
-	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;
-    document.querySelector("#maxVisitTime").value = config.settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
+	document.querySelector("#blacklist").textContent = config.blacklist.join();
+	document.querySelector("#wishlist").textContent = config.wishlist.join();
+	document.querySelector("#personaKey").textContent = config.persona.key;
+	//document.querySelector("#keywords").textContent = config.persona.keywords;
+	//document.querySelector("#defaultURLs").textContent = config.persona.defaultURLs.join();
+	document.querySelector("#maxBytes").textContent = config.settings.maxBytes;
+	document.querySelector("#maxLinkDepth").textContent = config.settings.maxLinkDepth;
+	document.querySelector("#maxNumberOfLinksToClick").textContent = config.settings.maxNumberOfLinksToClick;
+	document.querySelector("#minVisitTime").textContent = config.settings.minVisitTime;
+    document.querySelector("#maxVisitTime").textContent = config.settings.maxVisitTime;
+    document.querySelector("#maxPageviewsFromRoot").textContent = config.settings.maxPageviewsFromRoot;
   }
   
   var getting = browser.storage.local.get("fakeConfig");
@@ -106,7 +106,7 @@ function toggleState() {
 }
 
 document.querySelector("#settings_link").addEventListener("click", openSettings);
-//document.querySelector("#power_button").addEventListener("click", toggleState);
+document.querySelector("#power_button").addEventListener("click", toggleState);
 document.addEventListener("DOMContentLoaded", restoreConfig);
-//document.addEventListener("DOMContentLoaded", loadStatus);
+document.addEventListener("DOMContentLoaded", loadStatus);
 
