@@ -1,86 +1,300 @@
 // for testing purposes
 var urlList = ["https://www.google.de", "https://wikipedia.de", "https://ebay.de", "https://kansdf.de"]
 var i = 0
+var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
+var interval = 5000;
 
 function urlProvider() {
 	
-	openUrl(urlList[i++])
+//	openUrl(urlList[i++], false)
+//	
+//	if (i == urlList.length) {
+//		i = 0
+//	}
 	
-	if (i == urlList.length) {
-		i = 0
-	}
+	openUrl("https://www.google.de", false)
 }
 
+browser.runtime.onMessage.addListener(notify)
+//browser.browserAction.onClicked.addListener(urlProvider);
 browser.browserAction.onClicked.addListener(urlProvider);
 
+function notify(message, sender, sendResponse){
+	if (sender.tab.id == tabId) {
+		console.log(message.length + " Links received from CS")
+		
+		setTimeout(selectNextLink,5000);
+	}
+
+	function selectNextLink() {
+        urls = [];
+        urls = getLinksDomainPercentage(message,false,0.1)
+        pickIndex = Math.floor(Math.random()*urls.length)
+
+		openUrl(urls[pickIndex], false)
+	}
+}
 
 // functionality to open a given URL in a separate tab object 
 
 var tabId = -1
-var lastUrlOpened
+var windowId = -1
+var lastUrlRequested
+var runInNewWindow
+
+
+//ToDo Listener to cancel interval if plugin is turned off
+function callTimer(){
+	setInterval(callLibary,interval);
+	console.log(interval);
+}
+
+//function calls the libary to generate a random URL from the wordlist
+function callLibary(){
+
+	//ToDo place libary at the right place
+	urlLib.generateURL({
+		wordlist: wl
+		}).then(function(url) {
+			console.log(url);
+			openUrl(url);
+			});
+}
 
 /**
  * Opens the given URL in a new tab. If the function has already been called at least once 
- * the tab that was initially created will be reused in every subsequent function call to open the given URL.  
+ * the tab that was initially created will be reused in every subsequent function call to open the given URL.
+ * The new tab can either be opened in the current window or in a new one alternatively.
  * 
  * @param url the URL to be opened
+ * @param inNewWindow specifies whether the URL shall be opened in a new window 
  */
-function openUrl(url) {
-	console.log("Button clicked - load URL in separate tab")
+function openUrl(url, inNewWindow) {
+	runInNewWindow = inNewWindow
+	
+	if(inNewWindow) {
+		
+		if (windowId < 0) {
+			console.log("Creating new window to run addon inside")
+			
+			lastUrlRequested = url
+			
+			windowCreating = browser.windows.create({
+				incognito: true,
+				state: "minimized"
+			});
+			
+			windowCreating.then(onWindowCreated, onError);
+		}
+		else {
+			maintainAddOnTab(url, windowId)
+		}
+	}
+	else {
+		maintainAddOnTab(url, null)
+	}
+	
+	function onWindowCreated(window) {
+		windowId = window.id
+		
+		console.log('New window created - ID: ' + window.id +
+				' / FOCUSED: ' + window.focused)
+				
+		maintainAddOnTab(lastUrlRequested, windowId)
+	}
+}
+
+/**
+ * Helper function that keeps track of the single tab which is supposed to serve the add-on for URL calls only.
+ * Therefore a tab object is created, updated or reopened if necessary. 
+ * 
+ * @param url
+ * @param windowId
+ */
+function maintainAddOnTab(url, windowId) {
+	lastUrlRequested = url
 	
 	if (tabId < 0) {
-		var creating = browser.tabs.create({
-			url: url,
-			active: false,
-			index: 0,
-			pinned: true
-		});
+		if (windowId == null){
+			var creating = browser.tabs.create({
+				url: url,
+				active: false,
+				index: 0,
+				pinned: true
+			});
+		}
+		else {
+			var creating = browser.tabs.create({
+				url: url,
+				active: true,
+				index: 0,
+				windowId: windowId
+			});
+		}
 		
-		creating.then(onCreated, onError);
+		creating.then(onTabCreated, onError);
 	} else {
-		
 		var updatingTab = browser.tabs.update(tabId, {
 			url: url
 		});
 		
-		updatingTab.then(onUpdated, onError)
+		updatingTab.then(onTabUpdated, onUpdateTabError)
+	}
+	
+	function onTabCreated(tab) {
+		 
+		tabId = tab.id
+		
+		console.log('New tab created - ID: ' + tab.id +
+				' / SELECTED: ' + tab.selected +
+				' / PINNED: ' + tab.pinned +
+				' / TITLE: ' + tab.title +
+				' / STATUS: ' + tab.status +
+				' / WINDOW-ID: ' + tab.windowId +
+				' / URL: ' + tab.url);
+
+		//injectContentScript("/mystique.js")
+	}
+
+	function onTabUpdated(tab) {
+		
+		console.log('Tab updated - ID: ' + tab.id +
+				' / SELECTED: ' + tab.selected +
+				' / PINNED: ' + tab.pinned +
+				' / TITLE: ' + tab.title +
+				' / STATUS: ' + tab.status +
+				' / WINDOW-ID: ' + tab.windowId +
+				' / URL: ' + tab.url);
+		
+		//injectContentScript("/mystique.js")
+	}
+	
+	function onError(error){
+		console.log(error)
 	}
 }
 
-function onCreated(tab) {
- 
-	tabId = tab.id
-	lastUrlOpened = tab.url
+function sendMessageToContentScript(command){
 	
-	console.log('New tab created - ID: ' + tab.id +
-			' / SELECTED: ' + tab.selected +
-			' / PINNED: ' + tab.pinned +
-			' / TITLE: ' + tab.title +
-			' / STATUS: ' + tab.status +
-			' / URL: ' + tab.url)
+	browser.tabs.sendMessage(
+			tabId,
+			{action: command}
+		).then(response => {
+			console.log("BackgroundScript - message received from content: " + response.response)
+		});
 }
 
-function onUpdated(tab) {
+function injectContentScript(script){
 	
-	lastUrlOpened = tab.url
+	var executing = browser.tabs.executeScript(tabId, {
+		allFrames: true,
+		file: script,
+		runAt: "document_start"
+	});
 	
-	console.log('Tab updated - ID: ' + tab.id +
-			' / SELECTED: ' + tab.selected +
-			' / PINNED: ' + tab.pinned +
-			' / TITLE: ' + tab.title +
-			' / STATUS: ' + tab.status +
-			' / URL: ' + tab.url)
+	executing.then(onExecuted, onError)
+	
+	function onExecuted(result){
+		console.log('Script has been injected sucessfully - ' + result)
+		
+		sendMessageToContentScript("execute")
+	}
+}
+
+function reopenTab(){
+	tabId = -1
+	openUrl(lastUrlRequested, runInNewWindow)
+}
+
+function onUpdateTabError(error){
+	console.log(error)
+	
+	if (runInNewWindow) {
+		// check whether the separate window still exists - otherwise open again 
+		getting = browser.windows.get(windowId)
+		
+		getting.then(reopenTab, onGetWindowError)
+	}
+	else {
+		reopenTab()
+	}
+	
+	function onGetWindowError(error) {
+		console.log(error)
+		
+		windowId = -1
+		reopenTab()
+	}
 }
 
 function onError(error) {
 	console.log(error)
-	 
-	if (tabId >=0 ){
-		// tab already existed when error occurred
-		console.log("Trying to create new tab")
-		tabId = -1
-		openUrl(lastUrlOpened)
+}
+
+
+//========================= Link handling part
+
+/**
+* getLinksDomain is used to get a list of all links in the specified 
+@param document link
+@param followLinkOnDomainOnly to filter only to same Domain links
+*/
+
+function getLinksDomain(followLinkOnDomainOnly){
+    linksDetected = CONTENTSCRIPT.getLinks(); //TODO
+	var array = [];
+	for(var i=0; i<linksDetected.length; i++) {
+		if (isOnSameDomain(document.location.href,linksDetected[i])){
+			array.push(linksDetected[i]);
+		}
+		else if (followLinkOnDomainOnly) {
+			array.push(linksDetected[i]);
+		}
+
 	}
+	return array;
+}
+
+/**
+* getLinksDomain is used to get a list of all links in the specified 
+@param document link
+@param followLinkOnDomainOnly to filter only to same Domain links
+*/
+function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,numberOfLinksToClick_max){
+	var array = [];
+	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
+	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
+	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
+
+	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
+		return 	allLinks;
+	}
+	chosen = 0;
+	while (chosen < numberToChoose) {
+		pickIndex = Math.floor(Math.random()*allLinks.length)
+    		array.push(allLinks[pickIndex]);
+    		chosen++;
+	}
+	return array;
+}
+
+/**
+* select links is used to get a number of links based on the
+*/
+function isOnSameDomain(checkPage){
+	var prefix = /^https?:\/\//i;
+    var domain = /^[^\/]+/;
+    // removing prefix
+    url1 = window.location.href.replace(prefix, "");
+	url2 = checkPage.replace(prefix, "");
+    	// if link starts with / it is on the current page
+	if (url2.charAt(0) === "/") {
+        	return true;
+    	}
+    	// extract domain and compare
+   	var part1 = url1.match(domain).toString();
+	var part2 = url2.match(domain);
+	return part1.includes(part2);
 }
 
 //========================= USER AGENT Part
