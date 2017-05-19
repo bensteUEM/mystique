@@ -260,10 +260,10 @@ function getLinksDomain(followLinkOnDomainOnly){
 @param document link
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,numberOfLinksToClick_max){
+function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLinksToClick){
 	var array = [];
-	//alert("Choose max "+numberOfLinksToClick_max*100+" % Links");
-	var numberToChoose = Math.round(numberOfLinksToClick_max*Math.random()*allLinks.length);
+	//alert("Choose max "+maxNumberOfLinksToClick*100+" % Links");
+	var numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allLinks.length);
 	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
 
 	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
