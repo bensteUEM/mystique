@@ -193,6 +193,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (changes.hasOwnProperty(active)) {
         let storageChange = changes[active];
         runMystique = storageChange.newValue
+		if (runMystique)
+		{
+			    run();
+		}
     }
 });
 
