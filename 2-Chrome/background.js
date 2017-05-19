@@ -9,6 +9,9 @@ var currLinkDepth = 0;
 var linkCoveragePecentage;
 var minVisitTime;
 var maxVisitTime;
+var maxPageViewsFromRoot;
+var currentMaxPageViewsFromRoot;
+
 // Reference for tab, which loads the given urls
 var urlWindow;
 // count index to get the current url from the urls lib
@@ -47,6 +50,7 @@ chrome.storage.sync.get({
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth_max;
     maxBytes = items.maxBytes;
+    maxPageViewsFromRoot = parseInt(items.maxPageViewsFromRoot);
     minVisitTime = parseInt(items.minVisitTime);
     maxVisitTime = parseInt(items.maxVisitTime);
 
@@ -56,15 +60,21 @@ chrome.storage.sync.get({
 
 let run = function () {
     if (runMystique && usedBytes <= maxBytes) {
-        if (urls.length === 0) {
+        if (!currentMaxPageViewsFromRoot || currentMaxPageViewsFromRoot < 0) {
+            currentMaxPageViewsFromRoot = maxPageViewsFromRoot;
+            urls = [];
+        }
+        if (urls.length <= 0) {
             urls.unshift({
                 url: "http://wikipedia.de",
                 level: maxLinkDepth
             });
         }
+        currentMaxPageViewsFromRoot--;
         let url = urls[0];
         currLinkDepth = url.level;
-        console.info("CurrLinkDepth [" + currLinkDepth + "], urls [" + urls.length + "]");
+        console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
+            + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
         urls = urls.splice(1, urls.length);
         openUrl(url.url).then(() => {
             setTimeout(run, getRandomInt(minVisitTime, maxVisitTime + 1) * 1000);
@@ -185,10 +195,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (changes.hasOwnProperty(active)) {
         let storageChange = changes[active];
         runMystique = storageChange.newValue
-		if (runMystique)
-		{
-			    run();
-		}
+        if (runMystique) {
+            run();
+        }
     }
 });
 
