@@ -41,7 +41,10 @@ function run(){
 	console.log("ContentScript - action triggered")
 	
 	var links = getLinks();
-	var sending = browser.runtime.sendMessage(links);
+	var sending = browser.runtime.sendMessage({
+		topic: "links",
+		data: links
+	});
 }
 
 /**
