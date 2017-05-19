@@ -58,7 +58,7 @@ function restoreConfig() {
 	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
 	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;
     document.querySelector("#maxVisitTime").value = config.settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
+    //document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
   }
   
   var getting = browser.storage.local.get("fakeConfig");
@@ -93,6 +93,25 @@ function loadStatus() {
 
 function toggleState() {
 
+	//load settings
+	var getting = browser.storage.local.get("fakeConfig");
+    getting.then(toggleStateWithConfig, onError);
+  
+    function onError(error) {
+    console.log(`Error: ${error}`);
+    }
+}
+	
+function toggleStateWithConfig(result) {
+
+    console.log("toggleStateWithConfig result: " + result)
+    console.log("toggleStateWithConfig result.fakeconfig: " + result.fakeConfig)
+    
+   	var sending = browser.runtime.sendMessage({
+		topic: "config",
+		data: result.fakeConfig
+    
+	});
 	var active = true; //TODO: Get Status of Extension
 	var className = active ? "activated" : "deactivated";
 	var statusText = active ? "ON" : "OFF";
@@ -111,7 +130,7 @@ function toggleState() {
 }
 
 document.querySelector("#settings_link").addEventListener("click", openSettings);
-//document.querySelector("#power_button").addEventListener("click", toggleState);
+document.querySelector("#power_button").addEventListener("click", toggleState);
 document.addEventListener("DOMContentLoaded", restoreConfig);
 //document.addEventListener("DOMContentLoaded", loadStatus);
 

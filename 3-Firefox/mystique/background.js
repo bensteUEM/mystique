@@ -17,6 +17,7 @@ var lastUrlRequested
 var runInNewWindow = false
 
 var config
+var settings
 var maxLinkDepth = 5 //TODO
 var urls = []
 
@@ -28,7 +29,8 @@ function messageReceived(message, sender, sendResponse){
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		console.log(message.data.length + " links received from CS")
 		
-		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01) //TODO
+		let filteredLinks = getLinksDomainPercentage(message.data,settings.followLinkOnDomainOnly,settings.maxNumberOfLinksToClick)
+		console.log("PARAMs"+settings.followLinkOnDomainOnly+"==="+settings.maxNumberOfLinksToClick)
 		console.log(filteredLinks.length + " links remain after filtering")
 		maintainLinksToFollow(filteredLinks);
 		setTimeout(callNextUrl,5000);
@@ -40,6 +42,7 @@ function messageReceived(message, sender, sendResponse){
 	else if (message.topic == "config") {
 		console.log("Config object received in background: " + message.data)
 		config = message.data;
+		settings = config.settings;
 	}
 
 	function callNextUrl() {
@@ -104,7 +107,7 @@ function maintainLinksToFollow(newLinks) {
 	}
 	
 	function logLinkList(){
-		console.info(urls)
+		console.info(urls);
 //		for (url in urls){
 //			console.info("URL: " + url.url + " - LVL: " + url.level);
 //		}
