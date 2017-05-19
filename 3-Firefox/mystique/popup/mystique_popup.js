@@ -74,12 +74,17 @@ function toggleState() {
 	var className = active ? "activated" : "deactivated";
 	var statusText = active ? "ON" : "OFF";
 	
-	var btn = document.querySelector("#power_button");
-	if (btn.classList.length > 0) {
-		btn.classList.remove(e.target.classList.item(0));
-	}
-	btn.classList.add(className);
-	btn.innerText = statusText; 
+//	var btn = document.querySelector("#power_button");
+//	if (btn.classList.length > 0) {
+//		btn.classList.remove(e.target.classList.item(0));
+//	}
+//	btn.classList.add(className);
+//	btn.innerText = statusText;
+	
+	var sending = browser.runtime.sendMessage({
+		topic: "status",
+		data: active ? "ON" : "OFF"
+	});
 }
 
 document.querySelector("#settings_link").addEventListener("click", openSettings);

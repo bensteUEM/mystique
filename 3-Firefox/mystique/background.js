@@ -5,7 +5,7 @@ var interval = 5000;
 var startingUrl = "https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"
 
 function urlProvider() {
-	maintainLinksToFollow()
+	maintainLinksToFollow(startingUrl)
 	openUrl(urls[0].url, runInNewWindow)
 }
 
@@ -19,15 +19,21 @@ var maxLinkDepth = 5
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
-browser.browserAction.onClicked.addListener(urlProvider);
 
 function messageReceived(message, sender, sendResponse){
-	if (sender.tab.id == tabId) {
-		console.log(message.length + " Links received from CS")
+	console.log("BackgroundScript - message received")
+	
+	if (message.topic == "links" && sender.tab.id == tabId) {
+		console.log(message.data.length + " links received from CS")
 		
-		let filteredLinks = getLinksDomainPercentage(message,false,0.1)
+		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
+		console.log(filteredLinks.length + " links remain after filtering")
 		maintainLinksToFollow(filteredLinks)
 		setTimeout(callNextUrl,5000);
+	}
+	else if (message.topic == "status") {
+		console.log("Toggle running state: " + message.data)
+		urlProvider()
 	}
 
 	function callNextUrl() {
@@ -35,18 +41,23 @@ function messageReceived(message, sender, sendResponse){
 	}
 }
 
+/**
+ * This function maintains the global URL list. It takes new links to be added as an argument and adds them to the global list.
+ * Hereby it takes care of the correct link order (next link to be opened is always at first index) and keeps track of the max link depth. 
+ * 
+ * @param newLinks to be added to the global list of links that have to opened
+ * @returns
+ */
 function maintainLinksToFollow(newLinks) {
 	
+	// CASE: URL list is initially empty
 	if (urls.length == 0) {
 		// TODO this is when a very new URL from the library has to be requested 
-		urls.unshift({
-			url: startingUrl,
-			level: maxLinkDepth
-		});
-		
+		initTree();
 		logLinkList();
 	}
-	else if (urls[0].level > 0) {
+	// CASE: max link depth not yet reached and new links have been provided
+	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
 		let nextLevel = urls[0].level - 1
 		
 		newLinks = newLinks.map((link) => {
@@ -59,7 +70,13 @@ function maintainLinksToFollow(newLinks) {
 		
 		logLinkList();
 	}
+	// CASE: max link depth reached and/or NO new links have been provided
 	else {
+		reduceTree();
+		logLinkList();
+	}
+	
+	function reduceTree(){
 		let lastLevel
 		do {
 			lastLevel = urls[0].level
@@ -68,13 +85,16 @@ function maintainLinksToFollow(newLinks) {
 		
 		if (urls.length == 0) {
 			// TODO this is when a very new URL from the library has to be requested 
-			urls.unshift({
-				url: startingUrl,
-				level: maxLinkDepth
-			});
+			initTree();
 		}
-		
-		logLinkList();
+	}
+	
+	function initTree(){
+		// TODO this is when a very new URL from the library has to be requested  
+		urls.unshift({
+			url: startingUrl,
+			level: maxLinkDepth
+		});
 	}
 	
 	function logLinkList(){
@@ -85,7 +105,7 @@ function maintainLinksToFollow(newLinks) {
 	}
 }
 
-//ToDo Listener to cancel interval if plugin is turned off
+//TODO Listener to cancel interval if plugin is turned off
 function callTimer(){
 	setInterval(callLibary,interval);
 	console.log(interval);
@@ -94,7 +114,7 @@ function callTimer(){
 //function calls the libary to generate a random URL from the wordlist
 function callLibary(){
 
-	//ToDo place libary at the right place
+	//TODO place libary at the right place
 	urlLib.generateURL({
 		wordlist: wl
 		}).then(function(url) {
