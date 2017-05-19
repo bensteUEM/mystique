@@ -18,9 +18,6 @@ var urlWindow;
 var index = 0;
 // global interval to load urls 
 var loadUrlInterval;
-// interval duration in ms
-var intervalDuration = 5000000;
-// the next url which should be opened.
 // Could be null at the moment because the urlLib is very slow at generating new urls!"
 var nextUrl = null;
 
