@@ -2,7 +2,7 @@
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
-var startingUrl = "https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"
+var startingUrl;
 
 function urlProvider() {
 	maintainLinksToFollow(startingUrl)
@@ -26,14 +26,18 @@ function messageReceived(message, sender, sendResponse){
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		console.log(message.data.length + " links received from CS")
 		
-		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
+		let filteredLinks = getLinksDomainPercentage(message.data,false,0.10)
 		console.log(filteredLinks.length + " links remain after filtering")
 		maintainLinksToFollow(filteredLinks)
 		setTimeout(callNextUrl,5000);
 	}
 	else if (message.topic == "status") {
 		console.log("Toggle running state: " + message.data)
-		urlProvider()
+		if (message.data == "ON") 
+		{
+			callLibary();
+			//urlProvider()
+		}
 	}
 
 	function callNextUrl() {
@@ -111,14 +115,14 @@ function callTimer(){
 	console.log(interval);
 }
 
-callLibary();
+
 //function calls the libary to generate a random URL from the wordlist
 function callLibary(){
-
 	//TODO place libary at the right place
 	urlLib.generateURL("Banker", urlLib.initializeConfig()).then(function(url) {
-			console.log(url);
-			openUrl(url);
+			console.log(url.result);
+			startingUrl = url.result;
+			urlProvider();
 			});
 }
 
