@@ -45,8 +45,11 @@
 	<div class="label">
 		<label>Follow % of links on page
 			<br>
-			<input type='number' name='numberOfLinksToClick_max' id='numberOfLinksToClick_max'/>
-		</label>
+			<select id="maxNumberOfLinksToClick">
+					 <option value="20">Few</option>
+					 <option value="30" selected>Medium</option>
+					 <option value="40">Plenty</option>
+					</select>		</label>		</label>
 	</div>
 	<div class="description">Follow only links that lead to a page of the same domain</div>
 </div>
@@ -54,10 +57,26 @@
 	<div class="label">
 		<label>Follow links up to x times
 			<br>
-			<input type='number' name='linkDepth_max' id='linkDepth_max'/>
+			<select id="maxLinkDepth">
+					 <option value="2">Few</option>
+					 <option value="4" selected>Medium</option>
+					 <option value="7">Plenty</option>
+					</select>		</label>
 		</label>
 	</div>
 	<div class="description">Follow only links that lead to a page of the same domain</div>
+</div>
+<div class="settings_item">
+	<div class="label">
+		<label>Maximum page views from root
+			<br>
+			<select id="maxPageViewsFromRoot">
+					 <option value="10">Few</option>
+					 <option value="50" selected>Medium</option>
+					 <option value="100">Plenty</option>
+					</select>		</label>
+	</div>
+	<div class="description">Maximum number of clicks on subpages of a top level page (for example how many links on Wikipedia)</div>
 </div>
 <div class="settings_item">
 	<div class="label">
@@ -76,15 +95,6 @@
 		</label>
 	</div>
 	<div class="description">Maximum time before the addon automatically clicks on the next link</div>
-</div>
-<div class="settings_item">
-	<div class="label">
-		<label>Maximum page views from root
-			<br>
-			<input type='number' name='maxPageViewsFromRoot' id='maxPageViewsFromRoot'/>
-		</label>
-	</div>
-	<div class="description">Maximum number of clicks on subpages of a top level page (for example how many links on Wikipedia)</div>
 </div>
 <div class="settings_item">
 	<div class="label">
@@ -122,7 +132,9 @@
 <br>
 <br>
 <div id="status"></div>
-<button id="save">Save</button>
+<button id="save">Save</button><br><br>
+<button id="reset">Reset Settings</button>
+<br>
 <br>
 <br>
 <button id="toggleHistory">Show history </button>
