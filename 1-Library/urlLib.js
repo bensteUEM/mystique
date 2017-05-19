@@ -15,10 +15,9 @@ var urlLib = {
         return new Promise((resolve, reject) => {
             this._buildSearchString(personaKey, config)
                 .then(this._getUrl)
-                .then(this._approveUrl)
-                .then((url) => {
-                    if (url) {
-                        resolve(url);
+                .then((ret) => {
+                    if (ret) {
+                        resolve(ret);
                         return;
                     }
                     resolve(this.generateURL(personaKey, config));
@@ -234,14 +233,24 @@ var urlLib = {
                 //TODO: Choose random word
                 var searchString = newConfig.personas[personaKey].keywords[0];
                 console.log(searchString.word);
-                resolve(searchString.word);
+                var resultObj = {
+                    "searchString": searchString.word,
+                    "personaKey": personaKey,
+                    "config": config
+                };
+                resolve(resultObj);
             }).catch((e) => {
                 console.log("_buildSearchString - error " + JSON.stringify(e));
                 
                 //TODO: Choose random word
                 var searchString = config.personas[personaKey].keywords[0];
                 console.log(searchString.word);
-                resolve(searchString.word);
+                var resultObj = {
+                    "searchString": searchString.word,
+                    "personaKey": personaKey,
+                    "config": config
+                };
+                resolve(resultObj);
             });
         });
 
@@ -327,18 +336,22 @@ var urlLib = {
         },
     },
 
-    _getUrl: function (searchString) {
-        console.log("Search String is: " + searchString)
+    _getUrl: function (paramsObject) {
+        console.log("Provided Object is: " + paramsObject)
         return new Promise(function (resolve, reject) {
-            var url = "https://www.google.com/search?safe=active&num=25&q=" + encodeURIComponent(searchString);
+            var url = "https://www.google.com/search?safe=active&num=25&q=" + encodeURIComponent(paramsObject.searchString);
             $.get({
                 url: url,
                 success: data => {
-                    url = urlLib._getUrlModule._get_random_URL(data, personaKey, config);
+                    url = urlLib._getUrlModule._get_random_URL(data, paramsObject.personaKey, paramsObject.config);
                     if(url) {
-                        urlLib._getUrlModule._storeURLforPersona(url, config, personaKey);
+                        urlLib._getUrlModule._storeURLforPersona(url, paramsObject.config, paramsObject.personaKey);
                         console.log("Created URL is: " + url);
-                        resolve(url);
+                        var resultObj = {
+                            "result": url,
+                            "config": paramsObject.config
+                        };
+                        resolve(resultObj);
                     } else {
                         reject("Could not find valid URL");
                     }
@@ -348,7 +361,11 @@ var urlLib = {
                     var URLs = config.personas[personaKey].defaultURLs;
                     if(URLs.lenght > 0) {
                         url = URLs[Math.floor(Math.random() * URLs.lenght)];
-                        resolve(url);
+                        var resultObj = {
+                            "result": url,
+                            "config": paramsObject.config
+                        };
+                        resolve(resultObj);
                     } else {
                         reject(e);
                     }
