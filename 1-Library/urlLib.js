@@ -231,7 +231,7 @@ var urlLib = {
                 console.log("updated lexicon " + JSON.stringify(newConfig));
 
                 //TODO: Choose random word
-                var searchString = newConfig.personas[personaKey].keywords[0];
+                var searchString = newConfig.personas[personaKey].keywords[Math.floor(Math.random() * newConfig.personas[personaKey].keywords.length)];
                 console.log(searchString.word);
                 var resultObj = {
                     "searchString": searchString.word,
@@ -243,7 +243,7 @@ var urlLib = {
                 console.log("_buildSearchString - error " + JSON.stringify(e));
                 
                 //TODO: Choose random word
-                var searchString = config.personas[personaKey].keywords[0];
+                var searchString = config.personas[personaKey].keywords[Math.floor(Math.random() * config.personas[personaKey].keywords.length)];
                 console.log(searchString.word);
                 var resultObj = {
                     "searchString": searchString.word,
