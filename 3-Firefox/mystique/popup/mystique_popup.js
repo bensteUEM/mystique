@@ -13,23 +13,29 @@ function loadSettings() {
   function getValues(result) {
 	  
 	  var settings = result.settings;
-	  if(settings == null) {
+	  if(settings == null) { //TODO init will be done by library in future
 		  settings = {
 				maxBytes: "25",
-				linkCountPercent: "20",
-				linkDepthMax: "2",
+				maxNumberOfLinksToClick: "20",
+				maxLinkDepth: "2",
 				persona: "Persona1",
 				blackList: "black1",
-				wishList: "wish1"
+				wishList: "wish1",
+				minVisitTime : "60",
+				maxVisitTime: "660",
+				maxPageviewsFromRoot: "100"
 		}
 	  }
 
     document.querySelector("#maxBytes").textContent = settings.maxBytes;
-	document.querySelector("#linkCountPercent").textContent = settings.linkCountPercent;
-	document.querySelector("#linkDepthMax").textContent = settings.linkDepthMax;
+	document.querySelector("#maxNumberOfLinksToClick").textContent = settings.maxNumberOfLinksToClick;
+	document.querySelector("#maxLinkDepth").textContent = settings.maxLinkDepth;
 	document.querySelector("#persona").textContent = settings.persona;
 	document.querySelector("#blackList").textContent = settings.blackList;
 	document.querySelector("#wishList").textContent = settings.wishList;
+	document.querySelector("#minVisitTime").textContent = settings.minVisitTime;
+    document.querySelector("#maxVisitTime").textContent = settings.maxVisitTime;
+    document.querySelector("#maxPageviewsFromRoot").textContent = settings.maxPageviewsFromRoot;
   }
   
   var getting = browser.storage.local.get("settings");
