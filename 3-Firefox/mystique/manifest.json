@@ -30,6 +30,7 @@
 	},
 	
 	"browser_action": {
+		"default_popup": "popup/mystique_popup.html",
 		"default_icon": "icons/logo-96.png"
 	},
 	
