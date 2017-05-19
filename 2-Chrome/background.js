@@ -32,7 +32,7 @@ var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad"
 chrome.storage.sync.get({
     activate: "true",
     followLinkOnDomainOnly: "false",
-    maxBytes: '100',
+    maxBytes: 104857600,
     numberOfLinksToClick_max: 10,
     linkDepth_max: 5,
     minVisitTime: 3,
@@ -43,7 +43,6 @@ chrome.storage.sync.get({
     personas: 1,
     history: "",
     usedBytes: 0,
-    lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth_max;
@@ -52,18 +51,11 @@ chrome.storage.sync.get({
     maxVisitTime = parseInt(items.maxVisitTime);
 
     linkCoveragePecentage = items.numberOfLinksToClick_max;
-    if (items.lastSyncDate === getYesterday(items.lastSyncDate)) {
-        usedBytes = 0;
-        chrome.storage.sync.set({lastSyncDate: new Date()});
-    } else {
-        usedBytes = items.usedBytes;
-    }
-
     run();
 });
 
 let run = function () {
-    if (runMystique) {
+    if (runMystique && usedBytes <= maxBytes) {
         if (urls.length === 0) {
             urls.unshift({
                 url: "http://wikipedia.de",
@@ -203,8 +195,4 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getYesterday(d) {
-    return d && d.getDate && new Date(d.setDate(d.getDate() - 1));
 }
