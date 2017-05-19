@@ -405,8 +405,6 @@ var urlLib = {
         var configs = {
             "de":
             {
-                "blacklist": ["bild"],
-                "whishlist": [],
                 "personas": {
                     "Banker": {
                         "key": "Banker",
@@ -516,14 +514,16 @@ var urlLib = {
                 },
                 "settings": {
                     "maxBytes": 104857600, //Per day -> equals 100MB
-                    "functionlity": true,
+                    "functionality": true,
                     "tracing": true,
                     "followLinkOnDomainOnly": true,
                     "maxLinkDepth": 45,
                     "maxNumberOfLinksToClick": 30, // value is interpreted in percent, so no need for a float
                     "minVisitTime": 3,
                     "maxVisitTime": 120,
-                    "maxPageviewsFromRoot": 50
+                    "maxPageviewsFromRoot": 50,
+                    "blacklist": ["bild"],
+                    "wishlist": []
                 }
             }
         };
