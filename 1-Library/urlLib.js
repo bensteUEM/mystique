@@ -175,8 +175,12 @@ var urlLib = {
 
                     getNumOfResults(word + " " + masterWord).then(function (scoreNew) {
                         //give the oldWord a last chance
-                        getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) {                  
-                            if (scoreNew > scoreOld) {
+                        getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) { 
+                            var wordIndex = words.findIndex(function (e) {
+                                return e.word === word;
+                            });                 
+                            //only update the word if it is better than the old word and if it is not already present in the array
+                            if ( (scoreNew > scoreOld) && (wordIndex < 0)) {
                                 words.push({
                                     word: word,
                                     score: scoreNew
