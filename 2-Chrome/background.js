@@ -85,7 +85,7 @@ let run = function () {
             + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
         urls = urls.splice(1, urls.length);
         openUrl(url.url).then(() => {
-            setTimeout(run, getRandomInt(minVisitTime, maxVisitTime + 1) * 1000);
+             setTimeout(run, getRandomInt(parseInt(minVisitTime), parseInt(maxVisitTime) + 1) * 1000);
         });
     }
 
@@ -202,8 +202,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     let active = 'activate';
     if (changes.hasOwnProperty(active)) {
         let storageChange = changes[active];
-        runMystique = storageChange.newValue
+        runMystique = storageChange.newValue;
         if (runMystique) {
+			clearInterval(loadUrlInterval);
+			loadUrlInterval=null;
             run();
         }
     }
