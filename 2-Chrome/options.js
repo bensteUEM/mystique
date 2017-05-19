@@ -4,8 +4,8 @@ function save_options() {
   var followLinkOnDomainOnly = document.getElementById('followLinkOnDomainOnly').checked;
   var maxMegaBytes = document.getElementById('maxMegaBytes').value;
   var maxBytes = (maxMegaBytes * (1024*1024));	// convert from MegaBytes to Bytes
-  var numberOfLinksToClick_max = document.getElementById('numberOfLinksToClick_max').value;
-  var linkDepth_max = document.getElementById('linkDepth_max').value;
+  var maxNumberOfLinksToClick = document.getElementById('maxNumberOfLinksToClick').value;
+  var maxLinkDepth = document.getElementById('maxLinkDepth').value;
   var minVisitTime = document.getElementById('minVisitTime').value;
   var maxVisitTime = document.getElementById('maxVisitTime').value;
   var maxPageViewsFromRoot = document.getElementById('maxPageViewsFromRoot').value;
@@ -17,8 +17,8 @@ function save_options() {
     activate: activate, 
 	followLinkOnDomainOnly: followLinkOnDomainOnly, 
 	maxBytes: maxBytes, 
-	numberOfLinksToClick_max: numberOfLinksToClick_max, 
-	linkDepth_max: linkDepth_max, 
+	maxNumberOfLinksToClick: maxNumberOfLinksToClick, 
+	maxLinkDepth: maxLinkDepth, 
 	minVisitTime: minVisitTime, 
 	maxVisitTime: maxVisitTime, 
 	maxPageViewsFromRoot: maxPageViewsFromRoot, 
@@ -43,11 +43,11 @@ function restore_options() {
     activate: "true", 
 	followLinkOnDomainOnly: "false",
 	maxBytes: 104857600, 
-	numberOfLinksToClick_max: 10, 
-	linkDepth_max: 5, 
+	maxNumberOfLinksToClick: 30, 
+	maxLinkDepth: 4, 
 	minVisitTime: 3, 
-	maxVisitTime: 60, 
-	maxPageViewsFromRoot: 30,
+	maxVisitTime: 120, 
+	maxPageViewsFromRoot: 50,
 	blacklist: "", 
 	whitelist: "", 
 	personas: 1,
@@ -57,8 +57,8 @@ function restore_options() {
     document.getElementById('activate').checked = items.activate;
 	var maxMegaBytes = (items.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
 	document.getElementById('maxMegaBytes').value = maxMegaBytes;
-    document.getElementById('numberOfLinksToClick_max').value = items.numberOfLinksToClick_max;
-    document.getElementById('linkDepth_max').value = items.linkDepth_max;
+    document.getElementById('maxNumberOfLinksToClick').value = items.maxNumberOfLinksToClick;
+    document.getElementById('maxLinkDepth').value = items.maxLinkDepth;
     document.getElementById('minVisitTime').value = items.minVisitTime;
     document.getElementById('maxVisitTime').value = items.maxVisitTime;
     document.getElementById('maxPageViewsFromRoot').value = items.maxPageViewsFromRoot;
