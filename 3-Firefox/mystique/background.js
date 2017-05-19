@@ -111,13 +111,12 @@ function callTimer(){
 	console.log(interval);
 }
 
+callLibary();
 //function calls the libary to generate a random URL from the wordlist
 function callLibary(){
 
 	//TODO place libary at the right place
-	urlLib.generateURL({
-		wordlist: wl
-		}).then(function(url) {
+	urlLib.generateURL("Banker", urlLib.initializeConfig()).then(function(url) {
 			console.log(url);
 			openUrl(url);
 			});
