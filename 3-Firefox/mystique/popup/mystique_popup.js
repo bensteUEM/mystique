@@ -8,38 +8,61 @@ function openSettings() {
 	}
 }
 
-function loadSettings() {
+function restoreConfig() {
 
-  function getValues(result) {
+  function loadValues(result) {
 	  
-	  var settings = result.settings;
-	  if(settings == null) { //TODO init will be done by library in future
-		  settings = {
-				maxBytes: "25",
-				maxNumberOfLinksToClick: "20",
-				maxLinkDepth: "2",
-				persona: "Persona1",
-				blackList: "black1",
-				wishList: "wish1",
-				minVisitTime : "60",
-				maxVisitTime: "660",
-				maxPageviewsFromRoot: "100"
-		}
+	  var config = result.fakeConfig;
+	  
+	  //Set default values of no config found in the storage
+	  //TODO: Init will be done by library in future
+	  if(config == null) {
+		  config = {
+            blacklist: ["bild"],
+            whishlist: [],
+            persona: {                
+                key: "Banker",
+                keywords: [
+                    { "word": "DAX", "score": 0 },
+                    { "word": "Börsenkurs", "score": 5 },
+                    { "word": "Aktien", "score": 10 },
+                    { "word": "Wechselkurse", "score": 3 },
+                    { "word": "Goldpreis", "score": 7 }
+                ],
+                defaultURLs: [
+                    "http://www.boerse.de/",
+                    "http://www.faz.net/aktuell/finanzen/"
+                ]
+            },
+            settings: {
+                maxBytes: 5000, //PER dAY
+                functionlity: true,
+                tracing: true,
+                followLinkOnDomainOnly: true,
+                maxLinkDepth: 5,
+                maxNumberOfLinksToClick: 0.1,
+                minVisitTime: 60,
+                maxVisitTime: 600,
+                maxPageviewsFromRoot: 100
+            }
+        }
 	  }
 
-    document.querySelector("#maxBytes").textContent = settings.maxBytes;
-	document.querySelector("#maxNumberOfLinksToClick").textContent = settings.maxNumberOfLinksToClick;
-	document.querySelector("#maxLinkDepth").textContent = settings.maxLinkDepth;
-	document.querySelector("#persona").textContent = settings.persona;
-	document.querySelector("#blackList").textContent = settings.blackList;
-	document.querySelector("#wishList").textContent = settings.wishList;
-	document.querySelector("#minVisitTime").textContent = settings.minVisitTime;
-    document.querySelector("#maxVisitTime").textContent = settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").textContent = settings.maxPageviewsFromRoot;
+	document.querySelector("#blackList").value = config.blackList;
+	document.querySelector("#wishList").value = config.wishList;
+	document.querySelector("#personaKey").value = config.persona.key;
+	//document.querySelector("#keywords").value = config.persona.keywords;
+	//document.querySelector("#defaultUrls").value = config.persona.defaultUrls;
+	document.querySelector("#maxBytes").value = config.settings.maxBytes;
+	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
+	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
+	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;
+    document.querySelector("#maxVisitTime").value = config.settings.maxVisitTime;
+    document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
   }
   
-  var getting = browser.storage.local.get("settings");
-  getting.then(getValues, onError);
+  var getting = browser.storage.local.get("fakeConfig");
+  getting.then(loadValues, onError);
   
   function onError(error) {
     console.log(`Error: ${error}`);
@@ -88,7 +111,7 @@ function toggleState() {
 }
 
 document.querySelector("#settings_link").addEventListener("click", openSettings);
-document.querySelector("#power_button").addEventListener("click", toggleState);
-document.addEventListener("DOMContentLoaded", loadSettings);
-document.addEventListener("DOMContentLoaded", loadStatus);
+//document.querySelector("#power_button").addEventListener("click", toggleState);
+document.addEventListener("DOMContentLoaded", restoreConfig);
+//document.addEventListener("DOMContentLoaded", loadStatus);
 

@@ -15,7 +15,9 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow = false
-var maxLinkDepth = 5
+
+var config
+var maxLinkDepth = 5 //TODO
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
@@ -26,14 +28,18 @@ function messageReceived(message, sender, sendResponse){
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		console.log(message.data.length + " links received from CS")
 		
-		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
+		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01) //TODO
 		console.log(filteredLinks.length + " links remain after filtering")
-		maintainLinksToFollow(filteredLinks)
+		maintainLinksToFollow(filteredLinks);
 		setTimeout(callNextUrl,5000);
 	}
 	else if (message.topic == "status") {
 		console.log("Toggle running state: " + message.data)
-		urlProvider()
+		urlProvider();
+	}
+	else if (message.topic == "config") {
+		console.log("Config object received in background: " + message.data)
+		config = message.data;
 	}
 
 	function callNextUrl() {

@@ -1,58 +1,88 @@
-function saveSettings(e) {
+function saveConfig(e) {
 	e.preventDefault();
 	
-	var settings = {
-		maxBytes: document.querySelector("#maxBytes").value,
-		linkCountPercent: document.querySelector("#maxNumberOfLinksToClick").value,
-		linkDepthMax: document.querySelector("#maxLinkDepth").value,
-		persona: document.querySelector("#persona").value,
+	var fakeConfig: {
 		blackList: document.querySelector("#blackList").value,
 		wishList: document.querySelector("#wishList").value,
-		minVisitTime: 	document.querySelector("#minVisitTime").value,
-        maxVisitTime:    document.querySelector("#maxVisitTime").value,
-        maxPageviewsFromRoot:    document.querySelector("#maxPageviewsFromRoot").value
+		persona: {
+			key: document.querySelector("#personaKey").value,
+			keywords: document.querySelector("#keywords").value,
+			defaultUrls: document.querySelector("#defaultUrls").value
+		}
+		settings: {
+			maxBytes: document.querySelector("#maxBytes").value,
+			functionality: true,
+			tracing: true,
+			followLinkOnDomainOnly: true,
+			maxLinkDepth: document.querySelector("#maxLinkDepth").value,
+			maxNumberOfLinksToClick: document.querySelector("#maxNumberOfLinksToClick").value,
+			minVisitTime: document.querySelector("#minVisitTime").value,
+			maxVisitTime: document.querySelector("#maxVisitTime").value,
+			maxPageviewsFromRoot: document.querySelector("#maxPageviewsFromRoot").value
+		}
 	}
   
-	var setting = browser.storage.local.set({settings});
-	setting.then(null, onError);
+	var config = browser.storage.local.set({fakeConfig});
+	config.then(null, onError);
 	
 	function onError(error) {
 		console.log(`Error: ${error}`);
 	}
-
 }
 
-function restoreSettings() {
+function restoreConfig() {
 
   function loadValues(result) {
 	  
-	  var settings = result.settings;
-	  if(settings == null) {
-		  settings = {
-				maxBytes: "25",
-				maxNumberOfLinksToClick: "20",
-				maxLinkDepth: "2",
-				persona: "Persona1",
-				blackList: "black1",
-				wishList: "wish1",
-				minVisitTime : "60",
-				maxVisitTime: "660",
-				maxPageviewsFromRoot: "100"
-		  }
+	  var config = result.fakeConfig; //TODO why is this called fakeConfig
+	  
+	  //Set default values of no config found in the storage
+	  if(config == null) {
+		  config = {
+            /*blacklist: ["bild"],
+            whishlist: [],
+            persona: {                
+                key: "Banker",
+                keywords: [
+                    { "word": "DAX", "score": 0 },
+                    { "word": "Börsenkurs", "score": 5 },
+                    { "word": "Aktien", "score": 10 },
+                    { "word": "Wechselkurse", "score": 3 },
+                    { "word": "Goldpreis", "score": 7 }
+                ],
+                defaultURLs: [
+                    "http://www.boerse.de/",
+                    "http://www.faz.net/aktuell/finanzen/"
+                ]
+            },*/
+            settings: {
+                maxBytes: 5000, //PER dAY
+                functionality: true,
+                tracing: true,
+                followLinkOnDomainOnly: true,
+                maxLinkDepth: 5,
+                maxNumberOfLinksToClick: 0.1,
+                minVisitTime: 60,
+                maxVisitTime: 600,
+                maxPageviewsFromRoot: 100
+            }
+        }
 	  }
 
-    document.querySelector("#maxBytes").value = settings.maxBytes;
-	document.querySelector("#maxNumberOfLinksToClick").value = settings.maxNumberOfLinksToClick;
-	document.querySelector("#maxLinkDepth").value = settings.maxLinkDepth;
-	document.querySelector("#persona").value = settings.persona;
-	document.querySelector("#blackList").value = settings.blackList;
-	document.querySelector("#wishList").value = settings.wishList;
-	document.querySelector("#minVisitTime").value = settings.minVisitTime;
-    document.querySelector("#maxVisitTime").value = settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").value = settings.maxPageviewsFromRoot;
+	//document.querySelector("#blackList").value = config.blackList;
+	//document.querySelector("#wishList").value = config.wishList;
+	//document.querySelector("#personaKey").value = config.persona.key;
+	//document.querySelector("#keywords").value = config.persona.keywords;
+	//document.querySelector("#defaultUrls").value = config.persona.defaultUrls;
+	document.querySelector("#maxBytes").value = 5;//config.settings.maxBytes;
+	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
+	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
+	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;
+    document.querySelector("#maxVisitTime").value = config.settings.maxVisitTime;
+    document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
   }
   
-  var getting = browser.storage.local.get("settings");
+  var getting = browser.storage.local.get("fakeConfig");
   getting.then(loadValues, onError);
   
   function onError(error) {
@@ -60,5 +90,5 @@ function restoreSettings() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", restoreSettings);
-document.querySelector("form").addEventListener("submit", saveSettings);
+document.addEventListener("DOMContentLoaded", restoreConfig);
+document.querySelector("form").addEventListener("submit", saveConfig);
