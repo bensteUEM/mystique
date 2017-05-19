@@ -54,9 +54,6 @@ var urlLib = {
               var language = "de_DE";
               var persona = config.personas[personaKey];
 
-              var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
-              var searchWord = persona.keywords[randomNumber];
-
               var resultList = [];
               var foundResult = false;
               var counter = 0;
@@ -65,8 +62,8 @@ var urlLib = {
 
               //while(foundResult == false && counter < 10)
               //{
-                randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
-                searchWord = persona.keywords[randomNumber];
+                var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+                var searchWord = persona.keywords[randomNumber];
                 var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
                       + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";     
 
@@ -230,26 +227,50 @@ var urlLib = {
             urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (newConfig) {
                 console.log("updated lexicon " + JSON.stringify(newConfig));
 
-                //TODO: Choose random word
-                var searchString = newConfig.personas[personaKey].keywords[Math.floor(Math.random() * newConfig.personas[personaKey].keywords.length)];
+                //choose random word
+                /*var searchString = newConfig.personas[personaKey].keywords[Math.floor(Math.random() * newConfig.personas[personaKey].keywords.length)];
                 console.log(searchString.word);
                 var resultObj = {
                     "searchString": searchString.word,
                     "personaKey": personaKey,
                     "config": config
+                };*/
+
+                //choose first and last word in ordered list (by score)
+                var searchStringFirstLast = newConfig.personas[personaKey].keywords[0].word + " " 
+                    + newConfig.personas[personaKey].keywords[newConfig.personas[personaKey].keywords.length - 1].word
+
+                console.log(searchStringFirstLast);
+                var resultObj = {
+                    "searchString": searchStringFirstLast,
+                    "personaKey": personaKey,
+                    "config": newConfig
                 };
+
                 resolve(resultObj);
             }).catch((e) => {
                 console.log("_buildSearchString - error " + JSON.stringify(e));
                 
-                //TODO: Choose random word
-                var searchString = config.personas[personaKey].keywords[Math.floor(Math.random() * config.personas[personaKey].keywords.length)];
-                console.log(searchString.word);
+                //choose random word
+                //var searchString = config.personas[personaKey].keywords[Math.floor(Math.random() * config.personas[personaKey].keywords.length)];
+                /*console.log(searchString.word);
                 var resultObj = {
                     "searchString": searchString.word,
                     "personaKey": personaKey,
                     "config": config
+                };*/
+
+                //choose first and last word in ordered list (by score)
+                var searchStringFirstLast = config.personas[personaKey].keywords[0].word + " " 
+                    + config.personas[personaKey].keywords[config.personas[personaKey].keywords.length - 1].word
+
+                console.log(searchStringFirstLast);
+                var resultObj = {
+                    "searchString": searchStringFirstLast,
+                    "personaKey": personaKey,
+                    "config": config
                 };
+
                 resolve(resultObj);
             });
         });
