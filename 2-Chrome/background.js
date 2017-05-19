@@ -28,6 +28,7 @@ var tabId = null;
 
 var maxBytes = 0;
 var usedBytes = 0;
+var currLastSyncDate;
 
 // Wordlist copied from urlLib to call generateURL
 var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
@@ -46,6 +47,7 @@ chrome.storage.sync.get({
     personas: 1,
     history: "",
     usedBytes: 0,
+    lastSyncDate: new Date()
 }, function (items) {
     runMystique = items.activate;
     maxLinkDepth = items.linkDepth_max;
@@ -53,6 +55,7 @@ chrome.storage.sync.get({
     maxPageViewsFromRoot = parseInt(items.maxPageViewsFromRoot);
     minVisitTime = parseInt(items.minVisitTime);
     maxVisitTime = parseInt(items.maxVisitTime);
+    currLastSyncDate = items.lastSyncDate;
 
     linkCoveragePecentage = items.numberOfLinksToClick_max;
     run();
