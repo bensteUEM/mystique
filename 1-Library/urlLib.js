@@ -297,7 +297,7 @@ var urlLib = {
             var foundValidURL = false;
             for(var i=0;i<links.length;i++) {
                 url = links[Math.floor(Math.random() * links.length)];
-                if(urlib._isNotBlacklisted(url, config)) {
+                if(urlLib._isNotBlacklisted(url, config)) {
                     foundValidURL = true;
                     break;
                 }
