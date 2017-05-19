@@ -194,23 +194,17 @@ chrome.runtime.onMessage.addListener(
 
 // Get changes from settings
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-    let active = 'activate';
-    let maxBytesFromChange = 'maxBytes';
 
-    // check if 'active' settings has been updated
-    if (changes.hasOwnProperty(active)) {
-        let storageChange = changes[active];
-        runMystique = storageChange.newValue;
-        if (runMystique) {
-			clearInterval(loadUrlInterval);
-			loadUrlInterval=null;
-            run();
-        }
-    } else if(changes.hasOwnProperty(maxBytesFromChange)) {
-        maxBytes = changes[maxBytes];
-    }
-
-
+	for (type in changes){
+		this[type]=changes[type].newValue;
+	}
+	
+	runMystique=!!changes["active"];	
+	
+	//TODO: (changes.hasOwnProperty("maxBytes") && runMystique===false)) {
+	if (changes.hasOwnProperty("active")){ 
+		run();
+	}
 });
 
 function getRandomInt(min, max) {
