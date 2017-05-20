@@ -149,7 +149,7 @@ let _updateTab = function (url) {
 
 
 let processLinks = function (links) {
-    let followLinksCount = Math.floor(((parseInt(_config.settings.maxNumberOfLinksToClick) / 100) * links.length) + 1);
+    let followLinksCount = Math.floor(((parseInt(_config.settings.maxNumberOfLinksToClick)) * links.length) + 1);
     let idx, url;
     let i = 0;
     let followLinks = [];
