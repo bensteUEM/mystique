@@ -698,7 +698,7 @@ var urlLib = {
                     "maxBytes": 104857600, //Per day -> equals 100MB
                     "functionality": true,
                     "tracing": true,
-                    "followLinkOnDomainOnly": true,
+                    "followLinkOnDomainOnly": false,
                     "maxLinkDepth": 4,
                     "maxNumberOfLinksToClick": 30, // value is interpreted in percent, so no need for a float
                     "minVisitTime": 3,
