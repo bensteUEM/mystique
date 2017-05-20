@@ -222,10 +222,7 @@ chrome.runtime.onMessage.addListener(
 
 // Get changes from settings
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-
-    if(changes.hasOwnProperty('history') || changes.hasOwnProperty('usedBytes')) {
-        return;
-    } else if(changes.hasOwnProperty('changes')) {
+	if(changes.hasOwnProperty('config')) {
         _config = changes.config.newValue;
      }
 });
