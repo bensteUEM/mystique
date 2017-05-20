@@ -10,17 +10,17 @@ function urlProvider() {
 }
 
 // open default settings 
-  var getting = browser.storage.local.get("fakeConfig");
-  getting.then(loadValues, onError);
+var getting = browser.storage.local.get("fakeConfig");
+getting.then(loadValues, onError);
   
-  /** and initialize if empty */ 
-	  var config = result.fakeConfig;
- function loadValues(result) {
-	  	console.log("Config loaded from Browser"+config);
-	  if(config == null) {
+function loadValues(result) {
+    var config = result.fakeConfig;
+	console.log("Config loaded from Browser"+config);
+
+	if(config == null) {
 	    config = urlLib.initializeConfig();
 	    console.log("Config initialized from Lib because browser was null" +config);
-      }
+    }
 }  
 
 // functionality to open a given URL in a separate tab object 
