@@ -36,18 +36,22 @@ chrome.storage.sync.get({
     lastSyncDate = items.lastSyncDate;
 
     if (!items.config) {
-        _config = urlLib.initializeConfig("de");
-        // initialize config object and store it
-        let personaArray = Object.keys(_config.personas);
-        _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
-        _config.settings.lastSyncDate = Date.now();
-        chrome.storage.sync.set({config: _config});
+        resetConfig();
     } else {
         _config = items.config;
     }
 
     run();
 });
+
+let resetConfig = function() {
+    _config = urlLib.initializeConfig("de");
+    // initialize config object and store it
+    let personaArray = Object.keys(_config.personas);
+    _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
+    _config.settings.lastSyncDate = Date.now();
+    chrome.storage.sync.set({config: _config});
+}
 
 /* 
  blacklist
