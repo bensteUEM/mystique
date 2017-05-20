@@ -5,12 +5,10 @@ var urls = [];
 var runMystique = true;
 
 var maxLinkDepth;
-var currLinkDepth = 0;
 var linkCoveragePecentage;
 var minVisitTime;
 var maxVisitTime;
 var maxPageViewsFromRoot;
-var currentMaxPageViewsFromRoot;
 
 // Reference for tab, which loads the given urls
 var urlWindow;
@@ -23,75 +21,87 @@ var nextUrl = null;
 
 var tabId = null;
 
-var maxBytes = 0;
 var usedBytes = 0;
 var currLastSyncDate;
+var currentMaxPageViewsFromRoot;
+var currLinkDepth = 0;
 
-// Wordlist copied from urlLib to call generateURL
-var wordlist = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
+var _config; 
 
 chrome.storage.sync.get({
-    activate: "true",
-    followLinkOnDomainOnly: "false",
-    maxBytes: 104857600,
-    numberOfLinksToClick_max: 10,
-    linkDepth_max: 5,
-    minVisitTime: 3,
-    maxVisitTime: 10,
-    maxPageViewsFromRoot: 30,
-    blacklist: "",
-    whitelist: "",
-    personas: 1,
-    history: "",
-    usedBytes: 0,
-    lastSyncDate: Date.now()
-}, function (items) {
-    runMystique = items.activate;
-    maxLinkDepth = items.linkDepth_max;
-    maxBytes = items.maxBytes;
-    maxPageViewsFromRoot = parseInt(items.maxPageViewsFromRoot);
-    minVisitTime = parseInt(items.minVisitTime);
-    maxVisitTime = parseInt(items.maxVisitTime);
-    currLastSyncDate = items.lastSyncDate;
+    config: null,
+}, function(items) {
 
-    linkCoveragePecentage = items.numberOfLinksToClick_max;
+    lastSyncDate = items.lastSyncDate;
+
+    if(!items.config) {
+        _config = urlLib.initializeConfig("de");
+        // initialize config object and store it
+        let personaArray = Object.keys(_config.personas);
+        _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length -1)];
+        _config.settings.lastSyncDate = Date.now();
+        chrome.storage.sync.set({config: _config});
+    } else {
+        _config = items.config;
+    }
+
     run();
 });
 
-let run = function () {
+/* 
+blacklist
+followLinkOnDomainOnly
+functionality
+maxBytes
+maxLinkDepth
+NOT USED YET ---> maxNumberOfLinksToClick
+maxPageviewsFromRoot
+maxVisitTime
+minVisitTime
+tracing
+*/
 
+let run = function () {
     verifyTrafficLimit();
 
-    if (runMystique && usedBytes <= maxBytes) {
+    if(usedBytes >= _config.settings.maxBytes) {
+            return;
+    }
+
+    if (_config.settings.functionality) {
         if (!currentMaxPageViewsFromRoot || currentMaxPageViewsFromRoot < 0) {
-            currentMaxPageViewsFromRoot = maxPageViewsFromRoot;
+            currentMaxPageViewsFromRoot = parseInt(_config.settings.maxPageviewsFromRoot);
             urls = [];
         }
         if (urls.length <= 0) {
-            urls.unshift({
-                url: "http://wikipedia.de",
-                level: maxLinkDepth
-            });
-        }
-        currentMaxPageViewsFromRoot--;
-        let url = urls[0];
-        currLinkDepth = url.level;
-        console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
-            + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
-        urls = urls.splice(1, urls.length);
-        openUrl(url.url).then(() => {
-             setTimeout(run, getRandomInt(parseInt(minVisitTime), parseInt(maxVisitTime) + 1) * 1000);
-        });
-    }
+            urlLib.generateURL(_config.settings.selectedPersonaKey, _config).then((_urlResult) => {
+                _config = _urlResult.config;
+                urls.unshift({
+                    url: _urlResult.result,
+                    level: _config.settings.maxLinkDepth
+                });
 
-    /*urlLib.generateURL({wordlist: wordlist}).then((url) => {
-     if(url) {
-     urls.push(url);
-     }
-     }).catch((err) => {
-     console.log("Error ", err);
-     }); */
+                processUrl();
+            });
+        } else {
+            processUrl();
+        }
+        
+    }
 };
+
+let processUrl = function () {
+    currentMaxPageViewsFromRoot--;
+    let url = urls[0];
+    currLinkDepth = url.level;
+    console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
+    + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
+    urls = urls.splice(1, urls.length);
+    openUrl(url.url).then(() => {
+        setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
+    });
+}
+
 
 let openUrl = function (url, config) {
     return _getOrCreateTabId()
@@ -133,7 +143,7 @@ let _updateTab = function (url) {
 
 
 let processLinks = function (links) {
-    let followLinksCount = Math.floor(((linkCoveragePecentage / 100) * links.length) + 1);
+    let followLinksCount = Math.floor(((_config.settings.maxNumberOfLinksToClick / 100) * links.length) + 1);
     let idx, url;
     let i = 0;
     let followLinks = [];
@@ -195,7 +205,7 @@ chrome.runtime.onMessage.addListener(
 // Get changes from settings
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
-	for (type in changes){
+	/*for (type in changes){
 		this[type]=changes[type].newValue;
 	}
 	
@@ -204,7 +214,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 	//TODO: (changes.hasOwnProperty("maxBytes") && runMystique===false)) {
 	if (changes.hasOwnProperty("active")){ 
 		run();
-	}
+	} */
 });
 
 function getRandomInt(min, max) {
@@ -212,7 +222,7 @@ function getRandomInt(min, max) {
 }
 
 function verifyTrafficLimit() {
-    var d = new Date(currLastSyncDate);
+    var d = new Date(_config.settings.lastSyncDate);
     if(!d) {
         return;
     }
