@@ -10,7 +10,7 @@ function save_options() {
   var maxLinkDepth = document.getElementById('maxLinkDepth').value;
   var minVisitTime = document.getElementById('minVisitTime').value;
   var maxVisitTime = document.getElementById('maxVisitTime').value;
-  var maxPageViewsFromRoot = document.getElementById('maxPageViewsFromRoot').value;
+  var maxPageviewsFromRoot = document.getElementById('maxPageviewsFromRoot').value;
   var blacklist = document.getElementById('blacklist').value;
   var wishlist = document.getElementById('wishlist').value;
   var selectedPersonaKey = document.getElementById('personaSelector').value;
@@ -21,10 +21,10 @@ function save_options() {
   configTmp.settings.maxLinkDepth= maxLinkDepth, 
   configTmp.settings.minVisitTime= minVisitTime, 
   configTmp.settings.maxVisitTime= maxVisitTime, 
-  configTmp.settings.maxPageViewsFromRoot= maxPageViewsFromRoot, 
+  configTmp.settings.maxPageviewsFromRoot= maxPageviewsFromRoot, 
   configTmp.settings.blacklist= blacklist, 
   configTmp.settings.wishlist= wishlist, 
-  configTmp.selectedPersonaKey= selectedPersonaKey,
+  configTmp.settings.selectedPersonaKey= selectedPersonaKey,
   chrome.storage.sync.set({
     config: configTmp
   }, function() {
@@ -48,13 +48,14 @@ function restore_options() {
 	configTmp = items.config;
 	fill_personas(items.config.settings.selectedPersonaKey, items.config.personas);
     document.getElementById('functionality').checked = items.config.settings.functionality;
+    document.getElementById('followLinkOnDomainOnly').checked = items.config.settings.followLinkOnDomainOnly;
 	var maxMegaBytes = (items.config.settings.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
 	document.getElementById('maxMegaBytes').value = maxMegaBytes;
     document.getElementById('maxNumberOfLinksToClick').value = items.config.settings.maxNumberOfLinksToClick;
     document.getElementById('maxLinkDepth').value = items.config.settings.maxLinkDepth;
     document.getElementById('minVisitTime').value = items.config.settings.minVisitTime;
     document.getElementById('maxVisitTime').value = items.config.settings.maxVisitTime;
-    document.getElementById('maxPageViewsFromRoot').value = items.config.settings.maxPageViewsFromRoot;
+    document.getElementById('maxPageviewsFromRoot').value = items.config.settings.maxPageviewsFromRoot;
     document.getElementById('blacklist').value = items.config.settings.blacklist;
     document.getElementById('wishlist').value = items.config.settings.wishlist;
 	document.getElementById('history').value = items.config.settings.history;
@@ -105,6 +106,7 @@ function fill_personas(selectedPersonaKey, personasObject){
 		var opt = document.createElement('option');
 		opt.value = persona.key;
 		opt.innerHTML = persona.key;
+		if(personaKey == selectedPersonaKey) opt.selected = true;
 		personaSelector.appendChild(opt);
 		}
 }
