@@ -231,16 +231,11 @@ chrome.runtime.onMessage.addListener(
 // Get changes from settings
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
-	/*for (type in changes){
-		this[type]=changes[type].newValue;
-	}
-	
-	runMystique=!!changes["active"];	
-	
-	//TODO: (changes.hasOwnProperty("maxBytes") && runMystique===false)) {
-	if (changes.hasOwnProperty("active")){ 
-		run();
-	} */
+    if(changes.hasOwnProperty('history') || changes.hasOwnProperty('usedBytes')) {
+        return;
+    } else if(changes.hasOwnProperty('changes')) {
+        _config = changes.config.newValue;
+    }
 });
 
 function getRandomInt(min, max) {
