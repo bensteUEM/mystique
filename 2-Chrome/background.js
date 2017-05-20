@@ -10,6 +10,7 @@ let currLinkDepth = 0;
 let currentUrl = null;
 
 let _config;
+let _isRunning = false;
 
 chrome.storage.sync.get({
     config: null,
@@ -39,11 +40,12 @@ let resetConfig = function() {
 let run = function () {
     verifyTrafficLimit();
 
-    if (usedBytes >= _config.settings.maxBytes) {
+    if (usedBytes >= _config.settings.maxBytes || _isRunning === true) {
         return;
     }
 
     if (_config.settings.functionality) {
+        _isRunning = true;
         if (!currentMaxPageViewsFromRoot || currentMaxPageViewsFromRoot < 0) {
             currentMaxPageViewsFromRoot = parseInt(_config.settings.maxPageviewsFromRoot);
             urls = [];
@@ -61,6 +63,8 @@ let run = function () {
         } else {
             processUrl();
         }
+    } else {
+        _isRunning = false;
     }
 };
 
@@ -224,6 +228,7 @@ chrome.runtime.onMessage.addListener(
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 	if(changes.hasOwnProperty('config')) {
         _config = changes.config.newValue;
+        run();
      }
 });
 
