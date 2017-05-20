@@ -25,7 +25,7 @@ var urlLib = {
                     if (typeof config.personas[personaKey].defaultURLs !== 'undefined' && config.personas[personaKey].defaultURLs.length > 0)
                     {
                         ret.result = config.personas[personaKey].defaultURLs[Math.floor(Math.random() 
-                        * config.personas[personaKey].defaultURLs.length - 1)];
+                        * config.personas[personaKey].defaultURLs.length)];
                     }
                     else
                     {
@@ -248,7 +248,7 @@ var urlLib = {
                 console.log("config not changed");
 
                 //choose first and last word in ordered list (by score)
-                var keywordLength = config.personas[personaKey].keywords.length -1;
+                var keywordLength = config.personas[personaKey].keywords.length;
                 var searchStringFirstLast = config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word + " " 
                     + config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word
 
