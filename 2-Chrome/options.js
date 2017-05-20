@@ -115,7 +115,13 @@ function resetConfig(){
 	chrome.runtime.sendMessage({ 	
 		resetConfig: true
 	});
-	
+	// Update status to let user know options were saved.
+    var status = document.getElementById('status');
+    status.textContent = 'Options have been reset.';
+    setTimeout(function() {
+      status.textContent = '';
+	  restoreConfig();
+    }, 500);	
 }
 
 document.addEventListener('DOMContentLoaded', restoreConfig);
