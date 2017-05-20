@@ -192,8 +192,11 @@ function isOnSameDomain(checkPage) {
 // Get HTML DOM from page -> TO BE Checked ...
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
+        console.log("Request ", request);
+        console.log("Sender ", sender);
+        console.log("sendResponse ", sendResponse);
 
-        if (sender.tab.id === tabId) {
+        if (sender && sender.tab && sender.tab.id && sender.tab.id === tabId) {
             if (currLinkDepth > 0) {
                 console.log("Url ", request.url);
                 console.log("Links ", request.links);
@@ -230,6 +233,8 @@ chrome.runtime.onMessage.addListener(
                 });
                 // console.log(request.dom);
             }
+        } else if(request.hasOwnProperty('resetConfig') && request['resetConfig'] === true) {
+            resetConfig();
         }
     });
 
