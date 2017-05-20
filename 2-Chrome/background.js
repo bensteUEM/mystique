@@ -76,9 +76,15 @@ let processUrl = function () {
     console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
         + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
     urls = urls.splice(1, urls.length);
-    openUrl(currentUrl).finally(() => {
+    console.log("--- processUrl 1");
+    openUrl(currentUrl).then(() => {
+        console.log("--- processUrl 2");
+        setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
+    }, (exception) => {
+        console.error(exception)
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
     });
+    console.log("--- processUrl 3");
 };
 
 

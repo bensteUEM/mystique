@@ -143,23 +143,26 @@ var urlLib = {
 
                 var getNumOfResults = function (search) {
                     return new Promise(function (resolve, reject) {                        
-                        var url = "https://www.google.com/search?q=" + encodeURIComponent(search);
-                        $.get({
-                            url: url,
-                            success: function (data) {
-                                var resultStatsRegexp = /<div id="resultStats">[^>]*</g;
-                                var numberRegex = /\d+/g;
-                                var resultStats = resultStatsRegexp.exec(data)[0].replace("<div id=\"resultStats\">", "").replace("<", "").replace(" Ergebnisse", "").replace(" Results", "").replace("Ungefähr ", "");
-                                var numberOfResults = resultStats.replace(/\./g, '');
-                                numberOfResults = numberRegex.exec(numberOfResults)[0];
-                                numberOfResults = parseInt(numberOfResults);
+                        var url = "https://www.google.com/search?q=" + encodeURIComponent(search); 
+                        setTimeout(function() {
+                            $.get({
+                                url: url,
+                                success: function (data) {
+                                    var resultStatsRegexp = /<div id="resultStats">[^>]*</g;
+                                    var numberRegex = /\d+/g;
+                                    var resultStats = resultStatsRegexp.exec(data)[0].replace("<div id=\"resultStats\">", "").replace("<", "").replace(" Ergebnisse", "").replace(" Results", "").replace("Ungefähr ", "");
+                                    var numberOfResults = resultStats.replace(/\./g, '');
+                                    numberOfResults = numberRegex.exec(numberOfResults)[0];
+                                    numberOfResults = parseInt(numberOfResults);
 
-                                resolve(numberOfResults);
-                            },
-                            error: function (e) {
-                                reject(e);
-                            }
-                        });
+                                    resolve(numberOfResults);
+                                },
+                                error: function (e) {
+                                    reject(e);
+                                }
+                            });
+                        }, Math.floor(Math.random() * 30 * 1000));                     
+                        
                     });
                 };
 
@@ -175,7 +178,7 @@ var urlLib = {
                         });
                     }
                     //get all scores
-                    return Promise.each(words, item => {
+                    return Promise.each(words, item => {                                              
                         return getNumOfResults(item.word + " " + masterWord)
                             .then((score) => {
                                 item.score = score;
@@ -191,7 +194,7 @@ var urlLib = {
                 buildScoresIfNotThere(config.personas[masterWord].keywords).then(function (words) {
                     //get worst word in words
                     var worstWord = words.shift();
-
+                    
                     getNumOfResults(word + " " + masterWord).then(function (scoreNew) {
                         //give the oldWord a last chance
                         getNumOfResults(worstWord.word + " " + masterWord).then(function (scoreOld) { 
@@ -232,7 +235,7 @@ var urlLib = {
             urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (newConfig) {
 
                 //choose first and last word in ordered list (by score)
-                var keywordLength = newConfig.personas[personaKey].keywords.length -1;
+                var keywordLength = newConfig.personas[personaKey].keywords.length;
                 var searchStringFirstLast = newConfig.personas[keywordLength].word + " " 
                     + newConfig.personas[personaKey].keywords[keywordLength].word
 
