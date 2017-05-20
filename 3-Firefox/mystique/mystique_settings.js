@@ -89,7 +89,7 @@ function restoreConfig() {
 	  }
 
 	document.querySelector("#blacklist").value = config.blacklist.join();
-	document.querySelector("#wishlist").value = config.wishlist.join();
+	document.querySelector("#wishList").value = config.wishlist.join();
 	document.querySelector("#personaKey").value = config.persona.key;
 	document.querySelector("#keywords").value = keywordstrings.join();
 	document.querySelector("#defaultURLs").value = config.persona.defaultURLs.join();
