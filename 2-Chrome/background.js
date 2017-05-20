@@ -73,10 +73,10 @@ let processUrl = function () {
     console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
         + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
     urls = urls.splice(1, urls.length);
-    openUrl(currentUrl).then(() => {
+    openUrl(currentUrl).finally(() => {
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
     });
-}
+};
 
 
 let openUrl = function (url, config) {
