@@ -705,7 +705,8 @@ var urlLib = {
                     "maxVisitTime": 120,
                     "maxPageviewsFromRoot": 50,
                     "blacklist": ["bild"],
-                    "wishlist": []
+                    "wishlist": [],
+		    "selectedPersonaKey": ""
                 }
             }
         };
