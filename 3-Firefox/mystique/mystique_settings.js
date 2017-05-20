@@ -132,17 +132,25 @@ function loadStatus() {
 
 function toggleState() {
 
-	var active = true; //TODO: Get Status of Extension
-	var className = active ? "activated" : "deactivated";
-	var statusText = active ? "ON" : "OFF";
-
-	var btn = document.querySelector("#power_button");
-	if (btn.classList.length > 0) {
-		btn.classList.remove(e.target.classList.item(0));
-	}
-	btn.classList.add(className);
-	btn.innerText = statusText;
+	//load settings
+	var getting = browser.storage.local.get("fakeConfig");
+    getting.then(toggleStateWithConfig, onError);
+  
+    function onError(error) {
+    console.log(`Error: ${error}`);
+    }
 }
+	
+function toggleStateWithConfig(result) {
+
+    console.log("toggleStateWithConfig result: " + result)
+    console.log("toggleStateWithConfig result.fakeconfig: " + result.fakeConfig)
+    
+   	var sending = browser.runtime.sendMessage({
+		topic: "config",
+		data: result.fakeConfig
+    
+	});
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
