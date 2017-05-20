@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Title of the document</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.js"></script>
+    <script src="urlLib.js"></script>
+
+    <script>
+        $(function () {
+            console.log("ready!");
+            
+            var config = urlLib.initializeConfig();
+            var personaKey = "Banker";
+            
+            urlLib.generateURL(personaKey, config).then((d) => {
+                config = d.config;
+                console.log("URL: " + d.result);
+                console.log("PersonaKeys: " + JSON.stringify(d.config.personas[personaKey].keywords));
+            });
+        });
+    </script>
+</head>
+
+<body>
+    The content of the document......
+</body>
+
+</html>
