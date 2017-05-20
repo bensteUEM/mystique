@@ -21,13 +21,13 @@ function saveConfig(e) {
 			maxPageviewsFromRoot: document.querySelector("#maxPageviewsFromRoot").value
 		}
 	}
-  
-	var config = browser.storage.local.set({fakeConfig});
-	config.then(null, onError);
 	
-	function onError(error) {
-		console.log(`Error: ${error}`);
-	}
+	//send updated config to background.js   
+   	var sending = browser.runtime.sendMessage({
+		topic: "configUpdate",
+		data: result.fakeConfig
+    
+	});
 
 	function restoreKeywords() {
 		var keyObj;
@@ -133,28 +133,7 @@ function loadStatus() {
 }
 
 /** On Off Button pressed load browser settings*/
-function toggleState() {
-
-	//load settings
-	var getting = browser.storage.local.get("fakeConfig");
-    getting.then(toggleStateWithConfig, onError);
-  
-    function onError(error) {
-    console.log(`Error: ${error}`);
-    }
-}
-
-/** with browser seings continue to start the app */
-function toggleStateWithConfig(result) {
-
-    console.log("DEBUG toggleStateWithConfig result.fakeconfig: " + result.fakeConfig)
-    
-   	var sending = browser.runtime.sendMessage({
-		topic: "config",
-		data: result.fakeConfig
-    
-	});
-	
+function toggleState() {	
 //	var btn = document.querySelector("#power_button");
 //	if (btn.classList.length > 0) {
 //		btn.classList.remove(e.target.classList.item(0));

@@ -38,8 +38,20 @@ function messageReceived(message, sender, sendResponse){
 		console.log("Toggle running state: " + message.data)
 		urlProvider();
 	}
-	else if (message.topic == "config") {
-		console.log("Config object received in background: " + message.data)
+	else if (message.topic == "configUpdate") {
+		//check if config exists otherwise initialize
+		config = message.data;
+		console.log("Config object received in background: " + config)
+		//TODO check if empty
+		
+		//safe to browser config
+		var config = browser.storage.local.set({config});
+	    config.then(null, onError);
+	    function onError(error) {
+		console.log(`Error: ${error}`);
+	    }
+	    
+	    //update local settings object
 		config = message.data;
 		settings = config.settings;
 	}
