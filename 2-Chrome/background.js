@@ -1,28 +1,10 @@
 // We need to get them from the urlLib later
 var urls = [];
 
-// We need to load this from the settings
-var runMystique = true;
-
-var maxLinkDepth;
-var linkCoveragePecentage;
-var minVisitTime;
-var maxVisitTime;
-var maxPageViewsFromRoot;
-
-// Reference for tab, which loads the given urls
-var urlWindow;
-// count index to get the current url from the urls lib
-var index = 0;
-// global interval to load urls 
-var loadUrlInterval;
-// Could be null at the moment because the urlLib is very slow at generating new urls!"
-var nextUrl = null;
-
 var tabId = null;
 
 var usedBytes = 0;
-var currLastSyncDate;
+var lastSyncDate;
 var currentMaxPageViewsFromRoot;
 var currLinkDepth = 0;
 var currentUrl = null;
@@ -50,6 +32,8 @@ let resetConfig = function() {
     let personaArray = Object.keys(_config.personas);
     _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
     _config.settings.lastSyncDate = Date.now();
+    //TODO: DELETE
+    _config.settings.maxVisitTime = 10;
     chrome.storage.sync.set({config: _config});
 }
 
@@ -83,7 +67,7 @@ let run = function () {
                 _config = _urlResult.config;
                 urls.unshift({
                     url: _urlResult.result,
-                    level: _config.settings.maxLinkDepth
+                    level: parseInt(_config.settings.maxLinkDepth)
                 });
 
                 processUrl();
@@ -165,7 +149,7 @@ let _updateTab = function (url) {
 
 
 let processLinks = function (links) {
-    let followLinksCount = Math.floor(((_config.settings.maxNumberOfLinksToClick / 100) * links.length) + 1);
+    let followLinksCount = Math.floor(((parseInt(_config.settings.maxNumberOfLinksToClick) / 100) * links.length) + 1);
     let idx, url;
     let i = 0;
     let followLinks = [];
