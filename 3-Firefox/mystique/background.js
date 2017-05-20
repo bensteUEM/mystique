@@ -371,18 +371,22 @@ function rewriteUserAgentHeader(e) {
  	return {requestHeaders: e.requestHeaders};
 }
 
+
 /*
 Add rewriteUserAgentHeader as a listener to onBeforeSendHeaders,
 only for the target page.
 Make it "blocking" so we can modify the headers.
 from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
 */
+/*
 var targetPage = "http://useragentstring.com/*";
 browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,{urls: [targetPage]},["blocking", "requestHeaders"]);
+*/
 
 /*
 Map browser names to UA strings.
 */
+/*
 function generateUA(){
     
 	//WINDOWS Platform
@@ -444,3 +448,4 @@ function generateUA(){
     
 	return generateUA;
 }
+*/
