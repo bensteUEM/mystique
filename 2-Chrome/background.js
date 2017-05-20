@@ -117,7 +117,7 @@ let _getOrCreateTabId = function () {
         if (tabId !== null) {
             resolve(tabId);
         } else {
-            chrome.tabs.create({}, function (tab) {
+            chrome.tabs.create({active: false}, function (tab) {
                 tabId = tab.id;
                 chrome.tabs.onRemoved.addListener((currentTabId, changeInfo, tab) => {
                     if (currentTabId === tabId) {
