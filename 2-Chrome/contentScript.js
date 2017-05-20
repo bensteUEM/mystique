@@ -1,5 +1,10 @@
-window.onload = pageLoaded;
 
+
+if (document.readyState === "complete") {
+    pageLoaded();
+} else {
+    window.onload = pageLoaded;
+}
 
 function pageLoaded() {
 	var arr = [], l = document.links;
@@ -10,7 +15,8 @@ function pageLoaded() {
 	var _bytes = get_byte_size();
 
 	chrome.runtime.sendMessage({ 	
-		links: arr, 
+		links: arr,
+        url: document.location.href,
 		bytes: _bytes
 	});
 }

@@ -27,19 +27,19 @@ var currentMaxPageViewsFromRoot;
 var currLinkDepth = 0;
 var currentUrl = null;
 
-var _config; 
+var _config;
 
 chrome.storage.sync.get({
     config: null,
-}, function(items) {
+}, function (items) {
 
     lastSyncDate = items.lastSyncDate;
 
-    if(!items.config) {
+    if (!items.config) {
         _config = urlLib.initializeConfig("de");
         // initialize config object and store it
         let personaArray = Object.keys(_config.personas);
-        _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length -1)];
+        _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
         _config.settings.lastSyncDate = Date.now();
         chrome.storage.sync.set({config: _config});
     } else {
@@ -50,23 +50,23 @@ chrome.storage.sync.get({
 });
 
 /* 
-blacklist
-followLinkOnDomainOnly
-functionality
-maxBytes
-maxLinkDepth
-NOT USED YET ---> maxNumberOfLinksToClick
-maxPageviewsFromRoot
-maxVisitTime
-minVisitTime
-tracing
-*/
+ blacklist
+ followLinkOnDomainOnly
+ functionality
+ maxBytes
+ maxLinkDepth
+ NOT USED YET ---> maxNumberOfLinksToClick
+ maxPageviewsFromRoot
+ maxVisitTime
+ minVisitTime
+ tracing
+ */
 
 let run = function () {
     verifyTrafficLimit();
 
-    if(usedBytes >= _config.settings.maxBytes) {
-            return;
+    if (usedBytes >= _config.settings.maxBytes) {
+        return;
     }
 
     if (_config.settings.functionality) {
@@ -87,7 +87,7 @@ let run = function () {
         } else {
             processUrl();
         }
-        
+
     }
 };
 
@@ -97,7 +97,7 @@ let processUrl = function () {
     currentUrl = urlObject.url;
     currLinkDepth = urlObject.level;
     console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
-    + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
+        + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
     urls = urls.splice(1, urls.length);
     openUrl(currentUrl).then(() => {
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
@@ -124,6 +124,7 @@ let _getOrCreateTabId = function () {
                         tabId = null;
                     }
                 });
+
                 resolve(tab.id);
             })
         }
@@ -136,7 +137,22 @@ let _updateTab = function (url) {
         try {
             chrome.tabs.update(tabId, {
                 url: url
-            }, resolve);
+            }, (tab) => {
+                // add listener so callback executes only if page loaded. otherwise calls instantly
+                var listener = function(cTabId, changeInfo, tab) {
+
+                    if (tabId == cTabId && changeInfo.status === 'complete') {
+                        chrome.tabs.onUpdated.removeListener(listener);
+
+                        chrome.tabs.executeScript(tabId, {
+                            file: "contentScript.js",
+                            runAt: "document_end",
+                            matchAboutBlank: true
+                        }, resolve);
+                    }
+                };
+                chrome.tabs.onUpdated.addListener(listener);
+            });
         } catch (exception) {
             reject(exception)
         }
@@ -156,7 +172,7 @@ let processLinks = function (links) {
         // Check url
         // urlLib._approveUrl(url);
 
-        if(urlLib.approveURL(url, _config) && isOnSameDomain(url) ) {
+        if (urlLib.approveURL(url, _config) && isOnSameDomain(url)) {
             followLinks.push(url);
             i++;
         }
@@ -165,8 +181,8 @@ let processLinks = function (links) {
     return followLinks;
 };
 
-function isOnSameDomain(checkPage){
-    if(_config.settings.isOnSameDomain === false) {
+function isOnSameDomain(checkPage) {
+    if (_config.settings.isOnSameDomain === false) {
         return true;
     }
 
@@ -175,14 +191,14 @@ function isOnSameDomain(checkPage){
     // removing prefix
     let url1 = currentUrl.replace(prefix, "");
     let url2 = checkPage.replace(prefix, "");
-    	// if link starts with / it is on the current page
-	if (url2.charAt(0) === "/") {
-        	return true;
-    	}
-    	// extract domain and compare
+    // if link starts with / it is on the current page
+    if (url2.charAt(0) === "/") {
+        return true;
+    }
+    // extract domain and compare
     let part1 = url1.match(domain).toString();
     let part2 = url2.match(domain);
-	return part1.includes(part2);
+    return part1.includes(part2);
 }
 
 // Get HTML DOM from page -> TO BE Checked ...
@@ -191,6 +207,7 @@ chrome.runtime.onMessage.addListener(
 
         if (sender.tab.id === tabId) {
             if (currLinkDepth > 0) {
+                console.log("Url ", request.url);
                 console.log("Links ", request.links);
                 console.log("Bytes ", request.bytes);
 
@@ -231,16 +248,11 @@ chrome.runtime.onMessage.addListener(
 // Get changes from settings
 chrome.storage.onChanged.addListener(function (changes, namespace) {
 
-	/*for (type in changes){
-		this[type]=changes[type].newValue;
-	}
-	
-	runMystique=!!changes["active"];	
-	
-	//TODO: (changes.hasOwnProperty("maxBytes") && runMystique===false)) {
-	if (changes.hasOwnProperty("active")){ 
-		run();
-	} */
+    if(changes.hasOwnProperty('history') || changes.hasOwnProperty('usedBytes')) {
+        return;
+    } else if(changes.hasOwnProperty('changes')) {
+        _config = changes.config.newValue;
+     }
 });
 
 function getRandomInt(min, max) {
@@ -249,15 +261,15 @@ function getRandomInt(min, max) {
 
 function verifyTrafficLimit() {
     var d = new Date(_config.settings.lastSyncDate);
-    if(!d) {
+    if (!d) {
         return;
     }
 
     d.setHours(0);
     d.setMinutes(0);
     d.setSeconds(0);
-    
-    if(d.getTime() <= (d.getTime() - 24 * 60 * 60 * 1000)) {
+
+    if (d.getTime() <= (d.getTime() - 24 * 60 * 60 * 1000)) {
         usedBytes = 0;
         chrome.storage.sync.set({
             lastSyncDate: Date.now()

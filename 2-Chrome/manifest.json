@@ -13,17 +13,9 @@
   "background": {
     "scripts": ["libs/urlLib.js", "libs/bluebird.js","libs/jquery-3.2.1.min.js", "background.js"]
   },
-  "content_scripts": [{
-     "matches": [
-            "http://*/*",
-            "https://*/*"
-            ],
-    "js": ["contentScript.js"],
-    "run_at": "document_end"
-  }],
   "permissions": [
-    "activeTab",
-  "storage"
+    "activeTab", "http://*/*", "https://*/*",
+    "storage"
   ],
    "icons": {
     "128": "icon.png"
