@@ -178,7 +178,6 @@ chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         console.log("Request ", request);
         console.log("Sender ", sender);
-        console.log("sendResponse ", sendResponse);
 
         if (sender && sender.tab && sender.tab.id && sender.tab.id === tabId) {
             if (currLinkDepth > 0) {
