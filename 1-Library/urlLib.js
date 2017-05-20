@@ -195,7 +195,7 @@ var urlLib = {
                                 return e.word === word;
                             });                 
                             //only update the word if it is better than the old word and if it is not already present in the array
-                            if ( (scoreNew > scoreOld) && (wordIndex < 0)) {
+                            if ( (scoreNew > scoreOld) && (wordIndex < 0) && worstWord != word) {
                                 words.push({
                                     word: word,
                                     score: scoreNew
