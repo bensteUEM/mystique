@@ -13,7 +13,10 @@
 		"<all_urls>"
   	],
 	
-	"description": "Browse the web while your user profile is obscured by fake activity!/n Next-generation anti-tracking tool features:   Random traffic is generated to obscure your real user profile You pick what your fake profile should look like Illegal traffic is prevented by using up-to-date blacklists. If you have no data flat: define the limit of traffic generated!/n/nSchütze Deine Privatsphäre mithilfe dieses Addons! Features dieses Next-Gen Anti-Tracking-Tools: /n/n Zufallsgenerator erzeugt Fake-Seitenaufrufe /n Du definierst wie Dein Fake-Profil aussehen soll/n Mithilfe einer aktuellen Blacklist werden illegale Seitenbesuche verhindert/n Falls Du keine Daten-Flatrate hast: definiere Dein eigenes Datenlimit!/nExperimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
+	"description": "Our extension produces noice, while you are normally surfing the web. In the background different websites will be opened. These websites are random but connected to a specified stereotype.",
+	
+	"author": "DHBW.CAS.ADM.2K17",
+	"homepage_url": "https://mystique-extension.jimdo.com/",
 
 	"icons": {
 		"48": "icons/logo-48.png",
