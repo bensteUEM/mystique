@@ -153,11 +153,35 @@ let processLinks = function (links) {
         url = links[idx];
         // Check url
         // urlLib._approveUrl(url);
-        followLinks.push(url);
-        i++;
+
+        if(urlLib.approveURL(url, _config) && isOnSameDomain(url) ) {
+            followLinks.push(url);
+            i++;
+        }
+
     }
     return followLinks;
 };
+
+function isOnSameDomain(checkPage){
+    if(_config.settings.isOnSameDomain === false) {
+        return true;
+    }
+
+	var prefix = /^https?:\/\//i;
+    var domain = /^[^\/]+/;
+    // removing prefix
+    url1 = window.location.href.replace(prefix, "");
+	url2 = checkPage.replace(prefix, "");
+    	// if link starts with / it is on the current page
+	if (url2.charAt(0) === "/") {
+        	return true;
+    	}
+    	// extract domain and compare
+   	var part1 = url1.match(domain).toString();
+	var part2 = url2.match(domain);
+	return part1.includes(part2);
+}
 
 // Get HTML DOM from page -> TO BE Checked ...
 chrome.runtime.onMessage.addListener(
