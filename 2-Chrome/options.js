@@ -1,6 +1,8 @@
+var configTmp;
+
 // Saves options to chrome.storage
 function save_options() {
-  var activate = document.getElementById('activate').checked;
+  var functionality = document.getElementById('functionality').checked;
   var followLinkOnDomainOnly = document.getElementById('followLinkOnDomainOnly').checked;
   var maxMegaBytes = document.getElementById('maxMegaBytes').value;
   var maxBytes = (maxMegaBytes * (1024*1024));	// convert from MegaBytes to Bytes
@@ -10,22 +12,21 @@ function save_options() {
   var maxVisitTime = document.getElementById('maxVisitTime').value;
   var maxPageViewsFromRoot = document.getElementById('maxPageViewsFromRoot').value;
   var blacklist = document.getElementById('blacklist').value;
-  var whitelist = document.getElementById('whitelist').value;
-  var personas = document.getElementById('personas').value;
-  var history = document.getElementById('history').value;
+  var wishlist = document.getElementById('wishlist').value;
+  var selectedPersonaKey = document.getElementById('personaSelector').value;
+  configTmp.settings.functionality = functionality, 
+  configTmp.settings.followLinkOnDomainOnly= followLinkOnDomainOnly, 
+  configTmp.settings.maxBytes= maxBytes, 
+  configTmp.settings.maxNumberOfLinksToClick= maxNumberOfLinksToClick, 
+  configTmp.settings.maxLinkDepth= maxLinkDepth, 
+  configTmp.settings.minVisitTime= minVisitTime, 
+  configTmp.settings.maxVisitTime= maxVisitTime, 
+  configTmp.settings.maxPageViewsFromRoot= maxPageViewsFromRoot, 
+  configTmp.settings.blacklist= blacklist, 
+  configTmp.settings.wishlist= wishlist, 
+  configTmp.selectedPersonaKey= selectedPersonaKey,
   chrome.storage.sync.set({
-    activate: activate, 
-	followLinkOnDomainOnly: followLinkOnDomainOnly, 
-	maxBytes: maxBytes, 
-	maxNumberOfLinksToClick: maxNumberOfLinksToClick, 
-	maxLinkDepth: maxLinkDepth, 
-	minVisitTime: minVisitTime, 
-	maxVisitTime: maxVisitTime, 
-	maxPageViewsFromRoot: maxPageViewsFromRoot, 
-	blacklist: blacklist, 
-	whitelist: whitelist, 
-	personas: personas,
-	history: history,
+    config: configTmp
   }, function() {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -40,32 +41,23 @@ function save_options() {
 // stored in chrome.storage.
 function restore_options() {
   chrome.storage.sync.get({
-    activate: "true", 
-	followLinkOnDomainOnly: "false",
-	maxBytes: 104857600, 
-	maxNumberOfLinksToClick: 30, 
-	maxLinkDepth: 4, 
-	minVisitTime: 3, 
-	maxVisitTime: 120, 
-	maxPageViewsFromRoot: 50,
-	blacklist: "", 
-	whitelist: "", 
-	personas: 1,
-	history: "",
-	usedBytes: 0
+	config: null,
+	usedBytes: 0,
+	history: null
   }, function(items) {
-    document.getElementById('activate').checked = items.activate;
-	var maxMegaBytes = (items.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
+	configTmp = items.config;
+	fill_personas(items.config.settings.selectedPersonaKey, items.config.personas);
+    document.getElementById('functionality').checked = items.config.settings.functionality;
+	var maxMegaBytes = (items.config.settings.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
 	document.getElementById('maxMegaBytes').value = maxMegaBytes;
-    document.getElementById('maxNumberOfLinksToClick').value = items.maxNumberOfLinksToClick;
-    document.getElementById('maxLinkDepth').value = items.maxLinkDepth;
-    document.getElementById('minVisitTime').value = items.minVisitTime;
-    document.getElementById('maxVisitTime').value = items.maxVisitTime;
-    document.getElementById('maxPageViewsFromRoot').value = items.maxPageViewsFromRoot;
-    document.getElementById('blacklist').value = items.blacklist;
-    document.getElementById('whitelist').value = items.whitelist;
-    document.getElementById('personas').value = items.personas;
-	document.getElementById('history').value = items.history;
+    document.getElementById('maxNumberOfLinksToClick').value = items.config.settings.maxNumberOfLinksToClick;
+    document.getElementById('maxLinkDepth').value = items.config.settings.maxLinkDepth;
+    document.getElementById('minVisitTime').value = items.config.settings.minVisitTime;
+    document.getElementById('maxVisitTime').value = items.config.settings.maxVisitTime;
+    document.getElementById('maxPageViewsFromRoot').value = items.config.settings.maxPageViewsFromRoot;
+    document.getElementById('blacklist').value = items.config.settings.blacklist;
+    document.getElementById('wishlist').value = items.config.settings.wishlist;
+	document.getElementById('history').value = items.config.settings.history;
 	console.log("Used bytes: " + items.usedBytes);
 	var sizeInMB = (items.usedBytes / (1024*1024)).toFixed(2);	// convert from Bytes to MegaBytes
 	document.getElementById('usedBytes').textContent = sizeInMB;
@@ -97,6 +89,24 @@ function toggle_history(){
 		document.getElementById('history').style.visibility='hidden';
 		document.getElementById('toggleHistory').textContent='Show history';
 	}
+}
+
+
+function fill_personas(selectedPersonaKey, personasObject){
+	var personaSelector = document.getElementById('personaSelector');
+	// First: clear all options from personaSelector
+	var length = personaSelector.options.length;
+	for (i = 0; i < length; i++) {
+	  personaSelector.options[i] = null;
+	}
+	// Now create options from persona that was received from urlLib
+	for (var personaKey in personasObject){
+		var persona = personasObject[personaKey];
+		var opt = document.createElement('option');
+		opt.value = persona.key;
+		opt.innerHTML = persona.key;
+		personaSelector.appendChild(opt);
+		}
 }
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click', save_options);
