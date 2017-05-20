@@ -27,7 +27,11 @@ var urlLib = {
                         ret.result = config.personas[personaKey].defaultURLs[Math.floor(Math.random() 
                         * config.personas[personaKey].defaultURLs.length - 1)];
                     }
-                    
+                    else
+                    {
+                        ret.result = "http://www.bing.com/search?q=" + personaKey;
+                    }
+
                     console.log("regenerate: " + ret.result);
                     ret.config = config;
                     resolve(ret);
