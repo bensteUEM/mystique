@@ -16,9 +16,9 @@ function saveConfig(e) {
 		settings: {
 			active: globalConfig.settings.active,
 			maxBytes: document.querySelector("#maxBytes").value,
-			functionality: true,
-			tracing: true,
-			followLinkOnDomainOnly: true,
+			functionality: globalConfig.settings.functionality,
+			tracing: globalConfig.settings.tracing,
+			followLinkOnDomainOnly: globalConfig.settings.followLinkOnDomainOnly,
 			maxLinkDepth: document.querySelector("#maxLinkDepth").value,
 			maxNumberOfLinksToClick: document.querySelector("#maxNumberOfLinksToClick").value,
 			minVisitTime: document.querySelector("#minVisitTime").value,
@@ -49,13 +49,13 @@ function restoreConfig() {
 		}
 
 		//Bind Personas to Persona Select
-		var personaSelect = document.getElementById("personaKey");
+		/*var personaSelect = document.querySelector("#personaKey");
 		for(p in globalConfig.personas) {
 			var opt = document.createElement('option');
             opt.value = p.key;
             opt.text = p.key;
             personaSelect.appendChild(opt);
-		}
+		}*/
 
 		document.querySelector("#blacklist").value = globalConfig.blacklist.join();
 		document.querySelector("#wishlist").value = globalConfig.wishlist.join();
