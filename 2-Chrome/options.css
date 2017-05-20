@@ -92,6 +92,10 @@ body, html {
 	color:black;
 }
 
+#personaKeywords{
+	font-size:0.8em;
+}
+
 form {
 	display:block;
 }
