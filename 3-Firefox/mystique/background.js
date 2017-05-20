@@ -17,8 +17,26 @@ var lastUrlRequested
 var runInNewWindow = false
 var maxLinkDepth = 5
 var urls = []
+var timerId
 
 browser.runtime.onMessage.addListener(messageReceived)
+
+function sessionHandler(links){
+	console.log("Session called: " + links)
+	
+	if(maintainLinksToFollow(links)){
+		console.log("URL list is emtpy")
+		maintainLinksToFollow(getLinkFromLibary());
+		openUrl(urls[0].url, runInNewWindow);
+	}
+	else {
+		setTimeout(timerTriggered, 5000);
+	}
+	
+	function timerTriggered() {	
+		openUrl(urls[0].url, runInNewWindow)
+	}
+}
 
 function messageReceived(message, sender, sendResponse){
 	console.log("BackgroundScript - message received")
@@ -28,16 +46,19 @@ function messageReceived(message, sender, sendResponse){
 		
 		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
 		console.log(filteredLinks.length + " links remain after filtering")
-		maintainLinksToFollow(filteredLinks)
-		setTimeout(callNextUrl,5000);
+		
+		sessionHandler(filteredLinks);
 	}
 	else if (message.topic == "status") {
-		console.log("Toggle running state: " + message.data)
-		urlProvider()
-	}
-
-	function callNextUrl() {
-		openUrl(urls[0].url, runInNewWindow)
+		if (message.data == "ON"){
+			console.log("Toggle running state: " + message.data)
+			// start execution 
+			sessionHandler();
+		}
+		else {
+			console.log("Toggle running state: " + message.data)
+			// stop execution
+		}
 	}
 }
 
@@ -46,35 +67,37 @@ function messageReceived(message, sender, sendResponse){
  * Hereby it takes care of the correct link order (next link to be opened is always at first index) and keeps track of the max link depth. 
  * 
  * @param newLinks to be added to the global list of links that have to opened
- * @returns
+ * @returns isListEmpty == true when the global URL is empty
  */
 function maintainLinksToFollow(newLinks) {
 	
 	// CASE: URL list is initially empty
-	if (urls.length == 0) {
-		// TODO this is when a very new URL from the library has to be requested 
-		initTree();
+	if (urls.length == 0 && (newLinks == null || newLinks.length == 0)) {
+		console.log("URL list intially empty");
+		return true;
+	}
+	else if (urls.length == 0 && newLinks.length >= 0){
+		console.log("Filling URL list initially");
+		fillTree();
 		logLinkList();
 	}
 	// CASE: max link depth not yet reached and new links have been provided
 	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
-		let nextLevel = urls[0].level - 1
-		
-		newLinks = newLinks.map((link) => {
-            return {
-                url: link,
-                level: nextLevel
-            };
-        });
-		urls = newLinks.concat(urls)
-		
+		console.log("Adding new links to URL list");
+		fillTree();
 		logLinkList();
 	}
-	// CASE: max link depth reached and/or NO new links have been provided
+	// CASE: max link depth reached and/or NO new links have been provided while URL list wasn't empty yet
 	else {
+		console.log("Reducing URL list");
 		reduceTree();
 		logLinkList();
+		if (urls.length == 0) {
+			return true;
+		}
 	}
+	
+	return false;
 	
 	function reduceTree(){
 		let lastLevel
@@ -82,44 +105,38 @@ function maintainLinksToFollow(newLinks) {
 			lastLevel = urls[0].level
 			urls.splice(0, 1)
 		} while (urls.length > 0 && urls[0].level != lastLevel);
-		
-		if (urls.length == 0) {
-			// TODO this is when a very new URL from the library has to be requested 
-			initTree();
-		}
 	}
 	
-	function initTree(){
-		// TODO this is when a very new URL from the library has to be requested  
-		urls.unshift({
-			url: startingUrl,
-			level: maxLinkDepth
-		});
+	function fillTree(){
+		if (urls.length == 0) {
+			let nextLevel = maxLinkDepth
+		}
+		else {
+			let nextLevel = urls[0].level - 1
+		}
+		
+		newLinks = newLinks.map((link) => {
+            return {
+                url: link,
+                level: nextLevel
+            };
+        });
+		urls = newLinks.concat(urls);
 	}
 	
 	function logLinkList(){
 		console.info(urls)
-//		for (url in urls){
-//			console.info("URL: " + url.url + " - LVL: " + url.level);
-//		}
 	}
 }
 
-//TODO Listener to cancel interval if plugin is turned off
-function callTimer(){
-	setInterval(callLibary,interval);
-	console.log(interval);
-}
-
 //function calls the libary to generate a random URL from the wordlist
-function callLibary(){
+function getLinkFromLibary(){
 
-	//TODO place libary at the right place
-	urlLib.generateURL({
-		wordlist: wl
-		}).then(function(url) {
-			console.log(url);
-			openUrl(url);
+	let persona = "Banker"; //TODO #61
+	
+	return urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+			console.log("Got link from library: " + url.result);
+			return url.result
 			});
 }
 
