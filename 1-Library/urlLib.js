@@ -20,8 +20,21 @@ var urlLib = {
                     }
                     resolve(this.generateURL(personaKey, config));
                 }).catch((err) => {
-                    console.log("Regenerate");
-                    //return this.generateURL(config);
+                    // if generating url fails return default url
+                    var ret = {};
+                    if (typeof config.personas[personaKey].defaultURLs !== 'undefined' && config.personas[personaKey].defaultURLs.length > 0)
+                    {
+                        ret.result = config.personas[personaKey].defaultURLs[Math.floor(Math.random() 
+                        * config.personas[personaKey].defaultURLs.length)];
+                    }
+                    else
+                    {
+                        ret.result = "http://www.bing.com/search?q=" + personaKey;
+                    }
+
+                    console.log("regenerate: " + ret.result);
+                    ret.config = config;
+                    resolve(ret);
                 });
         })
     },
@@ -49,86 +62,76 @@ var urlLib = {
         updateLexicon: function personaKey(personaKey, config) {
             return new Promise(function (resolve, reject) {
                 
-              var language = "de_DE";
-              var persona = config.personas[personaKey];
+            var language = "de_DE";
+            var persona = config.personas[personaKey];
 
-              var resultList = [];
-              var foundResult = false;
-              var counter = 0;
+            var resultList = [];
+            var foundResult = false;
 
-                                   
+            var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
+            var searchWord = persona.keywords[randomNumber];
+            var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
+                    + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";     
 
-              //while(foundResult == false && counter < 10)
-              //{
-                var randomNumber = Math.floor((Math.random() * persona.keywords.length - 1) + 1);
-                var searchWord = persona.keywords[randomNumber];
-                var urlCall = "http://thesaurus.altervista.org/thesaurus/v1?word=" + searchWord.word
-                      + "&language=" + language + "&output=json&key=9kYEIiYAwcnhCuXrjK30";     
-
-                counter++;
-                  $.ajax({ 
-                      url: urlCall,
-                      type: "GET",
-                      success: function(data){ 
-                          if (data.length != 0) { 
-                              for (key in data.response) { 
-                                  var synonyms = data.response[key].list.synonyms.split("|");     
-                                  
-                                  if(synonyms.length > 3)
-                                  {
-                                    for(var i = 0; i<3; i++)
-                                    {
-                                            var result = {};
-                                            var tmp = synonyms[Math.floor(Math.random() * synonyms.length)].split(" (");
-                                            result.word = tmp[0];
-                                            result.score = 0;
-
-                                            resultList.push(result);
-                                            foundResult = true;
-                                    }
-                                }   
-                                else
+                $.ajax({ 
+                    url: urlCall,
+                    type: "GET",
+                    success: function(data){ 
+                        if (data.length != 0) { 
+                            for (key in data.response) { 
+                                var synonyms = data.response[key].list.synonyms.split("|");     
+                                
+                                if(synonyms.length > 3)
                                 {
-                                    for (synonymKey in synonyms.slice(1,3))
-                                    {
+                                for(var i = 0; i<3; i++)
+                                {
                                         var result = {};
-                                        var tmp = synonyms[synonymKey].split(" (");
+                                        var tmp = synonyms[Math.floor(Math.random() * synonyms.length)].split(" (");
                                         result.word = tmp[0];
                                         result.score = 0;
 
                                         resultList.push(result);
                                         foundResult = true;
-                                  }
-                                }                                
-                              }
-                            
-                            if(resultList.length == 0)
+                                }
+                            }   
+                            else
                             {
-                                var result = {};
-                                result.word = searchWord;
-                                result.score = 0;
+                                for (synonymKey in synonyms.slice(1,3))
+                                {
+                                    var result = {};
+                                    var tmp = synonyms[synonymKey].split(" (");
+                                    result.word = tmp[0];
+                                    result.score = 0;
+
+                                    resultList.push(result);
+                                    foundResult = true;
+                                }
+                            }                                
                             }
+                        
+                        if(resultList.length == 0)
+                        {
+                            var result = {};
+                            result.word = searchWord;
+                            result.score = 0;
+                        }
 
-                            return Promise.each(resultList, item => { urlLib._evolutionModule.insertWordIfFitEnough(item.word, 
-                                                                          config, personaKey).then(function(newConfig) {
-                                                  resolve(newConfig);
-                                              }).catch((e) => {
-                                                resolve(config);
-                                              })
+                        return Promise.each(resultList, item => { urlLib._evolutionModule.insertWordIfFitEnough(item.word, 
+                                                                        config, personaKey).then(function(newConfig) {
+                                                resolve(newConfig);
                                             }).catch((e) => {
-                                                resolve(config);
-                                            }); 
-                          }
-                      }, 
-                      error: function(xhr, status, error){ 
-                          console.log("no synonyms found");
-                          resolve(config);
-                      } 
-                  });
-              //}
-
-
-
+                                            resolve(config);
+                                            })
+                                        }).catch((e) => {
+                                            resolve(config);
+                                        }); 
+                        }
+                    }, 
+                    error: function(xhr, status, error){ 
+                        console.log("no synonyms found");
+                        resolve(config);
+                    } 
+                });
           }).then(function(newConfig) {
               resolve(newConfig);
           }).catch((e) => {
@@ -196,7 +199,7 @@ var urlLib = {
                                 return e.word === word;
                             });                 
                             //only update the word if it is better than the old word and if it is not already present in the array
-                            if ( (scoreNew > scoreOld) && (wordIndex < 0)) {
+                            if ( (scoreNew > scoreOld) && (wordIndex < 0) && worstWord != word) {
                                 words.push({
                                     word: word,
                                     score: scoreNew
@@ -245,7 +248,7 @@ var urlLib = {
                 console.log("config not changed");
 
                 //choose first and last word in ordered list (by score)
-                var keywordLength = config.personas[personaKey].keywords.length -1;
+                var keywordLength = config.personas[personaKey].keywords.length;
                 var searchStringFirstLast = config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word + " " 
                     + config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word
 
@@ -366,7 +369,7 @@ var urlLib = {
                 },
                 error: e => {
                     //If the GET fails, retrieve a defaultURL 
-                    var url = urlLib._getUrlModule._getFallbackURL(config, personaKey);
+                    var url = urlLib._getUrlModule._getFallbackURL(paramsObject.config, paramsObject.personaKey);
                     var resultObj = {
                         "result": url,
                         "config": paramsObject.config
