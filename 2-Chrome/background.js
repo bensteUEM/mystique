@@ -25,6 +25,7 @@ var usedBytes = 0;
 var currLastSyncDate;
 var currentMaxPageViewsFromRoot;
 var currLinkDepth = 0;
+var currentUrl = null;
 
 var _config; 
 
@@ -92,12 +93,13 @@ let run = function () {
 
 let processUrl = function () {
     currentMaxPageViewsFromRoot--;
-    let url = urls[0];
-    currLinkDepth = url.level;
+    let urlObject = urls[0];
+    currentUrl = urlObject.url;
+    currLinkDepth = urlObject.level;
     console.info("CurrLinkDepth [" + currLinkDepth + "] : urls [" + urls.length
     + "] : currentMaxPageViewsFromRoot [" + currentMaxPageViewsFromRoot + "]");
     urls = urls.splice(1, urls.length);
-    openUrl(url.url).then(() => {
+    openUrl(currentUrl).then(() => {
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
     });
 }
@@ -168,18 +170,18 @@ function isOnSameDomain(checkPage){
         return true;
     }
 
-	var prefix = /^https?:\/\//i;
-    var domain = /^[^\/]+/;
+    let prefix = /^https?:\/\//i;
+    let domain = /^[^\/]+/;
     // removing prefix
-    url1 = window.location.href.replace(prefix, "");
-	url2 = checkPage.replace(prefix, "");
+    let url1 = currentUrl.replace(prefix, "");
+    let url2 = checkPage.replace(prefix, "");
     	// if link starts with / it is on the current page
 	if (url2.charAt(0) === "/") {
         	return true;
     	}
     	// extract domain and compare
-   	var part1 = url1.match(domain).toString();
-	var part2 = url2.match(domain);
+    let part1 = url1.match(domain).toString();
+    let part2 = url2.match(domain);
 	return part1.includes(part2);
 }
 
