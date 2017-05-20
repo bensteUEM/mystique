@@ -140,6 +140,7 @@ function toggleState() {
 //	}
 //	btn.classList.add(className);
 //	btn.innerText = statusText;
+	console.log("ToggleState pressed in settings");
 	
 	var active = true; //TODO define in config
 	var sending = browser.runtime.sendMessage({

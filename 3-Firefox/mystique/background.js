@@ -42,7 +42,6 @@ function messageReceived(message, sender, sendResponse){
 		//check if config exists otherwise initialize
 		config = message.data;
 		console.log("Config object received in background: " + config);
-		//TODO check if empty
 		
 		//safe to browser config
 		var config = browser.storage.local.set({config});
@@ -113,7 +112,7 @@ function maintainLinksToFollow(newLinks) {
 		// TODO this is when a very new URL from the library has to be requested  
 		urls.unshift({
 			url: startingUrl,
-			level: settings.maxLinkDepth;
+			level: settings.maxLinkDepth
 		});
 	}
 	
