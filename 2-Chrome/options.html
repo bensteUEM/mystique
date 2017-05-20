@@ -18,7 +18,7 @@
 <div class="settings_item">
 	<div class="label">
 		<label>Activate extension:
-			<input type='checkbox' name='activate' id='activate'/>
+			<input type='checkbox' name='functionality' id='functionality'/>
 		</label>
 	</div>
 	<div class="description">Check if you want to activate the extension</div>
@@ -47,7 +47,7 @@
 			<br>
 			<select id="maxNumberOfLinksToClick">
 					 <option value="20">Few</option>
-					 <option value="30" selected>Medium</option>
+					 <option value="30">Medium</option>
 					 <option value="40">Plenty</option>
 					</select>		</label>		</label>
 	</div>
@@ -59,7 +59,7 @@
 			<br>
 			<select id="maxLinkDepth">
 					 <option value="2">Few</option>
-					 <option value="4" selected>Medium</option>
+					 <option value="4">Medium</option>
 					 <option value="7">Plenty</option>
 					</select>		</label>
 		</label>
@@ -72,7 +72,7 @@
 			<br>
 			<select id="maxPageViewsFromRoot">
 					 <option value="10">Few</option>
-					 <option value="50" selected>Medium</option>
+					 <option value="50">Medium</option>
 					 <option value="100">Plenty</option>
 					</select>		</label>
 	</div>
@@ -106,9 +106,9 @@
 </div>
 <div class="settings_item">
 	<div class="label">
-		<label>Whitelist:
+		<label>Wishlist:
 			<br>
-			<textarea id='whitelist'></textarea>
+			<textarea id='wishlist'></textarea>
 		</label>
 	</div>
 	<div class="description">Prefer URLs containing these words</div>
@@ -117,13 +117,11 @@
 	<div class="label">
 	<label>Personas:
 		<br>
-		<select id="personas">
-		 <option value="0">Nerd</option>
-		 <option value="1">Banker</option>
-		 <option value="2">Scientist</option>
-		 <option value="3">Athlete</option>
+		<select id="personaSelector">
+		 <option value="0">DEFAULT-Nerd</option>
 		</select>
 	</label>
+	<span id='personaKeywords'></span>
 	<div class="description">Emulate a person with this typical profile (preferred keywords in brackets)</div>
 	</div>
 </div>
