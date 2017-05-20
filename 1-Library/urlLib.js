@@ -312,6 +312,8 @@ var urlLib = {
             var URLs = config.personas[personaKey].defaultURLs;
             if(URLs.lenght > 0) {
                 url = URLs[Math.floor(Math.random() * URLs.lenght)];
+            } else {
+                url = "http://www.bing.com/search?q=" + personaKey;
             }
 
             return url;
