@@ -14,6 +14,11 @@ function saveConfig() {
   var blacklist = document.getElementById('blacklist').value;
   var wishlist = document.getElementById('wishlist').value;
   var selectedPersonaKey = document.getElementById('personaSelector').value;
+  
+  // Logic checks
+  if(parseInt(maxVisitTime) <= parseInt(minVisitTime)) {alert("Warning: Maximum visit time has to be bigger than minimum visit time! Changes have not been saved!"); return;}
+  if(parseInt(minVisitTime) < 0 || parseInt(maxVisitTime) < 0 || parseInt(maxMegaBytes) < 0) {alert("Warning: Values can't be negative! Changes have not been saved!"); return;}
+  
   configTmp.settings.functionality = functionality, 
   configTmp.settings.followLinkOnDomainOnly= followLinkOnDomainOnly, 
   configTmp.settings.maxBytes= maxBytes, 
