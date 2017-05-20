@@ -2,12 +2,7 @@
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
-var startingUrl = "https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"
-
-function urlProvider() {
-	maintainLinksToFollow(startingUrl)
-	openUrl(urls[0].url, runInNewWindow)
-}
+var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 // functionality to open a given URL in a separate tab object 
 
@@ -26,10 +21,22 @@ function sessionHandler(links){
 	
 	if(maintainLinksToFollow(links)){
 		console.log("URL list is emtpy")
-		maintainLinksToFollow(getLinkFromLibary());
+		
+		// TODO replace testing code with the section below
+		maintainLinksToFollow(startingUrl);
 		openUrl(urls[0].url, runInNewWindow);
+		
+//		let persona = "Banker"; //TODO #61
+//		//TODO #61 use correct config object
+//		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+//				console.log("Got link from library: " + url.result);
+//				
+//				maintainLinksToFollow(url.result);
+//				openUrl(urls[0].url, runInNewWindow);
+//			});
 	}
 	else {
+		console.log("URL list still contains links");
 		setTimeout(timerTriggered, 5000);
 	}
 	
@@ -37,6 +44,8 @@ function sessionHandler(links){
 		openUrl(urls[0].url, runInNewWindow)
 	}
 }
+
+// config.settings.maxPageviewsFromRoot
 
 function messageReceived(message, sender, sendResponse){
 	console.log("BackgroundScript - message received")
@@ -73,26 +82,27 @@ function maintainLinksToFollow(newLinks) {
 	
 	// CASE: URL list is initially empty
 	if (urls.length == 0 && (newLinks == null || newLinks.length == 0)) {
-		console.log("URL list intially empty");
+		console.log("MAINTAIN : URL list intially empty");
 		return true;
 	}
 	else if (urls.length == 0 && newLinks.length >= 0){
-		console.log("Filling URL list initially");
+		console.log("MAINTAIN : Filling URL list initially");
 		fillTree();
 		logLinkList();
 	}
 	// CASE: max link depth not yet reached and new links have been provided
 	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
-		console.log("Adding new links to URL list");
+		console.log("MAINTAIN : Adding new links to URL list");
 		fillTree();
 		logLinkList();
 	}
 	// CASE: max link depth reached and/or NO new links have been provided while URL list wasn't empty yet
 	else {
-		console.log("Reducing URL list");
+		console.log("MAINTAIN : Reducing URL list");
 		reduceTree();
 		logLinkList();
 		if (urls.length == 0) {
+			console.log("MAINTAIN : URL list is empty again")
 			return true;
 		}
 	}
@@ -108,11 +118,15 @@ function maintainLinksToFollow(newLinks) {
 	}
 	
 	function fillTree(){
+		let nextLevel
+		
 		if (urls.length == 0) {
-			let nextLevel = maxLinkDepth
+			nextLevel = maxLinkDepth // TODO #61
+			console.log("MAINTAIN : Filling on level " + nextLevel)
 		}
 		else {
-			let nextLevel = urls[0].level - 1
+			nextLevel = urls[0].level - 1
+			console.log("MAINTAIN : Filling on level " + nextLevel)
 		}
 		
 		newLinks = newLinks.map((link) => {
@@ -134,7 +148,7 @@ function getLinkFromLibary(){
 
 	let persona = "Banker"; //TODO #61
 	
-	return urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 			console.log("Got link from library: " + url.result);
 			return url.result
 			});
@@ -310,11 +324,17 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
 		return 	allLinks;
 	}
-	chosen = 0;
-	while (chosen < numberToChoose) {
-		pickIndex = Math.floor(Math.random()*allLinks.length)
-    		array.push(allLinks[pickIndex]);
-    		chosen++;
+	var chosen = 0;
+	var index = 0;
+	while (chosen < numberToChoose && index < allLinks.length) {
+		pickIndex = Math.floor(Math.random()*allLinks.length);
+		index++;
+		
+		// TODO #61 use correct config object
+		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
+			array.push(allLinks[pickIndex]);
+	    	chosen++;
+		}
 	}
 	return array;
 }
@@ -399,7 +419,7 @@ function generateUA(){
 	}
 	
 	var allUseablePlatforms = [];
-	if (true) {//TODO once personas do exist choose platform based on Persona #2 {
+	if (true) {//TODO #61 once personas do exist choose platform based on Persona #2 {
 		allUseablePlatforms = allUseablePlatforms.concat(windows);
 	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(apple);
