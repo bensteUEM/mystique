@@ -1,15 +1,27 @@
+//Background lädt Config aus Browser Storage
+	//Wenn Config nicht vorhanden erzeuge initiale Config und speichere sie in Browser Storage
+//Popup öffnen: Config aus Browser Storage laden
+//Popup Speichern: Config an Background senden
+	//Background speichert sie in Browser Storage
+
+var globalActive
+var globalConfig
+
+//TODO: Move to Background near Initialize
+var globalMaxBytes = [80000, 300000, 104857600]
+var globalMaxNumberOfLinks = [10, 30, 60]
+var globalMaxLinkDepth = [10, 20, 45]
+
 function saveConfig(e) {
 	e.preventDefault();
 	
-	var fakeConfig = {
+	var completeConfig = {
 		blacklist: document.querySelector("#blacklist").value.split(","),
 		wishlist: document.querySelector("#wishlist").value.split(","),
-		persona: {
-			key: document.querySelector("#personaKey").value,
-			keywords: restoreKeywords(),
-			defaultURLs: document.querySelector("#defaultURLs").value.split(",")
-		},
+		selectedPersonaKey: document.querySelector("#personaKey").value,
+		personas: globalConfig.personas,
 		settings: {
+			active: globalActive,
 			maxBytes: document.querySelector("#maxBytes").value,
 			functionality: true,
 			tracing: true,
@@ -25,131 +37,148 @@ function saveConfig(e) {
 	//send updated config to background.js   
    	var sending = browser.runtime.sendMessage({
 		topic: "configUpdate",
-		data: result.fakeConfig
-    
+		data: completeConfig
 	});
-
-	function restoreKeywords() {
-		var keyObj;
-		var keywordstrings = [];
-		var keywordobjects = [];
-		keywordstrings = document.querySelector("#keywords").value.split();
-		for(k in keywordstrings) {
-			keyObj = { word: k.substring(0, indexOf("(")), score: k.substring(indexOf("(")+1, indexOf(")")) }
-			keywordobjects.push(keyObj);
-		}
-
-		return keywordobjects;
-	}
 }
 
 /** Firefox addon configuration is opened */
 function restoreConfig() {
 
-  function loadValues(result) {
-	  
-	  var config = result.fakeConfig;
+	//Load Config from Browser Storage
+	var getting = browser.storage.local.get("completeConfig");
+	getting.then(loadValues, onError);
 
-	  //Set default values of no config found in the storage
-	  if(config == null) {
-		  config = {
-            blacklist: ["bild", "test"],
-            wishlist: ["geld", "aktie"],
-            persona: {
-                key: "Banker",
-                keywords: [
-                    { word: "DAX", score: 0 },
-                    { word: "Börsenkurs", score: 5 },
-                    { word: "Aktien", score: 10 },
-                    { word: "Wechselkurse", score: 3 },
-                    { word: "Goldpreis", score: 7 }
-                ],
-                defaultURLs: [
-                    "http://www.boerse.de/",
-                    "http://www.faz.net/aktuell/finanzen/"
-                ]
-            },
-            settings: {
-                maxBytes: 5000,
-                functionality: true,
-                tracing: true,
-                followLinkOnDomainOnly: true,
-                maxLinkDepth: 5,
-                maxNumberOfLinksToClick: 0.1,
-                minVisitTime: 60,
-                maxVisitTime: 600,
-                maxPageviewsFromRoot: 100
-            }
-        }
-	  }
+	function loadValues(result) {
 
-	var keywordstrings = [];
-		for(k in config.persona.keywords) {
-			keywordstrings.push(k.word + "(" + k.score + ")");
-	  }
+		globalConfig = result.completeConfig;
+		if(globalConfig == null) {
+			loadTempConfig(); //TODO Replace by Background Config
+		}
 
-	document.querySelector("#blacklist").value = config.blacklist.join();
-	document.querySelector("#wishList").value = config.wishlist.join();
-	document.querySelector("#personaKey").value = config.persona.key;
-	document.querySelector("#keywords").value = keywordstrings.join();
-	document.querySelector("#defaultURLs").value = config.persona.defaultURLs.join();
-	document.querySelector("#maxBytes").value = config.settings.maxBytes;
-	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
-	document.querySelector("#maxNumberOfLinksToClick").value = config.settings.maxNumberOfLinksToClick;
-	document.querySelector("#minVisitTime").value = config.settings.minVisitTime;
-    document.querySelector("#maxVisitTime").value = config.settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").value = config.settings.maxPageviewsFromRoot;
+		//Bind Personas to Persona Select
+		var personaSelect = document.getElementById("personaKey");
+		for(p in globalConfig.personas) {
+			var opt = document.createElement('option');
+            opt.value = p.key;
+            opt.text = p.key;
+            personaSelect.appendChild(opt);
+		}
+
+		document.querySelector("#blacklist").value = globalConfig.blacklist.join();
+		document.querySelector("#wishlist").value = globalConfig.wishlist.join();
+		document.querySelector("#personaKey").value = globalConfig.selectedPersona;
+
+		document.querySelector("#maxBytes").value = globalConfig.settings.maxBytes;
+		document.querySelector("#maxLinkDepth").value = globalConfig.settings.maxLinkDepth;
+		document.querySelector("#maxNumberOfLinksToClick").value = globalConfig.settings.maxNumberOfLinksToClick;
+		document.querySelector("#minVisitTime").value = globalConfig.settings.minVisitTime;
+		document.querySelector("#maxVisitTime").value = globalConfig.settings.maxVisitTime;
+		document.querySelector("#maxPageviewsFromRoot").value = globalConfig.settings.maxPageviewsFromRoot;
+
+		//Set Status
+		globalActive = globalConfig.settings.active; //TODO why not use the global config directly
+		updateStatusButton();
   }
-  
-  var getting = browser.storage.local.get("fakeConfig");
-  getting.then(loadValues, onError);
   
   function onError(error) {
     console.log(`Error: ${error}`);
   }
 }
 
-/** Helper to define if on or off  and draw button in respective color*/
-function loadStatus() {
-
-	function getStatus() {
-
-		var active = true; //TODO: Get Status of Extension
-		var className = active ? "activated" : "deactivated";
-		var statusText = active ? "ON" : "OFF";
-
-		document.querySelector("#power_button").classList.add(className);
-		document.querySelector("#power_button").textContent = statusText;
-	}
-
-	function onError(error) {
-		console.log(`Error: ${error}`);
-	}
-
-	//TODO:Get Status of Extension
-	//var getting = browser.management.get(browser.runtime.id);
-	//getting.then(getStatus, onError);
-	getStatus();
-}
-
 /** On Off Button pressed load browser settings*/
 function toggleState() {	
-//	var btn = document.querySelector("#power_button");
-//	if (btn.classList.length > 0) {
-//		btn.classList.remove(e.target.classList.item(0));
-//	}
-//	btn.classList.add(className);
-//	btn.innerText = statusText;
-	console.log("ToggleState pressed in settings");
+
+	globalActive = !globalActive;
+	updateStatusButton();
 	
 	var active = true; //TODO define in config
 	var sending = browser.runtime.sendMessage({
 		topic: "status",
-		data: active ? "ON" : "OFF"
+		data: globalActive ? "ON" : "OFF"
 	});
+}
+
+function updateStatusButton() {
+
+	var className = globalActive ? "activated" : "deactivated";
+	var statusText = globalActive ? "ON" : "OFF";
+
+	var btn = document.querySelector("#power_button");
+	if (btn.classList.length > 0) {
+		btn.classList.remove(btn.classList.item(0));
+	}
+	btn.classList.add(className);
+	btn.innerText = statusText;
 }
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
 document.addEventListener("DOMContentLoaded", loadStatus);
 document.querySelector("#power_button").addEventListener("click", toggleState);
+
+//==========================
+/** DEBUG helper as long as background.js does not safe into FF settings*/
+function loadTempConfig() {
+	globalConfig = {
+            "blacklist": ["bild"],
+            "wishlist": ["aktie"],
+			"selectedPersonaKey": "Banker",
+            "personas": {
+                "Banker": {
+                    "key": "Banker",
+                    "keywords": [
+                        { "word": "DAX", "score": 0 },
+                        { "word": "Börsenkurs", "score": 5 },
+                        { "word": "Aktien", "score": 10 },
+                        { "word": "Wechselkurse", "score": 3 },
+                        { "word": "Goldpreis", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.boerse.de/",
+                        "http://www.faz.net/aktuell/finanzen/"
+                    ]
+                },
+				"Hundebesitzer": {
+                    "key": "Hundebesitzer",
+                    "keywords": [
+                        { "word": "Hundefutter", "score": 0 },
+                        { "word": "Hundesteuer", "score": 5 },
+                        { "word": "Kotbeutel", "score": 10 },
+                        { "word": "Halsband", "score": 3 },
+                        { "word": "Tierarzt", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.fressnapf.de",
+                        "http://www.hunde.de"
+                    ]
+                },
+				"Surfer": {
+                    "key": "Surfer",
+                    "keywords": [
+                        { "word": "Hawaii", "score": 0 },
+                        { "word": "surfen", "score": 5 },
+                        { "word": "Welle", "score": 10 },
+                        { "word": "Carve", "score": 3 },
+                        { "word": "Surfbrett", "score": 7 },
+						{ "word": "Meer", "score": 6 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.surfen.de",
+                        "http://www.holidaycheck.de"
+                    ]
+                }
+            },
+            "settings": {
+				"active": false,
+                "maxBytes": 1, //Per day -> equals 100MB
+                "functionality": true,
+                "tracing": true,
+                "followLinkOnDomainOnly": true,
+                "maxLinkDepth": 0,
+                "maxNumberOfLinksToClick": 2, // value is interpreted in percent, so no need for a float
+                "minVisitTime": 3,
+                "maxVisitTime": 120,
+                "maxPageviewsFromRoot": 50
+				}
+			}
+}

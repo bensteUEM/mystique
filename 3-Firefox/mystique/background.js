@@ -22,7 +22,7 @@ function loadValues(result) {
 	    config = urlLib.initializeConfig();
 	    console.log("Config initialized from Lib because browser was null" +config);
     }
-}  
+}
 
 // functionality to open a given URL in a separate tab object 
 
