@@ -472,47 +472,148 @@ var urlLib = {
                     },
                     "Snowboarder": {
                         "key": "Snowboarder",
-                        "keywords": [{ "word": "Snowboard", "score": 0 }, { "word": "Wheelis", "score": 0 }, { "word": "Backside", "score": 0 }, { "word": "Snowboardtricks", "score": 0 }, { "word": "Skipiste", "score": 0 }, { "word": "Snowboardurlaub", "score": 0 }, { "word": "Cruise&Ride", "score": 0 }, { "word": "Skiträger", "score": 0 }],
+                        "keywords": [
+                            { "word": "Snowboard", "score": 0 }, 
+                            { "word": "Wheelis", "score": 0 }, 
+                            { "word": "Backside", "score": 0 }, 
+                            { "word": "Pulverschnee", "score": 0 }, 
+                            { "word": "Skipiste", "score": 0 }, 
+                            { "word": "Skigebiet", "score": 0 }, 
+                            { "word": "Apres-Ski", "score": 0 }, 
+                            { "word": "Skitraeger", "score": 0 },
+                            { "word": "Burton", "score": 0 },
+                            { "word": "X-games", "score": 0 }
+                        ],
                         "defaultURLs": []
                     },
                     "Yachtfahrer": {
                         "key": "Yachtfahrer",
-                        "keywords": [{ "word": "Bootsführerschein", "score": 0 }, { "word": "Schleusen", "score": 0 }, { "word": "Angelschein", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Bootsanhänger", "score": 0 }, { "word": "Yachthafen", "score": 0 }, { "word": "BVWW", "score": 0 }, { "word": "Segeln", "score": 0 }, { "word": "Schiffverkehrsregeln", "score": 0 }],
+                        "keywords": [
+                            { "word": "Bootsführerschein", "score": 0 }, 
+                            { "word": "Schleusen", "score": 0 }, 
+                            { "word": "Angelschein", "score": 0 }, 
+                            { "word": "Urlaub", "score": 0 }, 
+                            { "word": "Bootsanhänger", "score": 0 }, 
+                            { "word": "Yachthafen", "score": 0 }, 
+                            { "word": "BVWW", "score": 0 }, 
+                            { "word": "Segeln", "score": 0 }, 
+                            { "word": "Schiffverkehrsregeln", "score": 0 },
+                            { "word": "Wetter", "score": 0 }
+                        ],
                         "defaultURLs": []
                     },
                     "DINKS": {
                         "key": "DINKS",
-                        "keywords": [{ "word": "Karriere", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Wellness", "score": 0 }, { "word": "Hochschule", "score": 0 }, { "word": "Thermomix", "score": 0 }, { "word": "Sushi", "score": 0 }, { "word": "Essen gehen", "score": 0 }, { "word": "Shopping", "score": 0 }],
+                        "keywords": [
+                            { "word": "Karriere", "score": 0 }, 
+                            { "word": "Urlaub", "score": 0 }, 
+                            { "word": "Wellness", "score": 0 }, 
+                            { "word": "Hochschule", "score": 0 }, 
+                            { "word": "Thermomix", "score": 0 }, 
+                            { "word": "Sushi", "score": 0 }, 
+                            { "word": "Essen gehen", "score": 0 }, 
+                            { "word": "Shopping", "score": 0 },
+                            { "word": "Kinderfrei", "score": 0 },
+                            { "word": "Hotel", "score": 0 }
+                        ],
                         "defaultURLs": []
                     },
                     "Ingenieur": {
                         "key": "Ingenieur",
-                        "keywords": [{ "word": "Studium", "score": 0 }, { "word": "VDI", "score": 0 }, { "word": "VDA", "score": 0 }, { "word": "Elektronik", "score": 0 }, { "word": "Maschinenbau", "score": 0 }, { "word": "Konstruktion", "score": 0 }, { "word": "Zeichnung", "score": 0 }, { "word": "Schweißen", "score": 0 }, { "word": "Löten", "score": 0 }, { "word": "Fügen", "score": 0 }, { "word": "Drehen", "score": 0 }, { "word": "Fräsen", "score": 0 }],
+                        "keywords": [
+                            { "word": "Studium", "score": 0 }, 
+                            { "word": "VDI", "score": 0 }, 
+                            { "word": "VDA", "score": 0 }, 
+                            { "word": "Elektronik", "score": 0 }, 
+                            { "word": "Maschinenbau", "score": 0 }, 
+                            { "word": "Konstruktion", "score": 0 }, 
+                            { "word": "Zeichnung", "score": 0 }, 
+                            { "word": "Schweißen", "score": 0 }, 
+                            { "word": "Löten", "score": 0 }, 
+                            { "word": "Fügen", "score": 0 }, 
+                            { "word": "Drehen", "score": 0 }, 
+                            { "word": "Fräsen", "score": 0 }
+                        ],
                         "defaultURLs": []
                     },
                     "Lehrer": {
                         "key": "Lehrer",
-                        "keywords": [{ "word": "Kinder", "score": 0 }, { "word": "Erziehung", "score": 0 }, { "word": "Noten", "score": 0 }, { "word": "Hausaufgaben", "score": 0 }, { "word": "Zeugnisse", "score": 0 }, { "word": "Elterngespräch", "score": 0 }, { "word": "Schullandheim", "score": 0 }, { "word": "Lehrerausflug", "score": 0 }, { "word": "Tafel", "score": 0 }],
+                        "keywords": [
+                            { "word": "Kinder", "score": 0 }, 
+                            { "word": "Erziehung", "score": 0 }, 
+                            { "word": "Noten", "score": 0 }, 
+                            { "word": "Hausaufgaben", "score": 0 }, 
+                            { "word": "Zeugnisse", "score": 0 }, 
+                            { "word": "Elterngespräch", "score": 0 }, 
+                            { "word": "Schullandheim", "score": 0 }, 
+                            { "word": "Lehrerausflug", "score": 0 }, 
+                            { "word": "Tafel", "score": 0 }, 
+                            { "word": "Referendariat", "score": 0}
+                        ],
                         "defaultURLs": []
                     },
                     "Onlineshopper": {
                         "key": "Onlineshopper",
-                        "keywords": [{ "word": "alando", "score": 0 }, { "word": "Amazon", "score": 0 }, { "word": "DaWanda", "score": 0 }, { "word": "Conrad", "score": 0 }, { "word": "Notebooksbilliger", "score": 0 }],
+                        "keywords": [
+                            { "word": "Zalando", "score": 0 }, 
+                            { "word": "Amazon", "score": 0 }, 
+                            { "word": "DaWanda", "score": 0 }, 
+                            { "word": "Conrad", "score": 0 }, 
+                            { "word": "Notebooksbilliger", "score": 0 },
+                            { "word": "Ebay", "score": 0},
+                            { "word": "Sneaker", "score": 0},
+                            { "word": "Angebote", "score": 0},
+                            { "word": "Deals", "score": 0},
+                            { "word": "Schnaeppchen", "score": 0}
+                        ],
                         "defaultURLs": []
                     },
                     "Hundebesitzer": {
                         "key": "Hundebesitzer",
-                        "keywords": [{ "word": "Hundefutter", "score": 0 }, { "word": "Hundesteuer", "score": 0 }, { "word": "Kotbeutel", "score": 0 }, { "word": "Halsband", "score": 0 }, { "word": "Hundeleine", "score": 0 }, { "word": "Tierarzt", "score": 0 }],
+                        "keywords": [
+                            { "word": "Hundefutter", "score": 0 }, 
+                            { "word": "Hundesteuer", "score": 0 }, 
+                            { "word": "Kotbeutel", "score": 0 }, 
+                            { "word": "Halsband", "score": 0 }, 
+                            { "word": "Hundeleine", "score": 0 }, 
+                            { "word": "Tierarzt", "score": 0 },
+                            { "word": "Spielwiese", "score": 0},
+                            { "word": "Hundefloh", "score": 0},
+                            { "word": "Hundespielzeug", "score": 0},
+                            { "word": "Hundeknochen", "score": 0}
+                        ],
                         "defaultURLs": []
                     },
                     "Bauer": {
                         "key": "Bauer",
-                        "keywords": [{ "word": "Stall", "score": 0 }, { "word": "Rinder", "score": 0 }, { "word": "Schweine", "score": 0 }, { "word": "Tierarzt", "score": 0 }, { "word": "Heu", "score": 0 }, { "word": "Weizen", "score": 0 }, { "word": "Silo", "score": 0 }, { "word": "Mähdrescher", "score": 0 }, { "word": "Trecker", "score": 0 }, { "word": "Mais", "score": 0 }],
+                        "keywords": [
+                            { "word": "Stall", "score": 0 }, 
+                            { "word": "Rinder", "score": 0 }, 
+                            { "word": "Schweine", "score": 0 }, 
+                            { "word": "Tierarzt", "score": 0 }, 
+                            { "word": "Heu", "score": 0 }, 
+                            { "word": "Weizen", "score": 0 }, 
+                            { "word": "Silo", "score": 0 }, 
+                            { "word": "Maehdrescher", "score": 0 }, 
+                            { "word": "Traktor", "score": 0 }, 
+                            { "word": "Mais", "score": 0 }
+                        ],
                         "defaultURLs": []
                     },
                     "Surfer": {
                         "key": "Surfer",
-                        "keywords": [{ "word": "Hawaii", "score": 0 }, { "word": "surfen", "score": 0 }, { "word": "Welle", "score": 0 }, { "word": "Wellenreiten", "score": 0 }, { "word": "Carve", "score": 0 }, { "word": "Cutback", "score": 0 }, { "word": "Meer", "score": 0 }, { "word": "Surfbrett", "score": 0 }, { "word": "Surfspots", "score": 0 }],
+                        "keywords": [
+                            { "word": "Hawaii", "score": 0 }, 
+                            { "word": "surfen", "score": 0 }, 
+                            { "word": "Welle", "score": 0 }, 
+                            { "word": "Wellenreiten", "score": 0 }, 
+                            { "word": "Carve", "score": 0 }, 
+                            { "word": "Cutback", "score": 0 }, 
+                            { "word": "Meer", "score": 0 }, 
+                            { "word": "Surfbrett", "score": 0 }, 
+                            { "word": "Surfspots", "score": 0 },
+                            { "word": "Urlaub", "score": 0}
+                        ],
                         "defaultURLs": []
                     }
                 },
