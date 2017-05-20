@@ -1,7 +1,7 @@
 var configTmp;
 
 // Saves options to chrome.storage
-function save_options() {
+function saveConfig() {
   var functionality = document.getElementById('functionality').checked;
   var followLinkOnDomainOnly = document.getElementById('followLinkOnDomainOnly').checked;
   var maxMegaBytes = document.getElementById('maxMegaBytes').value;
@@ -39,7 +39,7 @@ function save_options() {
 
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
-function restore_options() {
+function restoreConfig() {
   chrome.storage.sync.get({
 	config: null,
 	usedBytes: 0,
@@ -67,7 +67,7 @@ function restore_options() {
 
 
 // Clear History
-function clear_history(){
+function clearHistory(){
   chrome.storage.sync.set({
 	history: ""
 	}, function() {
@@ -79,7 +79,7 @@ function clear_history(){
 });
 }
 
-function toggle_history(){
+function toggleHistory(){
 	if(document.getElementById('history').style.visibility == 'hidden')
 	{
 		document.getElementById('history').style.visibility='visible';
@@ -110,7 +110,16 @@ function fill_personas(selectedPersonaKey, personasObject){
 		personaSelector.appendChild(opt);
 		}
 }
-document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click', save_options);
-document.getElementById('clear').addEventListener('click', clear_history);
-document.getElementById('toggleHistory').addEventListener('click', toggle_history);
+
+function resetConfig(){
+	chrome.runtime.sendMessage({ 	
+		resetConfig: true
+	});
+	
+}
+
+document.addEventListener('DOMContentLoaded', restoreConfig);
+document.getElementById('saveSettings').addEventListener('click', saveConfig);
+document.getElementById('clearHistory').addEventListener('click', clearHistory);
+document.getElementById('toggleHistory').addEventListener('click', toggleHistory);
+document.getElementById('resetSettings').addEventListener('click', resetConfig);
