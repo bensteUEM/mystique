@@ -699,7 +699,7 @@ var urlLib = {
                     "functionality": true,
                     "tracing": true,
                     "followLinkOnDomainOnly": true,
-                    "maxLinkDepth": 45,
+                    "maxLinkDepth": 4,
                     "maxNumberOfLinksToClick": 30, // value is interpreted in percent, so no need for a float
                     "minVisitTime": 3,
                     "maxVisitTime": 120,
