@@ -113,7 +113,7 @@ function maintainLinksToFollow(newLinks) {
 		// TODO this is when a very new URL from the library has to be requested  
 		urls.unshift({
 			url: startingUrl,
-			level: settings.maxLinkDepth;
+			level: settings.maxLinkDepth
 		});
 	}
 	

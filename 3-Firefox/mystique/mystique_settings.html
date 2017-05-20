@@ -4,12 +4,10 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="mystique.css"/>
-
 </head>
 
 <body>
 <div class="header_container">
-    <img src="" alt="mystique_logo"/>
     <h1 class="main_header">Settings</h1>
 </div>
 <div id="power_button" class=""></div>
@@ -23,40 +21,40 @@
             <div class="settings_item">
                 <p class="label">Max Bytes per Day</p>
                 <select id="maxBytes">
-                    <option value="800">Low</option>
-                    <option value="3000">Medium</option>
-                    <option value="5000">High</option>
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
                 </select>
-                <span class="description">How many bytes you want to ...?</span>
+                <span class="description">How many bytes to load per day?</span>
             </div>
             <div class="settings_item">
                 <p class="label">Max Number of Links to click %</p>
 				<select id="maxNumberOfLinksToClick">
-                    <option value="0.1">Low</option>
-                    <option value="0.2">Medium</option>
-                    <option value="0.5">High</option>
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
                 </select>
-                <span class="description">How many links do you want to capture? More links are ..., less links are...</span>
+                <span class="description">How many links do you want to capture?</span>
 
             </div>
             <div class="settings_item">
                 <p class="label">Max Link Depth</p>
                 <select id="maxLinkDepth">
-                    <option value="1">Low</option>
-                    <option value="2">Medium</option>
-                    <option value="5">High</option>
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
                 </select>
-                <span class="description">How many levels do you want to step into the current page link structure ? More levels are ..., less levels are...</span>
+                <span class="description">How many levels do you want to capture?</span>
             </div>
 			<div class="settings_item">
                 <p class="label">Min Visit Time</p>
                 <input type="text" id="minVisitTime"></textarea>
-                <span class="description">Minimum Visit Time</span>
+                <span class="description">The minimum visit time per page?</span>
             </div>
             <div class="settings_item">
                 <p class="label">Max Visit Time</p>
                 <input type="text" id="maxVisitTime"></textarea>
-                <span class="description">Maximum Visit Time per page</span>
+                <span class="description">The maximum visit time per page?</span>
             </div>
             <div class="settings_item">
                 <p class="label">Max Page Views from Root</p>
@@ -66,22 +64,8 @@
             <div class="settings_item">
                 <p class="label">Persona</p>
                 <select id="personaKey">
-                    <option value="Banker">Banker</option>
-                    <option value="Persona2">Persona2</option>
-                    <option value="Persona3">Persona3</option>
-                    <option value="Persona4">Persona4</option>
                 </select>
                 <span class="description">Who do you want to be?</span>
-            </div>
-			<div class="settings_item">
-                <p class="label">Keywords</p>
-                <textarea type="text" id="keywords" col="20" rows="7"></textarea>
-                <span class="description">Keywords of the selected Persona</span>
-            </div>
-			<div class="settings_item">
-                <p class="label">Default URLs</p>
-                <textarea type="text" id="defaultURLs" col="20" rows="7"></textarea>
-                <span class="description">Default URLs of the selected Persona</span>
             </div>
             <div class="settings_item">
                 <p class="label">Blacklist</p>
