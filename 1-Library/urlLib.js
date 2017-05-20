@@ -27,10 +27,7 @@ var urlLib = {
                         ret.result = config.personas[personaKey].defaultURLs[Math.floor(Math.random() 
                         * config.personas[personaKey].defaultURLs.length - 1)];
                     }
-                    else
-                    {
-                        ret.result = "www.spiegel.de"
-                    }
+                    
                     console.log("regenerate: " + ret.result);
                     ret.config = config;
                     resolve(ret);
