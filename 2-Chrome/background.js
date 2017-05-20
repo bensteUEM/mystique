@@ -154,7 +154,7 @@ let processLinks = function (links) {
 };
 
 function isOnSameDomain(checkPage) {
-    if (_config.settings.isOnSameDomain === false) {
+    if (_config.settings.followLinkOnDomainOnly === false) {
         return true;
     }
 
