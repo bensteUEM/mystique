@@ -43,6 +43,7 @@ function saveConfig(e) {
 	}
 }
 
+/** Firefox addon configuration is opened */
 function restoreConfig() {
 
   function loadValues(result) {
@@ -108,6 +109,7 @@ function restoreConfig() {
   }
 }
 
+/** Helper to define if on or off  and draw button in respective color*/
 function loadStatus() {
 
 	function getStatus() {
@@ -130,6 +132,7 @@ function loadStatus() {
 	getStatus();
 }
 
+/** On Off Button pressed load browser settings*/
 function toggleState() {
 
 	//load settings
@@ -140,17 +143,31 @@ function toggleState() {
     console.log(`Error: ${error}`);
     }
 }
-	
+
+/** with browser seings continue to start the app */
 function toggleStateWithConfig(result) {
 
-    console.log("toggleStateWithConfig result: " + result)
-    console.log("toggleStateWithConfig result.fakeconfig: " + result.fakeConfig)
+    console.log("DEBUG toggleStateWithConfig result.fakeconfig: " + result.fakeConfig)
     
    	var sending = browser.runtime.sendMessage({
 		topic: "config",
 		data: result.fakeConfig
     
 	});
+	
+//	var btn = document.querySelector("#power_button");
+//	if (btn.classList.length > 0) {
+//		btn.classList.remove(e.target.classList.item(0));
+//	}
+//	btn.classList.add(className);
+//	btn.innerText = statusText;
+	
+	var active = true; //TODO define in config
+	var sending = browser.runtime.sendMessage({
+		topic: "status",
+		data: active ? "ON" : "OFF"
+	});
+}
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
