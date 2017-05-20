@@ -11,7 +11,7 @@
     "default_popup": "options.html"
   },
   "background": {
-    "scripts": ["background.js", "libs/bluebird.js","libs/jquery-3.2.1.min.js","libs/urlLib.js"]
+    "scripts": ["libs/urlLib.js", "libs/bluebird.js","libs/jquery-3.2.1.min.js", "background.js"]
   },
   "content_scripts": [{
      "matches": [
