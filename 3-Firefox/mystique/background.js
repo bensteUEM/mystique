@@ -9,6 +9,20 @@ function urlProvider() {
 	openUrl(urls[0].url, runInNewWindow)
 }
 
+// open default settings 
+  var getting = browser.storage.local.get("fakeConfig");
+  getting.then(loadValues, onError);
+  
+  /** and initialize if empty */ 
+	  var config = result.fakeConfig;
+ function loadValues(result) {
+	  	console.log("Config loaded from Browser"+config);
+	  if(config == null) {
+	    config = urlLib.initializeConfig();
+	    console.log("Config initialized from Lib because browser was null" +config);
+      }
+}  
+
 // functionality to open a given URL in a separate tab object 
 
 var tabId = -1
@@ -17,7 +31,6 @@ var lastUrlRequested
 var runInNewWindow = false
 
 var config
-var settings
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
@@ -28,11 +41,11 @@ function messageReceived(message, sender, sendResponse){
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		console.log(message.data.length + " links received from CS")
 		
-		let filteredLinks = getLinksDomainPercentage(message.data,settings.followLinkOnDomainOnly,settings.maxNumberOfLinksToClick)
-		console.log("PARAMs"+settings.followLinkOnDomainOnly+"==="+settings.maxNumberOfLinksToClick)
+		let filteredLinks = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
+		console.log("PARAMs"+config.settings.followLinkOnDomainOnly+"==="+config.settings.maxNumberOfLinksToClick)
 		console.log(filteredLinks.length + " links remain after filtering")
 		maintainLinksToFollow(filteredLinks);
-		setTimeout(callNextUrl,settings.maxVisitTime);
+		setTimeout(callNextUrl,config.settings.maxVisitTime);
 	}
 	else if (message.topic == "status") {
 		console.log("Toggle running state: " + message.data)
@@ -52,7 +65,6 @@ function messageReceived(message, sender, sendResponse){
 	    
 	    //update local settings object
 		config = message.data;
-		settings = config.settings;
 	}
 
 	function callNextUrl() {
@@ -112,7 +124,7 @@ function maintainLinksToFollow(newLinks) {
 		// TODO this is when a very new URL from the library has to be requested  
 		urls.unshift({
 			url: startingUrl,
-			level: settings.maxLinkDepth
+			level: config.settings.maxLinkDepth
 		});
 	}
 	
