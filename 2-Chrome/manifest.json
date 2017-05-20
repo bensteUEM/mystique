@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Mystique",
-  "description": "Our extension produces noise while you are normally surfing the web. In the background, different websites will be opened. These websites are random but connected to a specified stereotype.",
+  "description": "Produce noise in the background while normally surfing the web by opening random websites connected to a specified stereotype",
   "author": "DHBW.CAS.ADM.2K17",
   "homepage_url": "https://mystique-extension.jimdo.com/",
   "version": "1.0",

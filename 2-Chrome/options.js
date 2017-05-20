@@ -114,16 +114,19 @@ function fillPersonas(selectedPersonaKey, personasObject){
 }
 
 function resetConfig(){
-	chrome.runtime.sendMessage({ 	
-		resetConfig: true
-	});
-	// Update status to let user know options were saved.
-    var status = document.getElementById('status');
-    status.textContent = 'Options have been reset, reloading...';
-    setTimeout(function() {
-      status.textContent = '';
-	  restoreConfig();
-    }, 500);	
+	if(confirm("Are you sure you want to reset the settings to default?"))
+	{
+		chrome.runtime.sendMessage({ 	
+			resetConfig: true
+		});
+		// Update status to let user know options were saved.
+		var status = document.getElementById('status');
+		status.textContent = 'Options have been reset, reloading...';
+		setTimeout(function() {
+		  status.textContent = '';
+		  restoreConfig();
+		}, 500);
+	}		
 }
 
 function getKeywordsOfPersona()
