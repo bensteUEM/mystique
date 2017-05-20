@@ -32,23 +32,9 @@ let resetConfig = function() {
     let personaArray = Object.keys(_config.personas);
     _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
     _config.settings.lastSyncDate = Date.now();
-    //TODO: DELETE
-    _config.settings.maxVisitTime = 10;
     chrome.storage.sync.set({config: _config});
 }
 
-/* 
- blacklist
- followLinkOnDomainOnly
- functionality
- maxBytes
- maxLinkDepth
- NOT USED YET ---> maxNumberOfLinksToClick
- maxPageviewsFromRoot
- maxVisitTime
- minVisitTime
- tracing
- */
 
 let run = function () {
     verifyTrafficLimit();
@@ -157,8 +143,6 @@ let processLinks = function (links) {
     while (i < followLinksCount) {
         idx = Math.floor(Math.random() * links.length);
         url = links[idx];
-        // Check url
-        // urlLib._approveUrl(url);
 
         if (urlLib.approveURL(url, _config) && isOnSameDomain(url)) {
             followLinks.push(url);
