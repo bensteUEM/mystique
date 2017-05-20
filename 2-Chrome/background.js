@@ -74,10 +74,11 @@ let processUrl = function () {
     urls = urls.splice(1, urls.length);
     console.log("--- processUrl 1");
     openUrl(currentUrl).then(() => {
-        console.log("--- processUrl 2");
+        console.log("--- processUrl 2a");
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
     }, (exception) => {
-        console.error(exception)
+        console.log("--- processUrl 2b");
+        console.error(exception);
         setTimeout(run, getRandomInt(parseInt(_config.settings.minVisitTime), parseInt(_config.settings.maxVisitTime) + 1) * 1000);
     });
     console.log("--- processUrl 3");
@@ -114,23 +115,25 @@ let _getOrCreateTabId = function () {
 let _updateTab = function (url) {
     return new Promise((resolve, reject) => {
         try {
+            // add listener so callback executes only if page loaded. otherwise calls instantly
+            let listener = function(cTabId, changeInfo, tab) {
+                console.log("--- processUrl 10 - " + tabId, changeInfo);
+                if (tabId === cTabId && changeInfo.status === 'complete') {
+                    chrome.tabs.onUpdated.removeListener(listener);
+                    console.log("--- processUrl 4");
+                    chrome.tabs.executeScript(tabId, {
+                        file: "contentScript.js",
+                        runAt: "document_end",
+                        matchAboutBlank: true
+                    }, (tab) => {
+                        console.log("--- processUrl 5");
+                        resolve(tab);
+                    });
+                }
+            };
+            chrome.tabs.onUpdated.addListener(listener);
             chrome.tabs.update(tabId, {
                 url: url
-            }, (tab) => {
-                // add listener so callback executes only if page loaded. otherwise calls instantly
-                let listener = function(cTabId, changeInfo, tab) {
-
-                    if (tabId === cTabId && changeInfo.status === 'complete') {
-                        chrome.tabs.onUpdated.removeListener(listener);
-
-                        chrome.tabs.executeScript(tabId, {
-                            file: "contentScript.js",
-                            runAt: "document_end",
-                            matchAboutBlank: true
-                        }, resolve);
-                    }
-                };
-                chrome.tabs.onUpdated.addListener(listener);
             });
         } catch (exception) {
             reject(exception)
