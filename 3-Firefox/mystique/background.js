@@ -41,7 +41,7 @@ function messageReceived(message, sender, sendResponse){
 	else if (message.topic == "configUpdate") {
 		//check if config exists otherwise initialize
 		config = message.data;
-		console.log("Config object received in background: " + config)
+		console.log("Config object received in background: " + config);
 		//TODO check if empty
 		
 		//safe to browser config
