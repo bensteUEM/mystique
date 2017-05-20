@@ -302,13 +302,16 @@ var urlLib = {
          */
         _getNotBlacklistedURL: function(links, config, personaKey) {
             var url;
+            var foundValidUrl = false;
             for(var i=0;i<links.length;i++) {
                 url = links[Math.floor(Math.random() * links.length)];
-                if(urlLib._isNotBlacklisted(url, config))
+                if(urlLib._isNotBlacklisted(url, config)) {
+                    foundValidUrl = true;
                     break;
+                }
             }
 
-            if(!url)
+            if(!foundValidUrl)
                 url = urlLib._getUrlModule._getFallbackURL(config, personaKey);
 
             return url;
