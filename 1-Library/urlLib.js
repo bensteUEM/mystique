@@ -248,7 +248,7 @@ var urlLib = {
                 console.log("config not changed");
 
                 //choose first and last word in ordered list (by score)
-                var keywordLength = config.personas[personaKey].keywords.length;
+                var keywordLength = config.personas[personaKey].keywords.length - 1;
                 var searchStringFirstLast = config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word + " " 
                     + config.personas[personaKey].keywords[Math.floor(Math.random() * keywordLength)].word
 
@@ -414,39 +414,57 @@ var urlLib = {
                         "key": "Banker",
                         "keywords": [
                             { "word": "DAX", "score": 0 },
-                            { "word": "Börsenkurs", "score": 5 },
-                            { "word": "Aktien", "score": 10 },
-                            { "word": "Wechselkurse", "score": 3 },
-                            { "word": "Goldpreis", "score": 7 }
+                            { "word": "Börse", "score": 0 },
+                            { "word": "Aktien", "score": 0 },
+                            { "word": "Wechselkurs", "score": 0 },
+                            { "word": "Gold", "score": 0 },
+                            { "word": "Fond", "score": 0 },
+                            { "word": "Rendite", "score": 0 },
+                            { "word": "Devisen", "score": 0 },
+                            { "word": "Geld", "score": 0 },
+                            { "word": "Beratung", "score": 0 }
                         ],
-                        "defaultURLs": [
-                            "http://www.boerse.de/",
-                            "http://www.faz.net/aktuell/finanzen/"
-                        ]
+                        "defaultURLs": []
                     },
                     "Familie": {
                         "key": "Familie",
-                        "keywords": [{ "word": "Kindergarten", "score": 0 }, { "word": "Windeln", "score": 0 }, { "word": "Spielzeug", "score": 0 }, { "word": "Kinderbuch", "score": 0 }, { "word": "Babysitter", "score": 0 }, { "word": "Schwangerschaftsstreifen", "score": 0 }, { "word": "abnehmen", "score": 0 }, { "word": "Yogaübungen", "score": 0 }, { "word": "Kita", "score": 0 }, { "word": "Babynahrung", "score": 0 }],
+                        "keywords": [{ "word": "Kindergarten", "score": 0 }, { "word": "Windeln", "score": 0 }, { "word": "Spielzeug", "score": 0 }, { "word": "Kinderbuch", "score": 0 }, { "word": "Babysitter", "score": 0 }, { "word": "Schwangerschaft", "score": 0 }, { "word": "abnehmen", "score": 0 }, { "word": "Erziehung", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Babynahrung", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Fruehrentner": {
                         "key": "Fruehrentner",
-                        "keywords": [{ "word": "Altersteilzeit", "score": 0 }, { "word": "Frührente", "score": 0 }, { "word": "Weltreise", "score": 0 }, { "word": "Rentenrechner", "score": 0 }, { "word": "Urlaub", "score": 0 }, { "word": "Rente", "score": 0 }, { "word": "Auszeit", "score": 0 }, { "word": "Bootsführerschein", "score": 0 }],
+                        "keywords": [{ "word": "Altersteilzeit", "score": 0 }, { "word": "Frührente", "score": 0 }, 
+                                        { "word": "Weltreise", "score": 0 }, { "word": "Rentenrechner", "score": 0 }, 
+                                        { "word": "Urlaub", "score": 0 }, { "word": "Rente", "score": 0 }, 
+                                        { "word": "Bootsführerschein", "score": 0 }, { "word": "Rente", "score": 0 }, 
+                                        { "word": "Auszeit", "score": 0 }, { "word": "Yacht", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Student": {
                         "key": "Student",
-                        "keywords": [{ "word": "Studium", "score": 0 }, { "word": "Studiumsgebühren", "score": 0 }, { "word": "Studentenwohnung", "score": 0 }, { "word": "Hochschule", "score": 0 }, { "word": "BAFÖG", "score": 0 }, { "word": "Studententicket", "score": 0 }, { "word": "Bachelorthesis", "score": 0 }, { "word": "Masterthesis", "score": 0 }],
+                        "keywords": [{ "word": "Studium", "score": 0 }, { "word": "Studiengebühren", "score": 0 }, 
+                                        { "word": "Studentenwohnung", "score": 0 }, { "word": "Hochschule", "score": 0 }, 
+                                        { "word": "BAFÖG", "score": 0 }, { "word": "Studententicket", "score": 0 }, 
+                                        { "word": "Ghostwriter", "score": 0 }, { "word": "WG", "score": 0 }, 
+                                        { "word": "Bachelorthesis", "score": 0 }, { "word": "Masterthesis", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Fussballfan": {
                         "key": "Fussballfan",
-                        "keywords": [{ "word": "Bundesliga", "score": 0 }, { "word": "MLS", "score": 0 }, { "word": "Champions Leage", "score": 0 }, { "word": "FC Bayern", "score": 0 }, { "word": "BVB", "score": 0 }, { "word": "Fußballweltmeister", "score": 0 }, { "word": "Fifa", "score": 0 }, { "word": "DFB", "score": 0 }, { "word": "Spieltag", "score": 0 }, { "word": "Bier", "score": 0 }, { "word": "Sky", "score": 0 }],
+                        "keywords": [{ "word": "Bundesliga", "score": 0 }, { "word": "MLS", "score": 0 }, 
+                                        { "word": "Champions Leage", "score": 0 }, { "word": "FC Bayern", "score": 0 }, 
+                                        { "word": "BVB", "score": 0 }, { "word": "Fußballweltmeister", "score": 0 }, 
+                                        { "word": "Fifa", "score": 0 }, { "word": "DFB", "score": 0 }, 
+                                        { "word": "Spieltag", "score": 0 }, { "word": "Bier", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Fitnessjunkie": {
                         "key": "Fitnessjunkie",
-                        "keywords": [{ "word": "Fitnessprogramm", "score": 0 }, { "word": "Fitnessstudio", "score": 0 }, { "word": "abnehmen", "score": 0 }, { "word": "Sixpack", "score": 0 }, { "word": "Proteine", "score": 0 }, { "word": "Eiweiß", "score": 0 }, { "word": "Fitnesstracker", "score": 0 }, { "word": "Fitness-App", "score": 0 }, { "word": "Low-Carb", "score": 0 }, { "word": "Muskelaufbau", "score": 0 }],
+                        "keywords": [{ "word": "Fitnessprogramm", "score": 0 }, { "word": "Fitnessstudio", "score": 0 }, 
+                                    { "word": "abnehmen", "score": 0 }, { "word": "Sixpack", "score": 0 }, 
+                                    { "word": "Proteine", "score": 0 }, { "word": "Eiweiß", "score": 0 }, 
+                                    { "word": "Fitnesstracker", "score": 0 }, { "word": "Fitness-App", "score": 0 }, 
+                                    { "word": "Low-Carb", "score": 0 }, { "word": "Muskelaufbau", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Professor": {
@@ -457,17 +475,30 @@ var urlLib = {
                             {"word": "Hochschule", "score": 0},
                             {"word": "Hiwi", "score": 0},
                             {"word": "Latex", "score": 0},
+                            {"word": "Student", "score": 0},
+                            {"word": "Klausur", "score": 0},
+                            {"word": "Kreide", "score": 0},
+                            {"word": "Prüfung", "score": 0},
+                            {"word": "Didaktik", "score": 0}
                         ],
                         "defaultURLs": []
                     },
                     "Aktionaer": {
                         "key": "Aktionaer",
-                        "keywords": [{ "word": "Aktien", "score": 0 }, { "word": "ETF", "score": 0 }, { "word": "Dividende", "score": 0 }, { "word": "Broker", "score": 0 }, { "word": "Rendite", "score": 0 }, { "word": "Aktiengesellschaft", "score": 0 }, { "word": "Anleihen", "score": 0 }, { "word": "Hauptversammlung", "score": 0 }, { "word": "DAX", "score": 0 }, { "word": "NASDAQ", "score": 0 }, { "word": "Dividendenrendite", "score": 0 }],
+                        "keywords": [{ "word": "Aktien", "score": 0 }, { "word": "ETF", "score": 0 },
+                                    { "word": "Dividende", "score": 0 }, { "word": "Broker", "score": 0 }, 
+                                    { "word": "Rendite", "score": 0 }, { "word": "AG", "score": 0 }, 
+                                    { "word": "Anleihen", "score": 0 }, { "word": "Hauptversammlung", "score": 0 }, 
+                                    { "word": "DAX", "score": 0 }, { "word": "NASDAQ", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Lottospieler": {
                         "key": "Lottospieler",
-                        "keywords": [{ "word": "Lottogewinn", "score": 0 }, { "word": "Gewinnspiel", "score": 0 }, { "word": "Lottozahlen", "score": 0 }],
+                        "keywords": [{ "word": "Lottogewinn", "score": 0 }, { "word": "Gewinnspiel", "score": 0 }, 
+                                        { "word": "Lottozahlen", "score": 0 }, { "word": "Lotto", "score": 0 },
+                                        { "word": "Wahrscheinlichkeit", "score": 0 }, { "word": "Glück", "score": 0 }, 
+                                        { "word": "Eurojackpot", "score": 0 }, { "word": "Jackpot", "score": 0 }, 
+                                        { "word": "Auszahlung", "score": 0 }, { "word": "Ziehung", "score": 0 }],
                         "defaultURLs": []
                     },
                     "Snowboarder": {
