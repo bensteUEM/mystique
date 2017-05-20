@@ -2,10 +2,11 @@
   "manifest_version": 2,
 
   "name": "Mystique",
-  "description": "This extension generates random user profiles in order to confuse trackers",
+  "description": "Our extension produces noise while you are normally surfing the web. In the background, different websites will be opened. These websites are random but connected to a specified stereotype.",
+  "author": "DHBW.CAS.ADM.2K17",
+  "homepage_url": "https://mystique-extension.jimdo.com/",
   "version": "1.0",
   "options_page": "options.html",
-
   "browser_action": {
     "default_popup": "options.html"
   },
