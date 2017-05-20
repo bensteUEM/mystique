@@ -15,7 +15,8 @@
 <img src="icon.png" style="width: 60px;" />
 </div>
 <h3>Settings for the Mystique extension</h3>
-<button id="saveSettings">Save</button><br><br>
+<br>
+<button id="saveSettings">Save</button><br>
 
 <div class="settings_item">
 	<div class="label">
@@ -41,7 +42,7 @@
 		</label> 
 		(<span id='usedBytes'></span> MB used today)
 	</div>
-	<div class="description">Maximum of bytes that can be transmitted when accessing a new domain.</div>
+	<div class="description">Maximum of megabytes that can be transmitted when accessing a new domain.</div>
 </div>
 <div class="settings_item">
 	<div class="label">
@@ -82,7 +83,7 @@
 </div>
 <div class="settings_item">
 	<div class="label">
-		<label>Minimum visit time
+		<label>Minimum visit time (in s)
 			<br>
 			<input type='number' name='minVisitTime' id='minVisitTime'/>
 		</label>
@@ -91,7 +92,7 @@
 </div>
 <div class="settings_item">
 	<div class="label">
-		<label>Maximum visit time
+		<label>Maximum visit time (in s)
 			<br>
 			<input type='number' name='maxVisitTime' id='maxVisitTime'/>
 		</label>
@@ -123,7 +124,8 @@
 		 <option value="0">DEFAULT-Nerd</option>
 		</select>
 	</label>
-	<span id='personaKeywords'></span>
+	<br>
+	Keywords: <div id='personaKeywords'></div>
 	<div class="description">Emulate a person with this typical profile (preferred keywords in brackets)</div>
 	</div>
 </div>
@@ -132,7 +134,9 @@
 <br>
 <br>
 <div id="status"></div>
+<br>
 <button id="resetSettings">Reset Settings</button>
+<!--
 <br>
 <br>
 <br>
@@ -146,6 +150,7 @@
 <button id="clearHistory">Clear</button>
 <br>
 </div>
+-->
 <script src="options.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 var configTmp;
-
+var personasObjectGlobal;
 // Saves options to chrome.storage
 function saveConfig() {
   var functionality = document.getElementById('functionality').checked;
@@ -46,7 +46,7 @@ function restoreConfig() {
 	history: null
   }, function(items) {
 	configTmp = items.config;
-	fill_personas(items.config.settings.selectedPersonaKey, items.config.personas);
+	fillPersonas(items.config.settings.selectedPersonaKey, items.config.personas);
     document.getElementById('functionality').checked = items.config.settings.functionality;
     document.getElementById('followLinkOnDomainOnly').checked = items.config.settings.followLinkOnDomainOnly;
 	var maxMegaBytes = (items.config.settings.maxBytes / (1024*1024));	// convert from Bytes to MegaBytes
@@ -58,7 +58,7 @@ function restoreConfig() {
     document.getElementById('maxPageviewsFromRoot').value = items.config.settings.maxPageviewsFromRoot;
     document.getElementById('blacklist').value = items.config.settings.blacklist;
     document.getElementById('wishlist').value = items.config.settings.wishlist;
-	document.getElementById('history').value = items.config.settings.history;
+	//document.getElementById('history').value = items.config.settings.history;
 	console.log("Used bytes: " + items.usedBytes);
 	var sizeInMB = (items.usedBytes / (1024*1024)).toFixed(2);	// convert from Bytes to MegaBytes
 	document.getElementById('usedBytes').textContent = sizeInMB;
@@ -93,7 +93,8 @@ function toggleHistory(){
 }
 
 
-function fill_personas(selectedPersonaKey, personasObject){
+function fillPersonas(selectedPersonaKey, personasObject){
+	personasObjectGlobal = personasObject;
 	var personaSelector = document.getElementById('personaSelector');
 	// First: clear all options from personaSelector
 	var length = personaSelector.options.length;
@@ -108,7 +109,8 @@ function fill_personas(selectedPersonaKey, personasObject){
 		opt.innerHTML = persona.key;
 		if(personaKey == selectedPersonaKey) opt.selected = true;
 		personaSelector.appendChild(opt);
-		}
+	}
+	getKeywordsOfPersona();
 }
 
 function resetConfig(){
@@ -124,8 +126,26 @@ function resetConfig(){
     }, 500);	
 }
 
+function getKeywordsOfPersona()
+{
+	var keywordList = ""
+	var e = document.getElementById("personaSelector");
+	var selectedPersonaKeyTmp = e.options[e.selectedIndex].value;
+	for (var key in personasObjectGlobal[selectedPersonaKeyTmp].keywords)
+	{
+		keywordList+= personasObjectGlobal[selectedPersonaKeyTmp].keywords[key].word + ", ";
+	}
+	document.getElementById("personaKeywords").textContent = keywordList;
+}
+
+// Execute on load of page
 document.addEventListener('DOMContentLoaded', restoreConfig);
+
+// add event listeners to buttons
 document.getElementById('saveSettings').addEventListener('click', saveConfig);
-document.getElementById('clearHistory').addEventListener('click', clearHistory);
-document.getElementById('toggleHistory').addEventListener('click', toggleHistory);
 document.getElementById('resetSettings').addEventListener('click', resetConfig);
+document.getElementById('personaSelector').addEventListener('change', getKeywordsOfPersona);
+
+
+//document.getElementById('clearHistory').addEventListener('click', clearHistory);
+//document.getElementById('toggleHistory').addEventListener('click', toggleHistory);
