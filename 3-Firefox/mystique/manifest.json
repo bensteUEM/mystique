@@ -2,7 +2,7 @@
 
 	"manifest_version": 2,
 	"name": "Mystique-FF",
-	"version": "0.5",
+	"version": "0.4",
 	
 	"permissions": [
   		"tabs",
@@ -26,16 +26,15 @@
 	}],
   	
   	"background": {
-		"scripts": ["libraries/jquery-3.2.1.min.js","libraries/bluebird.js","urlLib.js","background.js"]
+		"scripts": ["urlLib.js","background.js"]
 	},
 	
 	"browser_action": {
 		"default_icon": "icons/logo-96.png",
-		"default_popup": "popup/mystique_popup.html"
+		"default_popup": "mystique_settings.html"
 	},
 	
 	"options_ui": {
-
   		"page": "mystique_settings.html"
   	}
 }
