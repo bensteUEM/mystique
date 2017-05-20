@@ -299,23 +299,29 @@ var urlLib = {
          */
         _getNotBlacklistedURL: function(links, config, personaKey) {
             var url;
-            var foundValidURL = false;
             for(var i=0;i<links.length;i++) {
                 url = links[Math.floor(Math.random() * links.length)];
-                if(urlLib._isNotBlacklisted(url, config)) {
-                    foundValidURL = true;
+                if(urlLib._isNotBlacklisted(url, config))
                     break;
-                }
             }
 
-            //check if there was a valid URL. Otherwise use one of the defaultURLs 
+            if(!url)
+                url = urlLib._getUrlModule._getFallbackURL(config, personaKey);
+
+            return url;
+        },
+
+        /**
+         * If google search does not work, get a fallback URL.
+         * If no previous URL is stored, create a bing search string. 
+         */
+        _getFallbackURL: function(config, personaKey) {
             var URLs = config.personas[personaKey].defaultURLs;
             if(URLs.lenght > 0) {
                 url = URLs[Math.floor(Math.random() * URLs.lenght)];
             } else {
                 url = "http://www.bing.com/search?q=" + personaKey;
             }
-
             return url;
         },
 
@@ -350,34 +356,24 @@ var urlLib = {
                 url: url,
                 success: data => {
                     url = urlLib._getUrlModule._get_random_URL(data, paramsObject.personaKey, paramsObject.config);
-                    if(url) {
-                        urlLib._getUrlModule._storeURLforPersona(url, paramsObject.config, paramsObject.personaKey);
-                        console.log("Created URL is: " + url);
-                        var resultObj = {
-                            "result": url,
-                            "config": paramsObject.config
-                        };
-                        resolve(resultObj);
-                    } else {
-                        reject("Could not find valid URL");
-                    }
+                    urlLib._getUrlModule._storeURLforPersona(url, paramsObject.config, paramsObject.personaKey);
+                    console.log("Created URL is: " + url);
+                    var resultObj = {
+                        "result": url,
+                        "config": paramsObject.config
+                    };
+                    resolve(resultObj);
                 },
                 error: e => {
                     //If the GET fails, retrieve a defaultURL 
-                    var URLs = config.personas[personaKey].defaultURLs;
-                    if(URLs.lenght > 0) {
-                        url = URLs[Math.floor(Math.random() * URLs.lenght)];
-                        var resultObj = {
-                            "result": url,
-                            "config": paramsObject.config
-                        };
-                        resolve(resultObj);
-                    } else {
-                        reject(e);
-                    }
+                    var url = urlLib._getUrlModule._getFallbackURL(config, personaKey);
+                    var resultObj = {
+                        "result": url,
+                        "config": paramsObject.config
+                    };
+                    resolve(resultObj);
                 }
             });
-
         })
     },
 
