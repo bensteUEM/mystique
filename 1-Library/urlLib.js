@@ -235,7 +235,7 @@ var urlLib = {
             urlLib._evolutionModule.updateLexicon(personaKey, config).then(function (newConfig) {
 
                 //choose first and last word in ordered list (by score)
-                var keywordLength = newConfig.personas[personaKey].keywords.length -1;
+                var keywordLength = newConfig.personas[personaKey].keywords.length;
                 var searchStringFirstLast = newConfig.personas[keywordLength].word + " " 
                     + newConfig.personas[personaKey].keywords[keywordLength].word
 
