@@ -8,11 +8,12 @@ function urlProvider() {
 	maintainLinksToFollow(startingUrl)
 	openUrl(urls[0].url, runInNewWindow)
 }
-
-// open default settings 
+//TODO this needs to be started with the run of the application #67
+console.log("will requested Browser config object");
 var getting = browser.storage.local.get("fakeConfig");
+console.log("Requested Browser config object");
 getting.then(loadValues, onError);
-  
+
 function loadValues(result) {
     var config = result.fakeConfig;
 	console.log("Config loaded from Browser"+config);
