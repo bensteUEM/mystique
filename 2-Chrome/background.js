@@ -1,15 +1,15 @@
 // We need to get them from the urlLib later
-var urls = [];
+let urls = [];
 
-var tabId = null;
+let tabId = null;
 
-var usedBytes = 0;
-var lastSyncDate;
-var currentMaxPageViewsFromRoot;
-var currLinkDepth = 0;
-var currentUrl = null;
+let usedBytes = 0;
+let lastSyncDate;
+let currentMaxPageViewsFromRoot;
+let currLinkDepth = 0;
+let currentUrl = null;
 
-var _config;
+let _config;
 
 chrome.storage.sync.get({
     config: null,
@@ -33,7 +33,7 @@ let resetConfig = function() {
     _config.settings.selectedPersonaKey = personaArray[getRandomInt(0, personaArray.length - 1)];
     _config.settings.lastSyncDate = Date.now();
     chrome.storage.sync.set({config: _config});
-}
+};
 
 
 let run = function () {
@@ -61,7 +61,6 @@ let run = function () {
         } else {
             processUrl();
         }
-
     }
 };
 
@@ -113,9 +112,9 @@ let _updateTab = function (url) {
                 url: url
             }, (tab) => {
                 // add listener so callback executes only if page loaded. otherwise calls instantly
-                var listener = function(cTabId, changeInfo, tab) {
+                let listener = function(cTabId, changeInfo, tab) {
 
-                    if (tabId == cTabId && changeInfo.status === 'complete') {
+                    if (tabId === cTabId && changeInfo.status === 'complete') {
                         chrome.tabs.onUpdated.removeListener(listener);
 
                         chrome.tabs.executeScript(tabId, {
@@ -202,7 +201,7 @@ chrome.runtime.onMessage.addListener(
                 });
                 urls = followLinks.concat(urls);
                 console.log("Call: ", sender.url);
-                var HistVar = "";
+                let HistVar = "";
                 chrome.storage.sync.get("history", function (items) {
                     HistVar = items.history;
                     console.log("History: ", HistVar);
@@ -236,7 +235,7 @@ function getRandomInt(min, max) {
 }
 
 function verifyTrafficLimit() {
-    var d = new Date(_config.settings.lastSyncDate);
+    let d = new Date(_config.settings.lastSyncDate);
     if (!d) {
         return;
     }
