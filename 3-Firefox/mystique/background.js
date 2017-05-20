@@ -18,7 +18,6 @@ var runInNewWindow = false
 
 var config
 var settings
-var maxLinkDepth = 5 //TODO
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
@@ -33,7 +32,7 @@ function messageReceived(message, sender, sendResponse){
 		console.log("PARAMs"+settings.followLinkOnDomainOnly+"==="+settings.maxNumberOfLinksToClick)
 		console.log(filteredLinks.length + " links remain after filtering")
 		maintainLinksToFollow(filteredLinks);
-		setTimeout(callNextUrl,5000);
+		setTimeout(callNextUrl,settings.maxVisitTime);
 	}
 	else if (message.topic == "status") {
 		console.log("Toggle running state: " + message.data)
@@ -102,7 +101,7 @@ function maintainLinksToFollow(newLinks) {
 		// TODO this is when a very new URL from the library has to be requested  
 		urls.unshift({
 			url: startingUrl,
-			level: maxLinkDepth
+			level: settings.maxLinkDepth;
 		});
 	}
 	
