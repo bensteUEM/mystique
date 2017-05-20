@@ -31,11 +31,10 @@
 	
 	"browser_action": {
 		"default_icon": "icons/logo-96.png",
-		"default_popup": "popup/mystique_popup.html"
+		"default_popup": "mystique_settings.html"
 	},
 	
 	"options_ui": {
-
   		"page": "mystique_settings.html"
   	}
 }

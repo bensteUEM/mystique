@@ -6,7 +6,7 @@ function saveConfig(e) {
 		wishlist: document.querySelector("#wishlist").value.split(","),
 		persona: {
 			key: document.querySelector("#personaKey").value,
-			//keywords: document.querySelector("#keywords").value,
+			keywords: restoreKeywords(),
 			defaultURLs: document.querySelector("#defaultURLs").value.split(",")
 		},
 		settings: {
@@ -28,6 +28,19 @@ function saveConfig(e) {
 	function onError(error) {
 		console.log(`Error: ${error}`);
 	}
+	
+	function restoreKeywords() {
+		var keyObj;
+		var keywordstrings = [];
+		var keywordobjects = [];
+		keywordstrings = document.querySelector("#keywords").value.split();
+		for(k in keywordstrings) {
+			keyObj = { word: k.substring(0, indexOf("(")), score: k.substring(indexOf("(")+1, indexOf(")")) }
+			keywordobjects.push(keyObj);
+		}
+		
+		return keywordobjects;
+	}
 }
 
 function restoreConfig() {
@@ -44,11 +57,11 @@ function restoreConfig() {
             persona: {                
                 key: "Banker",
                 keywords: [
-                    { "word": "DAX", "score": 0 },
-                    { "word": "Börsenkurs", "score": 5 },
-                    { "word": "Aktien", "score": 10 },
-                    { "word": "Wechselkurse", "score": 3 },
-                    { "word": "Goldpreis", "score": 7 }
+                    { word: "DAX", score: 0 },
+                    { word: "Börsenkurs", score: 5 },
+                    { word: "Aktien", score: 10 },
+                    { word: "Wechselkurse", score: 3 },
+                    { word: "Goldpreis", score: 7 }
                 ],
                 defaultURLs: [
                     "http://www.boerse.de/",
@@ -68,11 +81,16 @@ function restoreConfig() {
             }
         }
 	  }
-
+	  
+	var keywordstrings = [];
+		for(k in config.persona.keywords) {
+			keywordstrings.push(k.word + "(" + k.score + ")");
+	  }
+	  
 	document.querySelector("#blacklist").value = config.blacklist.join();
 	document.querySelector("#wishlist").value = config.wishlist.join();
 	document.querySelector("#personaKey").value = config.persona.key;
-	//document.querySelector("#keywords").value = config.persona.keywords;
+	document.querySelector("#keywords").value = keywordstrings.join();
 	document.querySelector("#defaultURLs").value = config.persona.defaultURLs.join();
 	document.querySelector("#maxBytes").value = config.settings.maxBytes;
 	document.querySelector("#maxLinkDepth").value = config.settings.maxLinkDepth;
@@ -90,5 +108,43 @@ function restoreConfig() {
   }
 }
 
+function loadStatus() {
+
+	function getStatus() {
+	  
+		var active = true; //TODO: Get Status of Extension
+		var className = active ? "activated" : "deactivated";
+		var statusText = active ? "ON" : "OFF";
+		
+		document.querySelector("#power_button").classList.add(className);
+		document.querySelector("#power_button").textContent = statusText;
+	}
+  
+	function onError(error) {
+		console.log(`Error: ${error}`);
+	}
+  
+	//TODO:Get Status of Extension
+	//var getting = browser.management.get(browser.runtime.id);
+	//getting.then(getStatus, onError);
+	getStatus();
+}
+
+function toggleState() {
+
+	var active = true; //TODO: Get Status of Extension
+	var className = active ? "activated" : "deactivated";
+	var statusText = active ? "ON" : "OFF";
+	
+	var btn = document.querySelector("#power_button");
+	if (btn.classList.length > 0) {
+		btn.classList.remove(e.target.classList.item(0));
+	}
+	btn.classList.add(className);
+	btn.innerText = statusText; 
+}
+
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
+document.addEventListener("DOMContentLoaded", loadStatus);
+document.querySelector("#power_button").addEventListener("click", toggleState);
