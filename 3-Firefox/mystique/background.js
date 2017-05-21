@@ -6,21 +6,21 @@ var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 // functionality to open a given URL in a separate tab object 
 
+var loggingActive = true
 var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow = false
 var maxLinkDepth = 5
 var urls = []
-var timerId
 
 browser.runtime.onMessage.addListener(messageReceived)
 
 function sessionHandler(links){
-	console.log("Session called: " + links)
+	logData("[SessionHandler] - Started: " + links)
 	
 	if(maintainLinksToFollow(links)){
-		console.log("URL list is emtpy")
+		logData("[SessionHandler] - URL list is empty")
 		
 		// TODO replace testing code with the section below
 		maintainLinksToFollow(startingUrl);
@@ -36,7 +36,7 @@ function sessionHandler(links){
 //			});
 	}
 	else {
-		console.log("URL list still contains links");
+		logData("[SessionHandler] - URL list is filled")
 		setTimeout(timerTriggered, 5000);
 	}
 	
@@ -48,24 +48,21 @@ function sessionHandler(links){
 // config.settings.maxPageviewsFromRoot
 
 function messageReceived(message, sender, sendResponse){
-	console.log("BackgroundScript - message received")
+	logData("[MessageHandler] - Message received")
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
-		console.log(message.data.length + " links received from CS")
-		
+		logData("[MessageHandler] - " + message.data.length + " links received from CS")
 		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
-		console.log(filteredLinks.length + " links remain after filtering")
-		
+		logData("[MessageHandler] - " + filteredLinks.length + " links remain after filtering")
 		sessionHandler(filteredLinks);
 	}
 	else if (message.topic == "status") {
+		logData("[MessageHandler] - Status: " + message.data)
 		if (message.data == "ON"){
-			console.log("Toggle running state: " + message.data)
 			// start execution 
 			sessionHandler();
 		}
 		else {
-			console.log("Toggle running state: " + message.data)
 			// stop execution
 		}
 	}
@@ -82,27 +79,27 @@ function maintainLinksToFollow(newLinks) {
 	
 	// CASE: URL list is initially empty
 	if (urls.length == 0 && (newLinks == null || newLinks.length == 0)) {
-		console.log("MAINTAIN : URL list intially empty");
+		logData("[LinkManager] - URL list intially empty");
 		return true;
 	}
 	else if (urls.length == 0 && newLinks.length >= 0){
-		console.log("MAINTAIN : Filling URL list initially");
+		logData("[LinkManager] - Filling URL list initially");
 		fillTree();
-		logLinkList();
+		logData(urls, "info");
 	}
 	// CASE: max link depth not yet reached and new links have been provided
 	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
-		console.log("MAINTAIN : Adding new links to URL list");
+		logData("[LinkManager] - Adding new links to URL list");
 		fillTree();
-		logLinkList();
+		logData(urls, "info");
 	}
 	// CASE: max link depth reached and/or NO new links have been provided while URL list wasn't empty yet
 	else {
-		console.log("MAINTAIN : Reducing URL list");
+		logData("[LinkManager] - Reducing URL list");
 		reduceTree();
-		logLinkList();
+		logData(urls, "info");
 		if (urls.length == 0) {
-			console.log("MAINTAIN : URL list is empty again")
+			logData("[LinkManager] - URL list is empty again");
 			return true;
 		}
 	}
@@ -122,24 +119,21 @@ function maintainLinksToFollow(newLinks) {
 		
 		if (urls.length == 0) {
 			nextLevel = maxLinkDepth // TODO #61
-			console.log("MAINTAIN : Filling on level " + nextLevel)
+			logData("[LinkManager] - Filling on level " + nextLevel);
 		}
 		else {
 			nextLevel = urls[0].level - 1
-			console.log("MAINTAIN : Filling on level " + nextLevel)
+			logData("[LinkManager] - Filling on level " + nextLevel);
 		}
-		
+
 		newLinks = newLinks.map((link) => {
             return {
                 url: link,
                 level: nextLevel
             };
         });
+		
 		urls = newLinks.concat(urls);
-	}
-	
-	function logLinkList(){
-		console.info(urls)
 	}
 }
 
@@ -149,7 +143,7 @@ function getLinkFromLibary(){
 	let persona = "Banker"; //TODO #61
 	
 	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
-			console.log("Got link from library: " + url.result);
+			logData("[UrlLibrary] - Got new link: " + url.result);
 			return url.result
 			});
 }
@@ -167,7 +161,7 @@ function openUrl(url, inNewWindow) {
 	if(inNewWindow) {
 		
 		if (windowId < 0) {
-			console.log("Creating new window to run addon inside")
+			logData("[TabManager] - Creating new window to run addon inside");
 			
 			lastUrlRequested = url
 			
@@ -189,8 +183,8 @@ function openUrl(url, inNewWindow) {
 	function onWindowCreated(window) {
 		windowId = window.id
 		
-		console.log('New window created - ID: ' + window.id +
-				' / FOCUSED: ' + window.focused)
+		logData('[TabManager] - New window created - ID: ' + window.id +
+				' / FOCUSED: ' + window.focused);
 				
 		maintainAddOnTab(lastUrlRequested, windowId)
 	}
@@ -236,8 +230,7 @@ function maintainAddOnTab(url, windowId) {
 	function onTabProcessed(tab) {
 		 
 		tabId = tab.id
-		
-		console.log('New tab created - ID: ' + tab.id +
+		logData('[TabManager] - New tab created - ID: ' + tab.id +
 				' / SELECTED: ' + tab.selected +
 				' / PINNED: ' + tab.pinned +
 				' / TITLE: ' + tab.title +
@@ -247,7 +240,7 @@ function maintainAddOnTab(url, windowId) {
 	}
 	
 	function onUpdateTabError(error){
-		console.log(error)
+		logData(error, "error");
 		
 		if (runInNewWindow) {
 			// check whether the separate window still exists - otherwise open again 
@@ -259,7 +252,7 @@ function maintainAddOnTab(url, windowId) {
 		}
 		
 		function onGetWindowError(error) {
-			console.log(error)
+			logData(error, "error");
 			
 			windowId = -1
 			reopenTab()
@@ -273,7 +266,7 @@ function sendMessageToContentScript(command){
 			tabId,
 			{action: command}
 		).then(response => {
-			console.log("BackgroundScript - message received from content: " + response.response)
+			messageReceived(response);
 		});
 }
 
@@ -283,7 +276,22 @@ function reopenTab(){
 }
 
 function onError(error) {
-	console.log(error)
+	logData(error, "error")
+}
+
+function logData(data, level) {
+	if (loggingActive) {
+		switch (level) {
+			case "info":
+				console.info(data);
+				break;
+			case "error":
+				console.error(data);
+				break;
+			default:
+				console.log(data);
+		}
+	}
 }
 
 
@@ -326,8 +334,10 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	}
 	var chosen = 0;
 	var index = 0;
+	var pickedLinks = [];
 	while (chosen < numberToChoose && index < allLinks.length) {
 		pickIndex = Math.floor(Math.random()*allLinks.length);
+		pickedLinks.push(pickIndex)
 		index++;
 		
 		// TODO #61 use correct config object
@@ -336,6 +346,8 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	    	chosen++;
 		}
 	}
+	logData("[LinkEvaluation] - Picked links: " + pickedLinks);
+	logData("[LinkEvaluation] - No. of links tried to approve: " + index);
 	return array;
 }
 
