@@ -4,6 +4,23 @@ var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "acc
 var interval = 5000;
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
+//TODO this needs to be started with the run of the application #67
+var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"]; //debug if URL offline
+console.log("will requested Browser config object");
+var getting = browser.storage.local.get("fakeConfig");
+console.log("Requested Browser config object");
+getting.then(loadValues, onError);
+
+function loadValues(result) {
+    var config = result.fakeConfig;
+	console.log("Config loaded from Browser"+config);
+
+	if(config == null) {
+	    config = urlLib.initializeConfig();
+	    console.log("Config initialized from Lib because browser was null" +config);
+    }
+}
+
 // functionality to open a given URL in a separate tab object 
 
 var loggingActive = true
@@ -11,36 +28,37 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow = false
-var maxLinkDepth = 5
+
+var config
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
 
 function sessionHandler(links){
 	logData("[SessionHandler] - Started: " + links)
-	
+
 	if(maintainLinksToFollow(links)){
 		logData("[SessionHandler] - URL list is empty")
 		
 		// TODO replace testing code with the section below
 		maintainLinksToFollow(startingUrl);
 		openUrl(urls[0].url, runInNewWindow);
-		
+
 //		let persona = "Banker"; //TODO #61
 //		//TODO #61 use correct config object
 //		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 //				console.log("Got link from library: " + url.result);
-//				
+//
 //				maintainLinksToFollow(url.result);
 //				openUrl(urls[0].url, runInNewWindow);
 //			});
 	}
 	else {
 		logData("[SessionHandler] - URL list is filled")
-		setTimeout(timerTriggered, 5000);
+		setTimeout(timerTriggered, 5000);//TODO #61 random from max/min
 	}
-	
-	function timerTriggered() {	
+
+	function timerTriggered() {
 		openUrl(urls[0].url, runInNewWindow)
 	}
 }
@@ -52,14 +70,27 @@ function messageReceived(message, sender, sendResponse){
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		logData("[MessageHandler] - " + message.data.length + " links received from CS")
-		let filteredLinks = getLinksDomainPercentage(message.data,false,0.01)
+		let filteredLinks = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
 		logData("[MessageHandler] - " + filteredLinks.length + " links remain after filtering")
 		sessionHandler(filteredLinks);
 	}
 	else if (message.topic == "status") {
 		logData("[MessageHandler] - Status: " + message.data)
 		if (message.data == "ON"){
-			// start execution 
+			// start execution
+			//check if config exists otherwise initialize
+            config = message.data;
+            console.log("Config object received in background: " + config);
+
+            //safe to browser config
+            var config = browser.storage.local.set({config});
+            config.then(null, onError);
+            function onError(error) {
+            	console.log(`Error: ${error}`);
+            }
+
+            //update local settings object
+            config = message.data;
 			sessionHandler();
 		}
 		else {
@@ -118,7 +149,7 @@ function maintainLinksToFollow(newLinks) {
 		let nextLevel
 		
 		if (urls.length == 0) {
-			nextLevel = maxLinkDepth // TODO #61
+			nextLevel = config.settings.maxLinkDepth;
 			logData("[LinkManager] - Filling on level " + nextLevel);
 		}
 		else {
@@ -140,8 +171,8 @@ function maintainLinksToFollow(newLinks) {
 //function calls the libary to generate a random URL from the wordlist
 function getLinkFromLibary(){
 
-	let persona = "Banker"; //TODO #61
-	
+	let persona = "Banker"; //TODO #61 get current persona
+
 	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 			logData("[UrlLibrary] - Got new link: " + url.result);
 			return url.result
@@ -394,12 +425,15 @@ only for the target page.
 Make it "blocking" so we can modify the headers.
 from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
 */
+/*
 var targetPage = "http://useragentstring.com/*";
 browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,{urls: [targetPage]},["blocking", "requestHeaders"]);
+*/
 
 /*
 Map browser names to UA strings.
 */
+/*
 function generateUA(){
     
 	//WINDOWS Platform
@@ -461,3 +495,4 @@ function generateUA(){
     
 	return generateUA;
 }
+*/
