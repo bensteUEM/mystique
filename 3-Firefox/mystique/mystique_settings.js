@@ -105,7 +105,6 @@ function updateStatusButton() {
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
-	globalConfig = {
             "blacklist": ["bild"],
             "wishlist": ["aktie"],
 			"selectedPersonaKey": "Banker",
@@ -167,4 +166,3 @@ document.querySelector("#power_button").addEventListener("click", toggleState);
                 "maxPageviewsFromRoot": 50
 				}
 			}
-}
