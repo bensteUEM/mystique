@@ -6,7 +6,7 @@ var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 // starting to read config
 console.log("will requested Browser config object");
-var getting = browser.storage.local.get("completeConfig");
+var getting = browser.storage.local.get("config");
 getting.then(loadValues, onError);
 console.log("Requested Browser config object");
 
@@ -15,11 +15,11 @@ console.log("Requested Browser config object");
 * function loaded when action for loading the config is executed
 */
 function loadValues(result) {
-    config = result.fakeConfig;
+    config = result.config;
 	console.log("Config loaded from Browser"+config);
 
 	if(config == null) {
-	    config = urlLib.initializeConfig();
+	    config = urlLib.initializeConfig("de");
 	    console.log("Config initialized from Lib because browser was null");
 
 	    //Random selection of default persona
@@ -34,9 +34,8 @@ function loadValues(result) {
 */
 function saveValues(){
     console.log("trying to save"+config);
-    let completeConfig = config
-    var setting = browser.storage.local.set({completeConfig});
-    setting.then(null,onError())
+    var setting = browser.storage.local.set({config});
+    setting.then(null,onError);
 }
 
 // functionality to open a given URL in a separate tab object 
