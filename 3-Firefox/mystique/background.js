@@ -12,7 +12,7 @@ console.log("Requested Browser config object");
 getting.then(loadValues, onError);
 
 function loadValues(result) {
-    var config = result.fakeConfig;
+    config = result.fakeConfig;
 	console.log("Config loaded from Browser"+config);
 
 	if(config == null) {
