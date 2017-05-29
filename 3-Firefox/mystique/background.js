@@ -6,7 +6,7 @@ var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 // starting to read config
 console.log("will requested Browser config object");
-var getting = browser.storage.local.get("fakeConfig");
+var getting = browser.storage.local.get("completeConfig");
 getting.then(loadValues, onError);
 console.log("Requested Browser config object");
 
@@ -26,7 +26,17 @@ function loadValues(result) {
 	    let personaKeys = Object.keys(config.personas);
 	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
 	    console.log("Opted to use " +config.selectedPersonaKey + " by picking random");
+	    saveValues();
     }
+}
+
+/** save currently saved config to browser config
+*/
+function saveValues(){
+    console.log("trying to save"+config);
+    let completeConfig = config
+    var setting = browser.storage.local.set({completeConfig});
+    setting.then(null,onError())
 }
 
 // functionality to open a given URL in a separate tab object 
@@ -88,6 +98,10 @@ function messageReceived(message, sender, sendResponse){
 		else {
 			// stop execution
 		}
+	}
+	else if (message.topic == "configUpdate"){
+	    config = message.completeConfig
+	    saveValues();
 	}
 }
 
