@@ -44,7 +44,7 @@ function restoreConfig() {
 	function loadValues(result) {
 
 		globalConfig = result.config;
-		console.log("Settings loading with loadValues "+result.config.blacklist);
+		console.log("Settings loading with loadValues "+globalConfig.selectedPersonaKey);
 
 
 		//Bind Personas to Persona Select
