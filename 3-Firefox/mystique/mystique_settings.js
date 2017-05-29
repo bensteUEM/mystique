@@ -1,10 +1,3 @@
-//Background lädt Config aus Browser Storage
-	//Wenn Config nicht vorhanden erzeuge initiale Config und speichere sie in Browser Storage
-//Popup öffnen: Config aus Browser Storage laden
-//Popup Speichern: Config an Background senden
-	//Background speichert sie in Browser Storage
-
-var globalActive
 var globalConfig
 
 //TODO: Move to Background near Initialize
@@ -21,7 +14,7 @@ function saveConfig(e) {
 		selectedPersonaKey: document.querySelector("#personaKey").value,
 		personas: globalConfig.personas,
 		settings: {
-			active: globalActive,
+			active: globalConfig.settings.active,
 			maxBytes: document.querySelector("#maxBytes").value,
 			functionality: true,
 			tracing: true,
@@ -76,7 +69,6 @@ function restoreConfig() {
 		document.querySelector("#maxPageviewsFromRoot").value = globalConfig.settings.maxPageviewsFromRoot;
 
 		//Set Status
-		globalActive = globalConfig.settings.active; //TODO why not use the global config directly
 		updateStatusButton();
   }
   
@@ -88,20 +80,20 @@ function restoreConfig() {
 /** On Off Button pressed load browser settings*/
 function toggleState() {	
 
-	globalActive = !globalActive;
+	globalConfig.settings.active = !globalConfig.settings.active;
 	updateStatusButton();
 	
 	var active = true; //TODO define in config
 	var sending = browser.runtime.sendMessage({
 		topic: "status",
-		data: globalActive ? "ON" : "OFF"
+		data: globalConfig.settings.active ? "ON" : "OFF"
 	});
 }
 
 function updateStatusButton() {
 
-	var className = globalActive ? "activated" : "deactivated";
-	var statusText = globalActive ? "ON" : "OFF";
+	var className = globalConfig.settings.active ? "activated" : "deactivated";
+	var statusText = globalConfig.settings.active ? "ON" : "OFF";
 
 	var btn = document.querySelector("#power_button");
 	if (btn.classList.length > 0) {
@@ -113,7 +105,6 @@ function updateStatusButton() {
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
-document.addEventListener("DOMContentLoaded", loadStatus);
 document.querySelector("#power_button").addEventListener("click", toggleState);
 
 //==========================
