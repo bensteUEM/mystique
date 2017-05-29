@@ -9,11 +9,11 @@ function saveConfig(e) {
 	e.preventDefault();
 	
 	var completeConfig = {
-		blacklist: document.querySelector("#blacklist").value.split(","),
-		wishlist: document.querySelector("#wishlist").value.split(","),
 		selectedPersonaKey: document.querySelector("#personaKey").value,
 		personas: globalConfig.personas,
 		settings: {
+			blacklist: document.querySelector("#blacklist").value.split(","),
+        	wishlist: document.querySelector("#wishlist").value.split(","),
 			active: globalConfig.settings.active,
 			maxBytes: document.querySelector("#maxBytes").value,
 			functionality: globalConfig.settings.functionality,
@@ -38,15 +38,14 @@ function saveConfig(e) {
 function restoreConfig() {
 
 	//Load Config from Browser Storage
-	var getting = browser.storage.local.get("completeConfig");
+	var getting = browser.storage.local.get("config");
 	getting.then(loadValues, onError);
 
 	function loadValues(result) {
 
-		globalConfig = result.completeConfig;
-		if(globalConfig == null) {
-			loadTempConfig(); //TODO Replace by Background Config
-		}
+		globalConfig = result.config;
+		console.log("Settings loading with loadValues "+globalConfig.selectedPersonaKey);
+
 
 		//Bind Personas to Persona Select
 		/*var personaSelect = document.querySelector("#personaKey");
@@ -57,8 +56,8 @@ function restoreConfig() {
             personaSelect.appendChild(opt);
 		}*/
 
-		document.querySelector("#blacklist").value = globalConfig.blacklist.join();
-		document.querySelector("#wishlist").value = globalConfig.wishlist.join();
+		document.querySelector("#blacklist").value = globalConfig.settings.blacklist.join();
+		document.querySelector("#wishlist").value = globalConfig.settings.wishlist.join();
 		document.querySelector("#personaKey").value = globalConfig.selectedPersona;
 
 		document.querySelector("#maxBytes").value = globalConfig.settings.maxBytes;
