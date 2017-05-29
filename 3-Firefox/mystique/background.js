@@ -1,16 +1,19 @@
 // for testing purposes
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
-var interval = 5000;
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
-//TODO this needs to be started with the run of the application #67
-var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"]; //debug if URL offline
+
+// starting to read config
 console.log("will requested Browser config object");
 var getting = browser.storage.local.get("fakeConfig");
-console.log("Requested Browser config object");
 getting.then(loadValues, onError);
+console.log("Requested Browser config object");
 
+
+/**
+* function loaded when action for loading the config is executed
+*/
 function loadValues(result) {
     config = result.fakeConfig;
 	console.log("Config loaded from Browser"+config);
@@ -18,6 +21,10 @@ function loadValues(result) {
 	if(config == null) {
 	    config = urlLib.initializeConfig();
 	    console.log("Config initialized from Lib because browser was null" +config);
+
+	    //Random selection of default persona
+	    config.selectedPersonaKey = config.personas[Math.floor(Math.random()*config.personas.length)].key;
+	    console.log("Opted to use " +config.selectedPersonaKey + " by picking random");
     }
 }
 
@@ -40,22 +47,20 @@ function sessionHandler(links){
 	if(maintainLinksToFollow(links)){
 		logData("[SessionHandler] - URL list is empty")
 		
-		// TODO replace testing code with the section below
 		maintainLinksToFollow(startingUrl);
-		openUrl(urls[0].url, runInNewWindow);
+		//openUrl(urls[0].url, runInNewWindow); //OLD Code for debugging while persona config did not exist
 
-//		let persona = "Banker"; //TODO #61
-//		//TODO #61 use correct config object
-//		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
-//				console.log("Got link from library: " + url.result);
-//
-//				maintainLinksToFollow(url.result);
-//				openUrl(urls[0].url, runInNewWindow);
-//			});
+		let persona = config.selectedPersonaKey; //TODO check #77
+		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+				console.log("Got link from library: " + url.result + " with persona "+persona);
+				maintainLinksToFollow(url.result);
+				openUrl(urls[0].url, runInNewWindow);
+			});
 	}
 	else {
 		logData("[SessionHandler] - URL list is filled")
-		setTimeout(timerTriggered, 5000);//TODO #61 random from max/min
+		let timeout = Math.random() * (config.settings.maxVisitTime- config.settings.minVisitTime) + config.settings.minVisitTime;
+		setTimeout(timerTriggered, timeout);
 	}
 
 	function timerTriggered() {
@@ -154,10 +159,10 @@ function maintainLinksToFollow(newLinks) {
 	}
 }
 
-//function calls the libary to generate a random URL from the wordlist
+//function calls the libary to generate a random URL from the wordlist //TODO check #77
 function getLinkFromLibary(){
 
-	let persona = "Banker"; //TODO #61 get current persona
+	let persona = config.selectedPersona;
 
 	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 			logData("[UrlLibrary] - Got new link: " + url.result);
@@ -357,7 +362,6 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 		pickedLinks.push(pickIndex)
 		index++;
 		
-		// TODO #61 use correct config object
 		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
 			array.push(allLinks[pickIndex]);
 	    	chosen++;
