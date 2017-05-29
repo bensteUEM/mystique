@@ -48,13 +48,13 @@ function restoreConfig() {
 
 
 		//Bind Personas to Persona Select
-		/*var personaSelect = document.querySelector("#personaKey");
+		var personaSelect = document.querySelector("#personaKey");
 		for(p in globalConfig.personas) {
 			var opt = document.createElement('option');
             opt.value = p.key;
             opt.text = p.key;
             personaSelect.appendChild(opt);
-		}*/
+		}
 
 		document.querySelector("#blacklist").value = globalConfig.settings.blacklist.join();
 		document.querySelector("#wishlist").value = globalConfig.settings.wishlist.join();
@@ -105,64 +105,3 @@ function updateStatusButton() {
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
-            "blacklist": ["bild"],
-            "wishlist": ["aktie"],
-			"selectedPersonaKey": "Banker",
-            "personas": {
-                "Banker": {
-                    "key": "Banker",
-                    "keywords": [
-                        { "word": "DAX", "score": 0 },
-                        { "word": "Börsenkurs", "score": 5 },
-                        { "word": "Aktien", "score": 10 },
-                        { "word": "Wechselkurse", "score": 3 },
-                        { "word": "Goldpreis", "score": 7 }
-                    ],
-                    "defaultURLs": [
-                        "http://www.boerse.de/",
-                        "http://www.faz.net/aktuell/finanzen/"
-                    ]
-                },
-				"Hundebesitzer": {
-                    "key": "Hundebesitzer",
-                    "keywords": [
-                        { "word": "Hundefutter", "score": 0 },
-                        { "word": "Hundesteuer", "score": 5 },
-                        { "word": "Kotbeutel", "score": 10 },
-                        { "word": "Halsband", "score": 3 },
-                        { "word": "Tierarzt", "score": 7 }
-                    ],
-                    "defaultURLs": [
-                        "http://www.fressnapf.de",
-                        "http://www.hunde.de"
-                    ]
-                },
-				"Surfer": {
-                    "key": "Surfer",
-                    "keywords": [
-                        { "word": "Hawaii", "score": 0 },
-                        { "word": "surfen", "score": 5 },
-                        { "word": "Welle", "score": 10 },
-                        { "word": "Carve", "score": 3 },
-                        { "word": "Surfbrett", "score": 7 },
-						{ "word": "Meer", "score": 6 }
-                    ],
-                    "defaultURLs": [
-                        "http://www.surfen.de",
-                        "http://www.holidaycheck.de"
-                    ]
-                }
-            },
-            "settings": {
-				"active": false,
-                "maxBytes": 1, //Per day -> equals 100MB
-                "functionality": true,
-                "tracing": true,
-                "followLinkOnDomainOnly": true,
-                "maxLinkDepth": 0,
-                "maxNumberOfLinksToClick": 2, // value is interpreted in percent, so no need for a float
-                "minVisitTime": 3,
-                "maxVisitTime": 120,
-                "maxPageviewsFromRoot": 50
-				}
-			}
