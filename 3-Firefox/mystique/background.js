@@ -323,11 +323,11 @@ function logData(data, level) {
 /**
 * getLinksDomain is used to get a list of all links in the specified 
 @param document link
+@param allLinks same as name
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-
-function getLinksDomain(followLinkOnDomainOnly){
-    linksDetected = CONTENTSCRIPT.getLinks(); //TODO
+function getLinksDomain(allLinks,followLinkOnDomainOnly){
+    linksDetected = allLinks.getLinks();
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
 		if (isOnSameDomain(document.location.href,linksDetected[i])){
@@ -344,7 +344,9 @@ function getLinksDomain(followLinkOnDomainOnly){
 /**
 * getLinksDomain is used to get a list of all links in the specified 
 @param document link
+@param allLinks same as name
 @param followLinkOnDomainOnly to filter only to same Domain links
+@param maxNumberOfLinksToClick number
 */
 function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLinksToClick){
 	var array = [];
@@ -456,7 +458,7 @@ function generateUA(){
 	}
 	
 	var allUseablePlatforms = [];
-	if (true) {//TODO #61 once personas do exist choose platform based on Persona #2 {
+	if (true) {//TODO #choose platform based on Persona #2 {
 		allUseablePlatforms = allUseablePlatforms.concat(windows);
 	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(apple);
