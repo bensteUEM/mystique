@@ -77,20 +77,6 @@ function messageReceived(message, sender, sendResponse){
 	else if (message.topic == "status") {
 		logData("[MessageHandler] - Status: " + message.data)
 		if (message.data == "ON"){
-			// start execution
-			//check if config exists otherwise initialize
-            config = message.data;
-            console.log("Config object received in background: " + config);
-
-            //safe to browser config
-            var config = browser.storage.local.set({config});
-            config.then(null, onError);
-            function onError(error) {
-            	console.log(`Error: ${error}`);
-            }
-
-            //update local settings object
-            config = message.data;
 			sessionHandler();
 		}
 		else {
