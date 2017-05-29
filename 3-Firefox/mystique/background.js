@@ -20,10 +20,11 @@ function loadValues(result) {
 
 	if(config == null) {
 	    config = urlLib.initializeConfig();
-	    console.log("Config initialized from Lib because browser was null" +config);
+	    console.log("Config initialized from Lib because browser was null");
 
 	    //Random selection of default persona
-	    config.selectedPersonaKey = config.personas[Math.floor(Math.random()*config.personas.length)].key;
+	    let personaKeys = Object.keys(config.personas);
+	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
 	    console.log("Opted to use " +config.selectedPersonaKey + " by picking random");
     }
 }
