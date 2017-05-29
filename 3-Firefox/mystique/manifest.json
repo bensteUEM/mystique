@@ -1,21 +1,43 @@
 {
 
-  "manifest_version": 2,
-  "name": "Mystique-FF",
-  "version": "0.1",
+	"manifest_version": 2,
+	"name": "Mystique-FF",
+	"version": "0.4",
+	
+	"permissions": [
+  		"tabs",
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"http://useragentstring.com/*",
+		"<all_urls>"
+  	],
+	
+	"description": "Our extension produces noice, while you are normally surfing the web. In the background different websites will be opened. These websites are random but connected to a specified stereotype.",
+	
+	"author": "DHBW.CAS.ADM.2K17",
+	"homepage_url": "https://mystique-extension.jimdo.com/",
 
-  "description": "Experimental browser plugin which should obscure browsing behaviour of its users - https://github.com/bensteUEM/mystique",
+	"icons": {
+		"48": "icons/logo-48.png",
+		"96": "icons/logo-96.png"
+	},
 
-  "icons": {
-  "48": "icons/DHBW_CAS_logo_blur-48.png",
-  "96": "icons/DHBW_CAS_logo_blur-96.png"
-},
-  
-  "content_scripts": [
-    {
-      "matches": ["*://*.dhbw.de/*"],
-      "js": ["mystique.js"]
-    }
-  ]
-
+  	"content_scripts": [{
+		"matches": ["*://*/*"],
+		"js": ["mystique.js"]
+	}],
+  	
+  	"background": {
+		"scripts": ["libraries/urlLib.js","background.js"]
+	},
+	
+	"browser_action": {
+		"default_icon": "icons/logo-96.png",
+		"default_popup": "mystique_settings.html"
+	},
+	
+	"options_ui": {
+  		"page": "mystique_settings.html"
+  	}
 }
