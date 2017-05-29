@@ -105,10 +105,6 @@ function updateStatusButton() {
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
-
-//==========================
-/** DEBUG helper as long as background.js does not safe into FF settings*/
-function loadTempConfig() {
 	globalConfig = {
             "blacklist": ["bild"],
             "wishlist": ["aktie"],
