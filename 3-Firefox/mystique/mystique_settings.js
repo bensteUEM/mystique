@@ -1,64 +1,175 @@
-function saveSettings(e) {
+var globalConfig
+
+//TODO: Move to Background near Initialize
+var globalMaxBytes = [80000, 300000, 104857600]
+var globalMaxNumberOfLinks = [10, 30, 60]
+var globalMaxLinkDepth = [10, 20, 45]
+
+function saveConfig(e) {
 	e.preventDefault();
 	
-	var settings = {
-		maxBytes: document.querySelector("#maxBytes").value,
-		linkCountPercent: document.querySelector("#maxNumberOfLinksToClick").value,
-		linkDepthMax: document.querySelector("#maxLinkDepth").value,
-		persona: document.querySelector("#persona").value,
-		blackList: document.querySelector("#blackList").value,
-		wishList: document.querySelector("#wishList").value,
-		minVisitTime: 	document.querySelector("#minVisitTime").value,
-        maxVisitTime:    document.querySelector("#maxVisitTime").value,
-        maxPageviewsFromRoot:    document.querySelector("#maxPageviewsFromRoot").value
+	var completeConfig = {
+		blacklist: document.querySelector("#blacklist").value.split(","),
+		wishlist: document.querySelector("#wishlist").value.split(","),
+		selectedPersonaKey: document.querySelector("#personaKey").value,
+		personas: globalConfig.personas,
+		settings: {
+			active: globalConfig.settings.active,
+			maxBytes: document.querySelector("#maxBytes").value,
+			functionality: true,
+			tracing: true,
+			followLinkOnDomainOnly: true,
+			maxLinkDepth: document.querySelector("#maxLinkDepth").value,
+			maxNumberOfLinksToClick: document.querySelector("#maxNumberOfLinksToClick").value,
+			minVisitTime: document.querySelector("#minVisitTime").value,
+			maxVisitTime: document.querySelector("#maxVisitTime").value,
+			maxPageviewsFromRoot: document.querySelector("#maxPageviewsFromRoot").value
+		}
 	}
-  
-	var setting = browser.storage.local.set({settings});
-	setting.then(null, onError);
 	
-	function onError(error) {
-		console.log(`Error: ${error}`);
-	}
-
+	//send updated config to background.js   
+   	var sending = browser.runtime.sendMessage({
+		topic: "configUpdate",
+		data: completeConfig
+	});
 }
 
-function restoreSettings() {
+/** Firefox addon configuration is opened */
+function restoreConfig() {
 
-  function loadValues(result) {
-	  
-	  var settings = result.settings;
-	  if(settings == null) {
-		  settings = {
-				maxBytes: "25",
-				maxNumberOfLinksToClick: "20",
-				maxLinkDepth: "2",
-				persona: "Persona1",
-				blackList: "black1",
-				wishList: "wish1",
-				minVisitTime : "60",
-				maxVisitTime: "660",
-				maxPageviewsFromRoot: "100"
-		  }
-	  }
+	//Load Config from Browser Storage
+	var getting = browser.storage.local.get("completeConfig");
+	getting.then(loadValues, onError);
 
-    document.querySelector("#maxBytes").value = settings.maxBytes;
-	document.querySelector("#maxNumberOfLinksToClick").value = settings.maxNumberOfLinksToClick;
-	document.querySelector("#maxLinkDepth").value = settings.maxLinkDepth;
-	document.querySelector("#persona").value = settings.persona;
-	document.querySelector("#blackList").value = settings.blackList;
-	document.querySelector("#wishList").value = settings.wishList;
-	document.querySelector("#minVisitTime").value = settings.minVisitTime;
-    document.querySelector("#maxVisitTime").value = settings.maxVisitTime;
-    document.querySelector("#maxPageviewsFromRoot").value = settings.maxPageviewsFromRoot;
+	function loadValues(result) {
+
+		globalConfig = result.completeConfig;
+		if(globalConfig == null) {
+			loadTempConfig(); //TODO Replace by Background Config
+		}
+
+		//Bind Personas to Persona Select
+		var personaSelect = document.getElementById("personaKey");
+		for(p in globalConfig.personas) {
+			var opt = document.createElement('option');
+            opt.value = p.key;
+            opt.text = p.key;
+            personaSelect.appendChild(opt);
+		}
+
+		document.querySelector("#blacklist").value = globalConfig.blacklist.join();
+		document.querySelector("#wishlist").value = globalConfig.wishlist.join();
+		document.querySelector("#personaKey").value = globalConfig.selectedPersona;
+
+		document.querySelector("#maxBytes").value = globalConfig.settings.maxBytes;
+		document.querySelector("#maxLinkDepth").value = globalConfig.settings.maxLinkDepth;
+		document.querySelector("#maxNumberOfLinksToClick").value = globalConfig.settings.maxNumberOfLinksToClick;
+		document.querySelector("#minVisitTime").value = globalConfig.settings.minVisitTime;
+		document.querySelector("#maxVisitTime").value = globalConfig.settings.maxVisitTime;
+		document.querySelector("#maxPageviewsFromRoot").value = globalConfig.settings.maxPageviewsFromRoot;
+
+		//Set Status
+		updateStatusButton();
   }
-  
-  var getting = browser.storage.local.get("settings");
-  getting.then(loadValues, onError);
   
   function onError(error) {
     console.log(`Error: ${error}`);
   }
 }
 
-document.addEventListener("DOMContentLoaded", restoreSettings);
-document.querySelector("form").addEventListener("submit", saveSettings);
+/** On Off Button pressed load browser settings*/
+function toggleState() {	
+
+	globalConfig.settings.active = !globalConfig.settings.active;
+	updateStatusButton();
+	
+	var active = true; //TODO define in config
+	var sending = browser.runtime.sendMessage({
+		topic: "status",
+		data: globalConfig.settings.active ? "ON" : "OFF"
+	});
+}
+
+function updateStatusButton() {
+
+	var className = globalConfig.settings.active ? "activated" : "deactivated";
+	var statusText = globalConfig.settings.active ? "ON" : "OFF";
+
+	var btn = document.querySelector("#power_button");
+	if (btn.classList.length > 0) {
+		btn.classList.remove(btn.classList.item(0));
+	}
+	btn.classList.add(className);
+	btn.innerText = statusText;
+}
+
+document.addEventListener("DOMContentLoaded", restoreConfig);
+document.querySelector("form").addEventListener("submit", saveConfig);
+document.querySelector("#power_button").addEventListener("click", toggleState);
+
+//==========================
+/** DEBUG helper as long as background.js does not safe into FF settings*/
+function loadTempConfig() {
+	globalConfig = {
+            "blacklist": ["bild"],
+            "wishlist": ["aktie"],
+			"selectedPersonaKey": "Banker",
+            "personas": {
+                "Banker": {
+                    "key": "Banker",
+                    "keywords": [
+                        { "word": "DAX", "score": 0 },
+                        { "word": "Börsenkurs", "score": 5 },
+                        { "word": "Aktien", "score": 10 },
+                        { "word": "Wechselkurse", "score": 3 },
+                        { "word": "Goldpreis", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.boerse.de/",
+                        "http://www.faz.net/aktuell/finanzen/"
+                    ]
+                },
+				"Hundebesitzer": {
+                    "key": "Hundebesitzer",
+                    "keywords": [
+                        { "word": "Hundefutter", "score": 0 },
+                        { "word": "Hundesteuer", "score": 5 },
+                        { "word": "Kotbeutel", "score": 10 },
+                        { "word": "Halsband", "score": 3 },
+                        { "word": "Tierarzt", "score": 7 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.fressnapf.de",
+                        "http://www.hunde.de"
+                    ]
+                },
+				"Surfer": {
+                    "key": "Surfer",
+                    "keywords": [
+                        { "word": "Hawaii", "score": 0 },
+                        { "word": "surfen", "score": 5 },
+                        { "word": "Welle", "score": 10 },
+                        { "word": "Carve", "score": 3 },
+                        { "word": "Surfbrett", "score": 7 },
+						{ "word": "Meer", "score": 6 }
+                    ],
+                    "defaultURLs": [
+                        "http://www.surfen.de",
+                        "http://www.holidaycheck.de"
+                    ]
+                }
+            },
+            "settings": {
+				"active": false,
+                "maxBytes": 1, //Per day -> equals 100MB
+                "functionality": true,
+                "tracing": true,
+                "followLinkOnDomainOnly": true,
+                "maxLinkDepth": 0,
+                "maxNumberOfLinksToClick": 2, // value is interpreted in percent, so no need for a float
+                "minVisitTime": 3,
+                "maxVisitTime": 120,
+                "maxPageviewsFromRoot": 50
+				}
+			}
+}
