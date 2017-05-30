@@ -161,7 +161,11 @@ var urlLib = {
                                     reject(e);
                                 }
                             });
+<<<<<<< HEAD
                         }, Math.floor(Math.random() * 30 * 1000));                     
+=======
+                        }, Math.floor(Math.random() * 15 * 1000));                     
+>>>>>>> refs/remotes/origin/3-Firefox-Master
                         
                     });
                 };

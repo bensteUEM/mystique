@@ -13,6 +13,7 @@
             
             var config = urlLib.initializeConfig();
             var personaKey = "Banker";
+<<<<<<< HEAD
             setInterval(function() {
                 urlLib.generateURL(personaKey, config).then((d) => {
                     config = d.config;
@@ -22,6 +23,15 @@
             }, 10000);
         });
 
+=======
+            
+            urlLib.generateURL(personaKey, config).then((d) => {
+                config = d.config;
+                console.log("URL: " + d.result);
+                console.log("PersonaKeys: " + JSON.stringify(d.config.personas[personaKey].keywords));
+            });
+        });
+>>>>>>> refs/remotes/origin/3-Firefox-Master
     </script>
 </head>
 

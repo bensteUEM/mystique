@@ -2,11 +2,26 @@
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var interval = 5000;
+<<<<<<< HEAD
 var startingUrl;
+=======
+>>>>>>> refs/remotes/origin/3-Firefox-Master
 
-function urlProvider() {
-	maintainLinksToFollow(startingUrl)
-	openUrl(urls[0].url, runInNewWindow)
+//TODO this needs to be started with the run of the application #67
+var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"]; //debug if URL offline
+console.log("will requested Browser config object");
+var getting = browser.storage.local.get("fakeConfig");
+console.log("Requested Browser config object");
+getting.then(loadValues, onError);
+
+function loadValues(result) {
+    var config = result.fakeConfig;
+	console.log("Config loaded from Browser"+config);
+
+	if(config == null) {
+	    config = urlLib.initializeConfig();
+	    console.log("Config initialized from Lib because browser was null" +config);
+    }
 }
 
 // functionality to open a given URL in a separate tab object 
@@ -15,10 +30,42 @@ var tabId = -1
 var windowId = -1
 var lastUrlRequested
 var runInNewWindow = false
-var maxLinkDepth = 5
+
+var config
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
+
+function sessionHandler(links){
+	console.log("Session called: " + links)
+
+	if(maintainLinksToFollow(links)){
+		console.log("URL list is emtpy")
+
+		// TODO replace testing code with the section below
+		maintainLinksToFollow(startingUrl);
+		openUrl(urls[0].url, runInNewWindow);
+
+//		let persona = "Banker"; //TODO #61
+//		//TODO #61 use correct config object
+//		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+//				console.log("Got link from library: " + url.result);
+//
+//				maintainLinksToFollow(url.result);
+//				openUrl(urls[0].url, runInNewWindow);
+//			});
+	}
+	else {
+		console.log("URL list still contains links");
+		setTimeout(timerTriggered, 5000);//TODO #61 random from max/min
+	}
+
+	function timerTriggered() {
+		openUrl(urls[0].url, runInNewWindow)
+	}
+}
+
+// config.settings.maxPageviewsFromRoot
 
 function messageReceived(message, sender, sendResponse){
 	console.log("BackgroundScript - message received")
@@ -26,12 +73,17 @@ function messageReceived(message, sender, sendResponse){
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		console.log(message.data.length + " links received from CS")
 		
+<<<<<<< HEAD
 		let filteredLinks = getLinksDomainPercentage(message.data,false,0.10)
+=======
+		let filteredLinks = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
+>>>>>>> refs/remotes/origin/3-Firefox-Master
 		console.log(filteredLinks.length + " links remain after filtering")
-		maintainLinksToFollow(filteredLinks)
-		setTimeout(callNextUrl,5000);
+
+		sessionHandler(filteredLinks);
 	}
 	else if (message.topic == "status") {
+<<<<<<< HEAD
 		console.log("Toggle running state: " + message.data)
 		if (message.data == "ON") 
 		{
@@ -42,6 +94,30 @@ function messageReceived(message, sender, sendResponse){
 
 	function callNextUrl() {
 		openUrl(urls[0].url, runInNewWindow)
+=======
+		if (message.data == "ON"){
+			console.log("Toggle running state: " + message.data)
+			// start execution
+			//check if config exists otherwise initialize
+            config = message.data;
+            console.log("Config object received in background: " + config);
+
+            //safe to browser config
+            var config = browser.storage.local.set({config});
+            config.then(null, onError);
+            function onError(error) {
+            	console.log(`Error: ${error}`);
+            }
+
+            //update local settings object
+            config = message.data;
+			sessionHandler();
+		}
+		else {
+			console.log("Toggle running state: " + message.data)
+			//TODO stop execution
+		}
+>>>>>>> refs/remotes/origin/3-Firefox-Master
 	}
 }
 
@@ -50,65 +126,73 @@ function messageReceived(message, sender, sendResponse){
  * Hereby it takes care of the correct link order (next link to be opened is always at first index) and keeps track of the max link depth. 
  * 
  * @param newLinks to be added to the global list of links that have to opened
- * @returns
+ * @returns isListEmpty == true when the global URL is empty
  */
 function maintainLinksToFollow(newLinks) {
 	
 	// CASE: URL list is initially empty
-	if (urls.length == 0) {
-		// TODO this is when a very new URL from the library has to be requested 
-		initTree();
+	if (urls.length == 0 && (newLinks == null || newLinks.length == 0)) {
+		console.log("MAINTAIN : URL list intially empty");
+		return true;
+	}
+	else if (urls.length == 0 && newLinks.length >= 0){
+		console.log("MAINTAIN : Filling URL list initially");
+		fillTree();
 		logLinkList();
 	}
 	// CASE: max link depth not yet reached and new links have been provided
 	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
-		let nextLevel = urls[0].level - 1
-		
-		newLinks = newLinks.map((link) => {
-            return {
-                url: link,
-                level: nextLevel
-            };
-        });
-		urls = newLinks.concat(urls)
-		
+		console.log("MAINTAIN : Adding new links to URL list");
+		fillTree();
 		logLinkList();
 	}
-	// CASE: max link depth reached and/or NO new links have been provided
+	// CASE: max link depth reached and/or NO new links have been provided while URL list wasn't empty yet
 	else {
+		console.log("MAINTAIN : Reducing URL list");
 		reduceTree();
 		logLinkList();
+		if (urls.length == 0) {
+			console.log("MAINTAIN : URL list is empty again")
+			return true;
+		}
 	}
-	
+	return false;
+
 	function reduceTree(){
 		let lastLevel
 		do {
 			lastLevel = urls[0].level
 			urls.splice(0, 1)
 		} while (urls.length > 0 && urls[0].level != lastLevel);
-		
-		if (urls.length == 0) {
-			// TODO this is when a very new URL from the library has to be requested 
-			initTree();
-		}
 	}
-	
-	function initTree(){
-		// TODO this is when a very new URL from the library has to be requested  
-		urls.unshift({
-			url: startingUrl,
-			level: maxLinkDepth
-		});
+
+	function fillTree(){
+		let nextLevel
+
+		if (urls.length == 0) {
+			nextLevel = config.settings.maxLinkDepth;
+			console.log("MAINTAIN : Filling on level " + nextLevel)
+		}
+		else {
+			nextLevel = urls[0].level - 1
+			console.log("MAINTAIN : Filling on level " + nextLevel)
+		}
+
+		newLinks = newLinks.map((link) => {
+            return {
+                url: link,
+                level: nextLevel
+            };
+        });
+		urls = newLinks.concat(urls);
 	}
 	
 	function logLinkList(){
 		console.info(urls)
-//		for (url in urls){
-//			console.info("URL: " + url.url + " - LVL: " + url.level);
-//		}
 	}
 }
 
+<<<<<<< HEAD
 //TODO Listener to cancel interval if plugin is turned off
 function callTimer(){
 	setInterval(callLibary,interval);
@@ -123,6 +207,16 @@ function callLibary(){
 			console.log(url.result);
 			startingUrl = url.result;
 			urlProvider();
+=======
+//function calls the libary to generate a random URL from the wordlist
+function getLinkFromLibary(){
+
+	let persona = "Banker"; //TODO #61 get current persona
+
+	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+			console.log("Got link from library: " + url.result);
+			return url.result
+>>>>>>> refs/remotes/origin/3-Firefox-Master
 			});
 }
 
@@ -296,11 +390,17 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
 		return 	allLinks;
 	}
-	chosen = 0;
-	while (chosen < numberToChoose) {
-		pickIndex = Math.floor(Math.random()*allLinks.length)
-    		array.push(allLinks[pickIndex]);
-    		chosen++;
+	var chosen = 0;
+	var index = 0;
+	while (chosen < numberToChoose && index < allLinks.length) {
+		pickIndex = Math.floor(Math.random()*allLinks.length);
+		index++;
+
+		// TODO #61 use correct config object
+		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
+			array.push(allLinks[pickIndex]);
+	    	chosen++;
+		}
 	}
 	return array;
 }
@@ -348,12 +448,15 @@ only for the target page.
 Make it "blocking" so we can modify the headers.
 from https://github.com/mdn/webextensions-examples/blob/master/user-agent-rewriter/background.js
 */
+/*
 var targetPage = "http://useragentstring.com/*";
 browser.webRequest.onBeforeSendHeaders.addListener(rewriteUserAgentHeader,{urls: [targetPage]},["blocking", "requestHeaders"]);
+*/
 
 /*
 Map browser names to UA strings.
 */
+/*
 function generateUA(){
     
 	//WINDOWS Platform
@@ -385,7 +488,7 @@ function generateUA(){
 	}
 	
 	var allUseablePlatforms = [];
-	if (true) {//TODO once personas do exist choose platform based on Persona #2 {
+	if (true) {//TODO #61 once personas do exist choose platform based on Persona #2 {
 		allUseablePlatforms = allUseablePlatforms.concat(windows);
 	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(apple);
@@ -415,3 +518,4 @@ function generateUA(){
     
 	return generateUA;
 }
+*/

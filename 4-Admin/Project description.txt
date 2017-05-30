@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Did you know that your credit card company knows when you will get divorced - even before it has happened?!
 
 Data mining companies can easily make conclusions about your life and who you are - simply by using data from your browsing history.
@@ -15,3 +16,22 @@ Key Features:
     You pick what your fake profile should look like!
     Illegal traffic is prevented by using up-to-date blacklists!
     If you have no data flat: define the limit of traffic generated!
+=======
+Did you know that your credit card company knows when you will get divorced - even before it has happened?!
+
+Data mining companies can easily make conclusions about your life and who you are - simply by using data from your browsing history.
+Mystique makes sure that no company can invade your privacy based on your browsing behavior.
+
+Get Mystique for Firefox or Chrome.
+
+
+ 
+
+Key Features:
+
+    Browse the web while your user profile is obscured by fake activity!
+    Random traffic is generated to obscure your real user profile!
+    You pick what your fake profile should look like!
+    Illegal traffic is prevented by using up-to-date blacklists!
+    If you have no data flat: define the limit of traffic generated!
+>>>>>>> refs/remotes/origin/3-Firefox-Master
