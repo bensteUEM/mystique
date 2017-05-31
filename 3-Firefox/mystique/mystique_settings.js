@@ -46,20 +46,23 @@ function restoreConfig() {
 		globalConfig = result.config;
 		console.log("Settings loading with loadValues "+globalConfig.selectedPersonaKey);
 
-
 		//Bind Personas to Persona Select
 		var personaSelect = document.querySelector("#personaKey");
-		for(p in globalConfig.personas) {
-			var opt = document.createElement('option');
-            opt.value = p.key;
-            opt.text = p.key;
-            personaSelect.appendChild(opt);
+		for(const p in globalConfig.personas) {
+			if(globalConfig.personas.hasOwnProperty(p)) {
+				var opt = document.createElement('option');
+				opt.value = globalConfig.personas[p].key;
+				opt.text = globalConfig.personas[p].key;
+				personaSelect.appendChild(opt);
+			}
 		}
-
+		document.querySelector("#personaKey").value = globalConfig.selectedPersonaKey;
+		
+		//Load Keywords of the selected persona
+		loadKeywords();	
+		
 		document.querySelector("#blacklist").value = globalConfig.settings.blacklist.join();
 		document.querySelector("#wishlist").value = globalConfig.settings.wishlist.join();
-		document.querySelector("#personaKey").value = globalConfig.selectedPersona;
-
 		document.querySelector("#maxBytes").value = globalConfig.settings.maxBytes;
 		document.querySelector("#maxLinkDepth").value = globalConfig.settings.maxLinkDepth;
 		document.querySelector("#maxNumberOfLinksToClick").value = globalConfig.settings.maxNumberOfLinksToClick;
@@ -102,6 +105,16 @@ function updateStatusButton() {
 	btn.innerText = statusText;
 }
 
+function loadKeywords() {
+	var selPersonaKeys = globalConfig.personas[document.querySelector("#personaKey").value].keywords;
+	var keywordWords = [];
+	for(let k = 0; l = k < selPersonaKeys.length; k++) {
+		keywordWords.push(selPersonaKeys[k].word);
+	}
+	document.querySelector("#keywords").textContent = keywordWords.join();
+}
+
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
+document.querySelector("#personaKey").addEventListener("change", loadKeywords);
