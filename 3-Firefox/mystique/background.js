@@ -5,19 +5,17 @@ var interval = 5000;
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 //TODO this needs to be started with the run of the application #67
-var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"]; //debug if URL offline
-console.log("will requested Browser config object");
 var getting = browser.storage.local.get("fakeConfig");
-console.log("Requested Browser config object");
+logData("[InitProcess] - Browser config object requested");
 getting.then(loadValues, onError);
 
 function loadValues(result) {
     config = result.fakeConfig;
-	console.log("Config loaded from Browser"+config);
+	logData("[InitProcess] - Config loaded from browser - " + config);
 
 	if(config == null) {
 	    config = urlLib.initializeConfig();
-	    console.log("Config initialized from Lib because browser was null" +config);
+	    logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
     }
 }
 
