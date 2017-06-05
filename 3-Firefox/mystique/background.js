@@ -23,7 +23,7 @@ function loadValues(result) {
 	    //Random selection of default persona
 	    let personaKeys = Object.keys(config.personas);
 	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
-	    console.log("Opted to use " +config.selectedPersonaKey + " by picking random");
+	    logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
 	    saveValues();
     }
 }
@@ -31,7 +31,7 @@ function loadValues(result) {
 /** save currently saved config to browser config
 */
 function saveValues(){
-    console.log("trying to save"+config);
+    logData("[ConfigStorage] - Trying to save " + config);
     var setting = browser.storage.local.set({config});
     setting.then(null,onError);
 }
@@ -61,7 +61,7 @@ function sessionHandler(links){
 		//TODO check whether the correct config is used
 		let persona = config.selectedPersonaKey; //TODO check #77
 		urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
-				console.log("Got link from library: " + url.result + " with persona "+persona);
+				logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
 				maintainLinksToFollow([url.result]);
 				openUrl(urls[0].url, runInNewWindow);
 			});
@@ -69,13 +69,21 @@ function sessionHandler(links){
 	else {
 		logData("[SessionHandler] - URL list is filled")
 		// TODO maybe timeout value should be determined in separate function
-		let timeout = Math.random() * (config.settings.maxVisitTime- config.settings.minVisitTime) + config.settings.minVisitTime;
+		let timeout = calculateCurrentVisitTime();
+		logData("[SessionHandler] - Set timeout " + timeout + " ms")
 		setTimeout(timerTriggered, timeout);
 	}
 
 	function timerTriggered() {
 		openUrl(urls[0].url, runInNewWindow)
 	}
+}
+
+function calculateCurrentVisitTime() {
+	let timeout = Math.random() * (config.settings.maxVisitTime- config.settings.minVisitTime) + config.settings.minVisitTime;
+	timeout = Math.round(timeout) * 1000;
+	
+	return timeout;
 }
 
 // config.settings.maxPageviewsFromRoot
