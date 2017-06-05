@@ -161,7 +161,7 @@ var urlLib = {
                                     reject(e);
                                 }
                             });
-                        }, Math.floor(Math.random() * 30 * 1000));                     
+                        }, Math.floor(Math.random() * 15 * 1000));                     
                         
                     });
                 };

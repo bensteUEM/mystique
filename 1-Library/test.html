@@ -13,15 +13,13 @@
             
             var config = urlLib.initializeConfig();
             var personaKey = "Banker";
-            setInterval(function() {
-                urlLib.generateURL(personaKey, config).then((d) => {
-                    config = d.config;
-                    console.log("URL: " + d.result);
-                    console.log("PersonaKeys: " + JSON.stringify(d.config.personas[personaKey].keywords));
+            
+            urlLib.generateURL(personaKey, config).then((d) => {
+                config = d.config;
+                console.log("URL: " + d.result);
+                console.log("PersonaKeys: " + JSON.stringify(d.config.personas[personaKey].keywords));
             });
-            }, 10000);
         });
-
     </script>
 </head>
 
