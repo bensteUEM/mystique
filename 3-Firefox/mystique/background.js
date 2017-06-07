@@ -41,16 +41,20 @@ function saveValues(){
 var loggingActive = true
 var tabId = -1
 var windowId = -1
-var lastUrlRequested
+var lastUrlRequested = null
 var runInNewWindow = false
 var numberOfCollectedLinks = 0
+var filteredLinksFromCS = null
+var timerHandle = null
 
 var config
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
 
-function sessionHandler(links){
+function sessionHandler(){
+	let links = filteredLinksFromCS;
+	filteredLinksFromCS = null;
 	logData("[SessionHandler] - Session invoked with " + (links == null ? "NULL" : links.length) + " new links");
 	
 	if (numberOfCollectedLinks < config.settings.maxPageviewsFromRoot) {
@@ -83,20 +87,21 @@ function sessionHandler(links){
 			urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 					logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
 					numberOfCollectedLinks = maintainLinksToFollow([url.result]);
-					openUrl(urls[0].url, runInNewWindow);
+					openNextUrlAndSetUpTimer();
 				});
 		}
 		else {
 			logData("[SessionHandler] - URL list already contains links")
 			numberOfCollectedLinks += actuallyAddedLinks;
-			let timeout = calculateCurrentVisitTime();
-			logData("[SessionHandler] - Set timeout " + timeout + " ms")
-			setTimeout(timerTriggered, timeout);
+			openNextUrlAndSetUpTimer();
 		}
 	}
 
-	function timerTriggered() {
+	function openNextUrlAndSetUpTimer() {
 		openUrl(urls[0].url, runInNewWindow)
+		let timeout = calculateCurrentVisitTime();
+		timerHandle = setTimeout(sessionHandler, timeout);
+		logData("[SessionHandler] - Session timer started " + timeout + " ms [" + timerHandle + "]")
 	}
 }
 
@@ -107,14 +112,30 @@ function calculateCurrentVisitTime() {
 	return timeout;
 }
 
+function resetSession() {
+	clearTimeout(timerHandle);
+	logData("[SessionHandler] - Session timer cleared [" + timerHandle + "]- Execution stopped");
+	
+	browser.tabs.remove(tabId).then(function() {
+		logData("[SessionHandler] - Plugin tab closed");
+	}, onError);
+	
+	tabId = -1
+	windowId = -1
+	lastUrlRequested = null
+	numberOfCollectedLinks = 0
+	filteredLinksFromCS = null
+	timerHandle = null
+	urls = []
+}
+
 function messageReceived(message, sender, sendResponse){
 	logData("[MessageHandler] - Message received")
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		logData("[MessageHandler] - " + message.data.length + " links received from CS")
-		let filteredLinks = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
-		logData("[MessageHandler] - " + filteredLinks.length + " links remain after filtering")
-		sessionHandler(filteredLinks);
+		filteredLinksFromCS = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
+		logData("[MessageHandler] - " + filteredLinksFromCS.length + " links remain after filtering")
 	}
 	else if (message.topic == "status") {
 		logData("[MessageHandler] - Status: " + message.data)
@@ -123,6 +144,7 @@ function messageReceived(message, sender, sendResponse){
 		}
 		else {
 			// stop execution
+			resetSession();
 		}
 	}
 	else if (message.topic == "configUpdate"){
@@ -201,17 +223,6 @@ function maintainLinksToFollow(newLinks) {
 		
 		urls = newLinks.concat(urls);
 	}
-}
-
-//function calls the libary to generate a random URL from the wordlist //TODO check #77
-function getLinkFromLibary(){
-
-	let persona = config.selectedPersona;
-
-	urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
-			logData("[UrlLibrary] - Got new link: " + url.result);
-			return url.result
-			});
 }
 
 /**
@@ -296,13 +307,11 @@ function maintainAddOnTab(url, windowId) {
 	function onTabProcessed(tab) {
 		 
 		tabId = tab.id
-		logData('[TabManager] - New tab created - ID: ' + tab.id +
+		logData('[TabManager] - Tab updated - ID: ' + tab.id +
 				' / SELECTED: ' + tab.selected +
 				' / PINNED: ' + tab.pinned +
-				' / TITLE: ' + tab.title +
 				' / STATUS: ' + tab.status +
-				' / WINDOW-ID: ' + tab.windowId +
-				' / URL: ' + tab.url);
+				' / WINDOW-ID: ' + tab.windowId);
 	}
 	
 	function onUpdateTabError(error){
