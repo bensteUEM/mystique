@@ -82,9 +82,8 @@ function sessionHandler(){
 		if( actuallyAddedLinks == -1){
 			logData("[SessionHandler] - URL list is empty")
 			
-			//TODO check whether the correct config is used
 			let persona = config.selectedPersonaKey;
-			urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+			urlLib.generateURL(persona, config).then(function(url) {
 					logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
 					numberOfCollectedLinks = maintainLinksToFollow([url.result]);
 					openNextUrlAndSetUpTimer();
@@ -417,8 +416,7 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 		pickedLinks.push(pickIndex)
 		index++;
 		
-		//TODO check whether the correct config is used
-		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
+		if(urlLib.approveURL(allLinks[pickIndex], config)) {
 			array.push(allLinks[pickIndex]);
 	    	chosen++;
 		}
