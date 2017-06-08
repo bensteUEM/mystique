@@ -29,7 +29,7 @@
 	}],
   	
   	"background": {
-		"scripts": ["urlLib.js","background.js"]
+		"scripts": ["libraries/urlLib.js","background.js"]
 	},
 	
 	"browser_action": {

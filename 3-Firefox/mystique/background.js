@@ -1,75 +1,155 @@
 // for testing purposes
 var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
-var interval = 5000;
-var startingUrl = "https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"
+var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
-function urlProvider() {
-	maintainLinksToFollow(startingUrl)
-	openUrl(urls[0].url, runInNewWindow)
-}
 //TODO this needs to be started with the run of the application #67
-console.log("will requested Browser config object");
-var getting = browser.storage.local.get("fakeConfig");
-console.log("Requested Browser config object");
+var getting = browser.storage.local.get("config");
 getting.then(loadValues, onError);
+logData("[InitProcess] - Browser config object requested");
 
+
+/**
+* function loaded when action for loading the config is executed
+*/
 function loadValues(result) {
-    var config = result.fakeConfig;
-	console.log("Config loaded from Browser"+config);
+    config = result.config;
+	logData("[InitProcess] - Config loaded from browser - " + config);
 
 	if(config == null) {
-	    config = urlLib.initializeConfig();
-	    console.log("Config initialized from Lib because browser was null" +config);
+	    config = urlLib.initializeConfig("de");
+	    logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
+
+	    //Random selection of default persona
+	    let personaKeys = Object.keys(config.personas);
+	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
+	    logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
+	    saveValues();
     }
+}
+
+/** save currently saved config to browser config
+*/
+function saveValues(){
+    logData("[ConfigStorage] - Trying to save " + config);
+    var setting = browser.storage.local.set({config});
+    setting.then(null,onError);
 }
 
 // functionality to open a given URL in a separate tab object 
 
+var loggingActive = true
 var tabId = -1
 var windowId = -1
-var lastUrlRequested
+var lastUrlRequested = null
 var runInNewWindow = false
+var numberOfCollectedLinks = 0
+var filteredLinksFromCS = null
+var timerHandle = null
 
 var config
 var urls = []
 
 browser.runtime.onMessage.addListener(messageReceived)
 
-function messageReceived(message, sender, sendResponse){
-	console.log("BackgroundScript - message received")
+function sessionHandler(){
+	let links = filteredLinksFromCS;
+	filteredLinksFromCS = null;
+	logData("[SessionHandler] - Session invoked with " + (links == null ? "NULL" : links.length) + " new links");
 	
-	if (message.topic == "links" && sender.tab.id == tabId) {
-		console.log(message.data.length + " links received from CS")
+	if (numberOfCollectedLinks < config.settings.maxPageviewsFromRoot) {
+		let remainingLinksToCollect = config.settings.maxPageviewsFromRoot - numberOfCollectedLinks - (links == null ? 0 : links.length);
 		
-		let filteredLinks = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
-		console.log("PARAMs"+config.settings.followLinkOnDomainOnly+"==="+config.settings.maxNumberOfLinksToClick)
-		console.log(filteredLinks.length + " links remain after filtering")
-		maintainLinksToFollow(filteredLinks);
-		setTimeout(callNextUrl,config.settings.maxVisitTime);
+		if (remainingLinksToCollect >= 0) {
+			logData("[SessionHandler] - " + remainingLinksToCollect + " links remaining till maximum link count [" + config.settings.maxPageviewsFromRoot + "]");
+			handleLinks(links);
+		}
+		else {
+			logData("[SessionHandler] - Reducing number of new links by " + Math.abs(remainingLinksToCollect) + " to not exceed maximum link count [" + config.settings.maxPageviewsFromRoot + "]");
+			handleLinks(links.slice(0, links.length + remainingLinksToCollect));
+			maxLinksCollected = true;
+		}
 	}
-	else if (message.topic == "status") {
-		console.log("Toggle running state: " + message.data)
-		urlProvider();
+	else {
+		logData("[SessionHandler] - Maximum number of links already collected - processing current links [" + urls.length + "]");
+		handleLinks();
 	}
-	else if (message.topic == "configUpdate") {
-		//check if config exists otherwise initialize
-		config = message.data;
-		console.log("Config object received in background: " + config);
+	
+	function handleLinks(links) {
 		
-		//safe to browser config
-		var config = browser.storage.local.set({config});
-	    config.then(null, onError);
-	    function onError(error) {
-		console.log(`Error: ${error}`);
-	    }
-	    
-	    //update local settings object
-		config = message.data;
+		let actuallyAddedLinks = maintainLinksToFollow(links); 
+	
+		if( actuallyAddedLinks == -1){
+			logData("[SessionHandler] - URL list is empty")
+			
+			//TODO check whether the correct config is used
+			let persona = config.selectedPersonaKey; //TODO check #77
+			urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+					logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
+					numberOfCollectedLinks = maintainLinksToFollow([url.result]);
+					openNextUrlAndSetUpTimer();
+				});
+		}
+		else {
+			logData("[SessionHandler] - URL list already contains links")
+			numberOfCollectedLinks += actuallyAddedLinks;
+			openNextUrlAndSetUpTimer();
+		}
 	}
 
-	function callNextUrl() {
+	function openNextUrlAndSetUpTimer() {
 		openUrl(urls[0].url, runInNewWindow)
+		let timeout = calculateCurrentVisitTime();
+		timerHandle = setTimeout(sessionHandler, timeout);
+		logData("[SessionHandler] - Session timer started " + timeout + " ms [" + timerHandle + "]")
+	}
+}
+
+function calculateCurrentVisitTime() {
+	let timeout = Math.random() * (config.settings.maxVisitTime- config.settings.minVisitTime) + config.settings.minVisitTime;
+	timeout = Math.round(timeout) * 1000;
+	
+	return timeout;
+}
+
+function resetSession() {
+	clearTimeout(timerHandle);
+	logData("[SessionHandler] - Session timer cleared [" + timerHandle + "]- Execution stopped");
+	
+	browser.tabs.remove(tabId).then(function() {
+		logData("[SessionHandler] - Plugin tab closed");
+	}, onError);
+	
+	tabId = -1
+	windowId = -1
+	lastUrlRequested = null
+	numberOfCollectedLinks = 0
+	filteredLinksFromCS = null
+	timerHandle = null
+	urls = []
+}
+
+function messageReceived(message, sender, sendResponse){
+	logData("[MessageHandler] - Message received")
+	
+	if (message.topic == "links" && sender.tab.id == tabId) {
+		logData("[MessageHandler] - " + message.data.length + " links received from CS")
+		filteredLinksFromCS = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
+		logData("[MessageHandler] - " + filteredLinksFromCS.length + " links remain after filtering")
+	}
+	else if (message.topic == "status") {
+		logData("[MessageHandler] - Status: " + message.data)
+		if (message.data == "ON"){
+			sessionHandler();
+		}
+		else {
+			// stop execution
+			resetSession();
+		}
+	}
+	else if (message.topic == "configUpdate"){
+	    config = message.completeConfig
+	    saveValues();
 	}
 }
 
@@ -78,35 +158,41 @@ function messageReceived(message, sender, sendResponse){
  * Hereby it takes care of the correct link order (next link to be opened is always at first index) and keeps track of the max link depth. 
  * 
  * @param newLinks to be added to the global list of links that have to opened
- * @returns
+ * @returns numberOfLinks that have been added to the global list / -1 if the global list is empty
  */
 function maintainLinksToFollow(newLinks) {
 	
 	// CASE: URL list is initially empty
-	if (urls.length == 0) {
-		// TODO this is when a very new URL from the library has to be requested 
-		initTree();
-		logLinkList();
+	if (urls.length == 0 && (newLinks == null || newLinks.length == 0)) {
+		logData("[LinkManager] - URL list intially empty");
+		return -1;
+	}
+	else if (urls.length == 0 && newLinks.length >= 0){
+		logData("[LinkManager] - Filling URL list initially");
+		fillTree();
+		logData(urls, "info");
+		return newLinks.length;
 	}
 	// CASE: max link depth not yet reached and new links have been provided
 	else if (urls[0].level > 0 && !(newLinks == null || newLinks.length == 0)) {
-		let nextLevel = urls[0].level - 1
-		
-		newLinks = newLinks.map((link) => {
-            return {
-                url: link,
-                level: nextLevel
-            };
-        });
-		urls = newLinks.concat(urls)
-		
-		logLinkList();
+		logData("[LinkManager] - Adding new links to URL list");
+		fillTree();
+		logData(urls, "info");
+		return newLinks.length;
 	}
-	// CASE: max link depth reached and/or NO new links have been provided
+	// CASE: max link depth reached and/or NO new links have been provided while URL list wasn't empty yet
 	else {
+		logData("[LinkManager] - Reducing URL list");
 		reduceTree();
-		logLinkList();
+		logData(urls, "info");
+		if (urls.length == 0) {
+			logData("[LinkManager] - URL list is empty again");
+			return -1;
+		}
+		return 0;
 	}
+	
+	return null;
 	
 	function reduceTree(){
 		let lastLevel
@@ -114,45 +200,29 @@ function maintainLinksToFollow(newLinks) {
 			lastLevel = urls[0].level
 			urls.splice(0, 1)
 		} while (urls.length > 0 && urls[0].level != lastLevel);
+	}
+	
+	function fillTree(){
+		let nextLevel
 		
 		if (urls.length == 0) {
-			// TODO this is when a very new URL from the library has to be requested 
-			initTree();
+			nextLevel = config.settings.maxLinkDepth;
+			logData("[LinkManager] - Filling on level " + nextLevel);
 		}
-	}
-	
-	function initTree(){
-		// TODO this is when a very new URL from the library has to be requested  
-		urls.unshift({
-			url: startingUrl,
-			level: config.settings.maxLinkDepth
-		});
-	}
-	
-	function logLinkList(){
-		console.info(urls);
-//		for (url in urls){
-//			console.info("URL: " + url.url + " - LVL: " + url.level);
-//		}
-	}
-}
+		else {
+			nextLevel = urls[0].level - 1
+			logData("[LinkManager] - Filling on level " + nextLevel);
+		}
 
-//TODO Listener to cancel interval if plugin is turned off
-function callTimer(){
-	setInterval(callLibary,interval);
-	console.log(interval);
-}
-
-//function calls the libary to generate a random URL from the wordlist
-function callLibary(){
-
-	//TODO place libary at the right place
-	urlLib.generateURL({
-		wordlist: wl
-		}).then(function(url) {
-			console.log(url);
-			openUrl(url);
-			});
+		newLinks = newLinks.map((link) => {
+            return {
+                url: link,
+                level: nextLevel
+            };
+        });
+		
+		urls = newLinks.concat(urls);
+	}
 }
 
 /**
@@ -168,7 +238,7 @@ function openUrl(url, inNewWindow) {
 	if(inNewWindow) {
 		
 		if (windowId < 0) {
-			console.log("Creating new window to run addon inside")
+			logData("[TabManager] - Creating new window to run addon inside");
 			
 			lastUrlRequested = url
 			
@@ -190,8 +260,8 @@ function openUrl(url, inNewWindow) {
 	function onWindowCreated(window) {
 		windowId = window.id
 		
-		console.log('New window created - ID: ' + window.id +
-				' / FOCUSED: ' + window.focused)
+		logData('[TabManager] - New window created - ID: ' + window.id +
+				' / FOCUSED: ' + window.focused);
 				
 		maintainAddOnTab(lastUrlRequested, windowId)
 	}
@@ -237,18 +307,15 @@ function maintainAddOnTab(url, windowId) {
 	function onTabProcessed(tab) {
 		 
 		tabId = tab.id
-		
-		console.log('New tab created - ID: ' + tab.id +
+		logData('[TabManager] - Tab updated - ID: ' + tab.id +
 				' / SELECTED: ' + tab.selected +
 				' / PINNED: ' + tab.pinned +
-				' / TITLE: ' + tab.title +
 				' / STATUS: ' + tab.status +
-				' / WINDOW-ID: ' + tab.windowId +
-				' / URL: ' + tab.url);
+				' / WINDOW-ID: ' + tab.windowId);
 	}
 	
 	function onUpdateTabError(error){
-		console.log(error)
+		logData(error, "error");
 		
 		if (runInNewWindow) {
 			// check whether the separate window still exists - otherwise open again 
@@ -260,7 +327,7 @@ function maintainAddOnTab(url, windowId) {
 		}
 		
 		function onGetWindowError(error) {
-			console.log(error)
+			logData(error, "error");
 			
 			windowId = -1
 			reopenTab()
@@ -274,7 +341,7 @@ function sendMessageToContentScript(command){
 			tabId,
 			{action: command}
 		).then(response => {
-			console.log("BackgroundScript - message received from content: " + response.response)
+			messageReceived(response);
 		});
 }
 
@@ -284,7 +351,22 @@ function reopenTab(){
 }
 
 function onError(error) {
-	console.log(error)
+	logData(error, "error")
+}
+
+function logData(data, level) {
+	if (loggingActive) {
+		switch (level) {
+			case "info":
+				console.info(data);
+				break;
+			case "error":
+				console.error(data);
+				break;
+			default:
+				console.log(data);
+		}
+	}
 }
 
 
@@ -293,11 +375,11 @@ function onError(error) {
 /**
 * getLinksDomain is used to get a list of all links in the specified 
 @param document link
+@param allLinks same as name
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
-
-function getLinksDomain(followLinkOnDomainOnly){
-    linksDetected = CONTENTSCRIPT.getLinks(); //TODO
+function getLinksDomain(allLinks,followLinkOnDomainOnly){
+    linksDetected = allLinks.getLinks();
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
 		if (isOnSameDomain(document.location.href,linksDetected[i])){
@@ -314,7 +396,9 @@ function getLinksDomain(followLinkOnDomainOnly){
 /**
 * getLinksDomain is used to get a list of all links in the specified 
 @param document link
+@param allLinks same as name
 @param followLinkOnDomainOnly to filter only to same Domain links
+@param maxNumberOfLinksToClick number
 */
 function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLinksToClick){
 	var array = [];
@@ -325,12 +409,22 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
 		return 	allLinks;
 	}
-	chosen = 0;
-	while (chosen < numberToChoose) {
-		pickIndex = Math.floor(Math.random()*allLinks.length)
-    		array.push(allLinks[pickIndex]);
-    		chosen++;
+	var chosen = 0;
+	var index = 0;
+	var pickedLinks = [];
+	while (chosen < numberToChoose && index < allLinks.length) {
+		pickIndex = Math.floor(Math.random()*allLinks.length);
+		pickedLinks.push(pickIndex)
+		index++;
+		
+		//TODO check whether the correct config is used
+		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
+			array.push(allLinks[pickIndex]);
+	    	chosen++;
+		}
 	}
+	logData("[LinkEvaluation] - Picked links: " + pickedLinks);
+	logData("[LinkEvaluation] - No. of links tried to approve: " + index);
 	return array;
 }
 
@@ -370,7 +464,6 @@ function rewriteUserAgentHeader(e) {
  	 }
  	return {requestHeaders: e.requestHeaders};
 }
-
 
 /*
 Add rewriteUserAgentHeader as a listener to onBeforeSendHeaders,
@@ -418,7 +511,7 @@ function generateUA(){
 	}
 	
 	var allUseablePlatforms = [];
-	if (true) {//TODO once personas do exist choose platform based on Persona #2 {
+	if (true) {//TODO #choose platform based on Persona #2 {
 		allUseablePlatforms = allUseablePlatforms.concat(windows);
 	} if (true) {
 		allUseablePlatforms = allUseablePlatforms.concat(apple);
