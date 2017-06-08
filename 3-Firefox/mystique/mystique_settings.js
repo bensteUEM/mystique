@@ -6,6 +6,17 @@ var globalMaxBytes = [80000, 300000, 104857600]
 var globalMaxNumberOfLinks = [10, 30, 60]
 var globalMaxLinkDepth = [10, 20, 45]
 
+function resetConfig(e) {
+	//send reset message background.js   
+   	var sending = browser.runtime.sendMessage({
+		topic: "configReset",
+		data: ""
+	});
+	logData("resetButton pressed in GUI");
+	window.close();
+}
+
+
 function saveConfig(e) {
 	e.preventDefault();
 	
@@ -119,6 +130,7 @@ function logData(data, level) {
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
+document.querySelector("form").addEventListener("reset", resetConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
 
 //==========================

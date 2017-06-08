@@ -16,15 +16,19 @@ function loadValues(result) {
 	logData("[InitProcess] - Config loaded from browser - " + config);
 
 	if(config == null) {
-	    config = urlLib.initializeConfig("de");
-	    logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
-
-	    //Random selection of default persona
-	    let personaKeys = Object.keys(config.personas);
-	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
-	    logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
-	    saveValues();
+		initConfig();
     }
+}
+
+function initConfig(){
+	config = urlLib.initializeConfig("de");
+	logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
+
+	//Random selection of default persona
+	let personaKeys = Object.keys(config.personas);
+	config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
+	logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
+	saveValues();
 }
 
 /** save currently saved config to browser config
@@ -148,6 +152,9 @@ function messageReceived(message, sender, sendResponse){
 	else if (message.topic == "configUpdate"){
 	    config = message.data
 	    saveValues();
+	}
+	else if (message.topic == "configReset"){
+	    initConfig();
 	}
 }
 
