@@ -142,6 +142,7 @@ function messageReceived(message, sender, sendResponse){
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		logData("[MessageHandler] - " + message.data.length + " links received from CS")
+		logData("[MessageHandler] - " + config.settings.followLinkOnDomainOnly +"=domainonly "+ config.settings.maxNumberOfLinksToClick + "=%toclick")
 		filteredLinksFromCS = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
 		logData("[MessageHandler] - " + filteredLinksFromCS.length + " links remain after filtering")
 	}
@@ -390,7 +391,8 @@ function logData(data, level) {
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
 function getLinksDomain(allLinks,followLinkOnDomainOnly){
-    linksDetected = allLinks.getLinks();
+	logData("getLinksDomain- followLinkOnDomainOnly is"+followLinkOnDomainOnly);
+    linksDetected = allLinks;
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
 		if (isOnSameDomain(document.location.href,linksDetected[i])){
@@ -401,6 +403,7 @@ function getLinksDomain(allLinks,followLinkOnDomainOnly){
 		}
 
 	}
+	logData("getLinksDomain- has "+array.length);
 	return array;
 }
 
@@ -415,7 +418,8 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	var array = [];
 	let allDomainLinks = getLinksDomain(allLinks,followLinkOnDomainOnly);
 	let numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allDomainLinks.length);
-
+	logData("numbers to Chose "+numberToChoose + " of "+ allDomainLinks.length + " from should "+ maxNumberOfLinksToClick);
+	
 	if ((allDomainLinks.length <= numberToChoose) || (allDomainLinks.length<0)){	
 		return 	allDomainLinks;
 	}
