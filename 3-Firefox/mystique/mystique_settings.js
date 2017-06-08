@@ -6,8 +6,20 @@ var globalMaxBytes = [80000, 300000, 104857600]
 var globalMaxNumberOfLinks = [10, 30, 60]
 var globalMaxLinkDepth = [10, 20, 45]
 
+function resetConfig(e) {
+	//send reset message background.js   
+   	var sending = browser.runtime.sendMessage({
+		topic: "configReset",
+		data: ""
+	});
+	logData("resetButton pressed in GUI");
+	window.close();
+}
+
 function saveConfig(e) {
-	e.preventDefault();
+	if (e != null){
+		e.preventDefault();
+	}
 	
 	var completeConfig = {
 		selectedPersonaKey: document.querySelector("#personaKey").value,
@@ -15,7 +27,6 @@ function saveConfig(e) {
 		settings: {
 			blacklist: document.querySelector("#blacklist").value.split(","),
         	wishlist: document.querySelector("#wishlist").value.split(","),
-			active: globalConfig.settings.active,
 			maxBytes: document.querySelector("#maxBytes").value,
 			functionality: globalConfig.settings.functionality,
 			tracing: globalConfig.settings.tracing,
@@ -80,20 +91,20 @@ function restoreConfig() {
 /** On Off Button pressed load browser settings*/
 function toggleState() {	
 
-	globalConfig.settings.active = !globalConfig.settings.active;
+	globalConfig.settings.functionality = !globalConfig.settings.functionality;
 	updateStatusButton();
 	
-	var active = true; //TODO define in config
 	var sending = browser.runtime.sendMessage({
 		topic: "status",
-		data: globalConfig.settings.active ? "ON" : "OFF"
+		data: globalConfig.settings.functionality ? "ON" : "OFF"
 	});
+	
+	saveConfig();
 }
 
 function updateStatusButton() {
-
-	var className = globalConfig.settings.active ? "activated" : "deactivated";
-	var statusText = globalConfig.settings.active ? "ON" : "OFF";
+	var className = globalConfig.settings.functionality ? "activated" : "deactivated";
+	var statusText = globalConfig.settings.functionality ? "ON" : "OFF";
 
 	var btn = document.querySelector("#power_button");
 	if (btn.classList.length > 0) {
@@ -120,6 +131,7 @@ function logData(data, level) {
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
 document.querySelector("form").addEventListener("submit", saveConfig);
+document.querySelector("form").addEventListener("reset", resetConfig);
 document.querySelector("#power_button").addEventListener("click", toggleState);
 
 //==========================
@@ -175,9 +187,8 @@ function loadTempConfig() {
                 }
             },
             "settings": {
-				"active": false,
                 "maxBytes": 1, //Per day -> equals 100MB
-                "functionality": true,
+                "functionality": false,
                 "tracing": true,
                 "followLinkOnDomainOnly": true,
                 "maxLinkDepth": 0,
