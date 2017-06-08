@@ -83,7 +83,7 @@ function toggleState() {
 	globalConfig.settings.active = !globalConfig.settings.active;
 	updateStatusButton();
 	
-	var active = true; //TODO define in config
+	var active = true; //TODO #83 define in config
 	var sending = browser.runtime.sendMessage({
 		topic: "status",
 		data: globalConfig.settings.active ? "ON" : "OFF"
