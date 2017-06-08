@@ -83,7 +83,7 @@ function sessionHandler(){
 			logData("[SessionHandler] - URL list is empty")
 			
 			//TODO check whether the correct config is used
-			let persona = config.selectedPersonaKey; //TODO check #77
+			let persona = config.selectedPersonaKey;
 			urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
 					logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
 					numberOfCollectedLinks = maintainLinksToFollow([url.result]);
