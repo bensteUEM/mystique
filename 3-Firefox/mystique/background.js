@@ -400,23 +400,22 @@ function getLinksDomain(allLinks,followLinkOnDomainOnly){
 */
 function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLinksToClick){
 	var array = [];
-	//alert("Choose max "+maxNumberOfLinksToClick*100+" % Links");
-	var numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allLinks.length);
-	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
+	let allDomainLinks = getLinksDomain(allLinks,followLinkOnDomainOnly);
+	let numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allDomainLinks.length);
 
-	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
-		return 	allLinks;
+	if ((allDomainLinks.length <= numberToChoose) || (allDomainLinks.length<0)){	
+		return 	allDomainLinks;
 	}
 	var chosen = 0;
 	var index = 0;
 	var pickedLinks = [];
-	while (chosen < numberToChoose && index < allLinks.length) {
-		pickIndex = Math.floor(Math.random()*allLinks.length);
-		pickedLinks.push(pickIndex)
-		index++;
+	while (chosen < numberToChoose && index < allDomainLinks.length) {
+		pickIndex = Math.floor(Math.random()*allDomainLinks.length);
+		pickedLinks.push(pickIndex)		
+		index++;	
 		
-		if(urlLib.approveURL(allLinks[pickIndex], config)) {
-			array.push(allLinks[pickIndex]);
+		if(urlLib.approveURL(allDomainLinks[pickIndex], config)) {
+			array.push(allDomainLinks[pickIndex]);
 	    	chosen++;
 		}
 	}
