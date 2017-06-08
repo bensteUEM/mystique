@@ -3,11 +3,10 @@ var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
-//TODO this needs to be started with the run of the application #67
+//This is started with the run of the application
 var getting = browser.storage.local.get("config");
 getting.then(loadValues, onError);
 logData("[InitProcess] - Browser config object requested");
-
 
 /**
 * function loaded when action for loading the config is executed
