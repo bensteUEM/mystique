@@ -326,8 +326,8 @@ var urlLib = {
          */
         _getFallbackURL: function(config, personaKey) {
             var URLs = config.personas[personaKey].defaultURLs;
-            if(URLs.lenght > 0) {
-                url = URLs[Math.floor(Math.random() * URLs.lenght)];
+            if(URLs.length > 0) {
+                url = URLs[Math.floor(Math.random() * URLs.length)];
             } else {
                 url = "http://www.bing.com/search?q=" + personaKey;
             }
@@ -341,7 +341,7 @@ var urlLib = {
             var URLs = config.personas[personaKey].defaultURLs;
             //do not store more than 10 URLs per Persona
             if(URLs.length >= 10) {
-                URLs = URLs.slice(1, URLs.lenght);
+                URLs = URLs.slice(1, URLs.length);
             }
 
             URLs.push(url);

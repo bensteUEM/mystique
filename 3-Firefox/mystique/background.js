@@ -3,11 +3,10 @@ var i = 0
 var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "accelerant", "accelerator", "accident", "accompanist", "accordion", "account", "accountant", "achieve", "achiever", "acid", "acknowledgment", "acoustic", "acoustics", "acrylic", "act", "action", "active", "activity", "actor", "actress", "acupuncture", "ad", "adapter", "addiction", "addition", "address", "adjustment", "administration", "adrenalin"];
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
-//TODO this needs to be started with the run of the application #67
+//This is started with the run of the application
 var getting = browser.storage.local.get("config");
 getting.then(loadValues, onError);
 logData("[InitProcess] - Browser config object requested");
-
 
 /**
 * function loaded when action for loading the config is executed
@@ -17,15 +16,25 @@ function loadValues(result) {
 	logData("[InitProcess] - Config loaded from browser - " + config);
 
 	if(config == null) {
-	    config = urlLib.initializeConfig("de");
-	    logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
-
-	    //Random selection of default persona
-	    let personaKeys = Object.keys(config.personas);
-	    config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
-	    logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
-	    saveValues();
+		initConfig();
     }
+	
+	logData("[MessageHandler] - Status: " + config.settings.functionality)
+		if (config.settings.functionality == true){
+			resetSession();
+			sessionHandler();
+		}
+}
+
+function initConfig(){
+	config = urlLib.initializeConfig("de");
+	logData("[InitProcess] - Config linitialized from library because browser config was NULL - " + config);
+
+	//Random selection of default persona
+	let personaKeys = Object.keys(config.personas);
+	config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
+	logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
+	saveValues();
 }
 
 /** save currently saved config to browser config
@@ -82,9 +91,8 @@ function sessionHandler(){
 		if( actuallyAddedLinks == -1){
 			logData("[SessionHandler] - URL list is empty")
 			
-			//TODO check whether the correct config is used
-			let persona = config.selectedPersonaKey; //TODO check #77
-			urlLib.generateURL(persona, urlLib.initializeConfig()).then(function(url) {
+			let persona = config.selectedPersonaKey;
+			urlLib.generateURL(persona, config).then(function(url) {
 					logData("[UrlLibrary] - Got link from library: " + url.result + " with persona " + persona);
 					numberOfCollectedLinks = maintainLinksToFollow([url.result]);
 					openNextUrlAndSetUpTimer();
@@ -134,6 +142,7 @@ function messageReceived(message, sender, sendResponse){
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		logData("[MessageHandler] - " + message.data.length + " links received from CS")
+		logData("[MessageHandler] - " + config.settings.followLinkOnDomainOnly +"=domainonly "+ config.settings.maxNumberOfLinksToClick + "=%toclick")
 		filteredLinksFromCS = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
 		logData("[MessageHandler] - " + filteredLinksFromCS.length + " links remain after filtering")
 	}
@@ -148,8 +157,11 @@ function messageReceived(message, sender, sendResponse){
 		}
 	}
 	else if (message.topic == "configUpdate"){
-	    config = message.completeConfig
+	    config = message.data
 	    saveValues();
+	}
+	else if (message.topic == "configReset"){
+	    initConfig();
 	}
 }
 
@@ -379,7 +391,8 @@ function logData(data, level) {
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
 function getLinksDomain(allLinks,followLinkOnDomainOnly){
-    linksDetected = allLinks.getLinks();
+	logData("getLinksDomain- followLinkOnDomainOnly is"+followLinkOnDomainOnly);
+    linksDetected = allLinks;
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
 		if (isOnSameDomain(document.location.href,linksDetected[i])){
@@ -390,6 +403,7 @@ function getLinksDomain(allLinks,followLinkOnDomainOnly){
 		}
 
 	}
+	logData("getLinksDomain- has "+array.length);
 	return array;
 }
 
@@ -402,24 +416,23 @@ function getLinksDomain(allLinks,followLinkOnDomainOnly){
 */
 function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLinksToClick){
 	var array = [];
-	//alert("Choose max "+maxNumberOfLinksToClick*100+" % Links");
-	var numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allLinks.length);
-	//alert("Chose " + numberToChoose + " of "+ allLinks.length);
-
-	if ((allLinks.length <= numberToChoose) || (allLinks.length<0)){	
-		return 	allLinks;
+	let allDomainLinks = getLinksDomain(allLinks,followLinkOnDomainOnly);
+	let numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allDomainLinks.length);
+	logData("numbers to Chose "+numberToChoose + " of "+ allDomainLinks.length + " from should "+ maxNumberOfLinksToClick);
+	
+	if ((allDomainLinks.length <= numberToChoose) || (allDomainLinks.length<0)){	
+		return 	allDomainLinks;
 	}
 	var chosen = 0;
 	var index = 0;
 	var pickedLinks = [];
-	while (chosen < numberToChoose && index < allLinks.length) {
-		pickIndex = Math.floor(Math.random()*allLinks.length);
-		pickedLinks.push(pickIndex)
-		index++;
+	while (chosen < numberToChoose && index < allDomainLinks.length) {
+		pickIndex = Math.floor(Math.random()*allDomainLinks.length);
+		pickedLinks.push(pickIndex)		
+		index++;	
 		
-		//TODO check whether the correct config is used
-		if(urlLib.approveURL(allLinks[pickIndex], urlLib.initializeConfig())) {
-			array.push(allLinks[pickIndex]);
+		if(urlLib.approveURL(allDomainLinks[pickIndex], config)) {
+			array.push(allDomainLinks[pickIndex]);
 	    	chosen++;
 		}
 	}
