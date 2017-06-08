@@ -1,4 +1,5 @@
 var globalConfig
+var loggingActive = true
 
 //TODO: Move to Background near Initialize
 var globalMaxBytes = [80000, 300000, 104857600]
@@ -44,7 +45,7 @@ function restoreConfig() {
 	function loadValues(result) {
 
 		globalConfig = result.config;
-		console.log("Settings loading with loadValues "+globalConfig.selectedPersonaKey);
+		logData("[SettingsPopUp] - Settings loading with loadValues "+globalConfig.selectedPersonaKey);
 
 		//Bind Personas to Persona Select
 		var personaSelect = document.querySelector("#personaKey");
@@ -75,7 +76,7 @@ function restoreConfig() {
   }
   
   function onError(error) {
-    console.log(`Error: ${error}`);
+    logData(error, "error");
   }
 }
 
@@ -112,6 +113,20 @@ function loadKeywords() {
 		keywordWords.push(selPersonaKeys[k].word);
 	}
 	document.querySelector("#keywords").textContent = keywordWords.join();
+
+function logData(data, level) {
+	if (loggingActive) {
+		switch (level) {
+			case "info":
+				console.info(data);
+				break;
+			case "error":
+				console.error(data);
+				break;
+			default:
+				console.log(data);
+		}
+	}
 }
 
 document.addEventListener("DOMContentLoaded", restoreConfig);
