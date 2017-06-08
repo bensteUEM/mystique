@@ -146,7 +146,7 @@ function messageReceived(message, sender, sendResponse){
 		}
 	}
 	else if (message.topic == "configUpdate"){
-	    config = message.completeConfig
+	    config = message.data
 	    saveValues();
 	}
 }

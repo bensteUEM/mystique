@@ -91,7 +91,6 @@ function toggleState() {
 }
 
 function updateStatusButton() {
-
 	var className = globalConfig.settings.active ? "activated" : "deactivated";
 	var statusText = globalConfig.settings.active ? "ON" : "OFF";
 
