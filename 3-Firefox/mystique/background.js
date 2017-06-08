@@ -18,6 +18,12 @@ function loadValues(result) {
 	if(config == null) {
 		initConfig();
     }
+	
+	logData("[MessageHandler] - Status: " + config.settings.functionality)
+		if (config.settings.functionality == true){
+			resetSession();
+			sessionHandler();
+		}
 }
 
 function initConfig(){
