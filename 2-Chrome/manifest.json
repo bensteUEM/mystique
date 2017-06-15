@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
 
-  "name": "Mystique",
-  "description": "Produce noise in the background while normally surfing the web by opening random websites connected to a specified stereotype",
+  "name": "Mystique - Hide your identity",
+  "short_name": "Mystique",
+  "description": "Hide your surfing behavior by opening random websites in the background that are connected to a specified stereotype",
   "author": "DHBW.CAS.ADM.2K17",
   "homepage_url": "https://mystique-extension.jimdo.com/",
   "version": "1.0",
