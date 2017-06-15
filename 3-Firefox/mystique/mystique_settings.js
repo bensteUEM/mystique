@@ -80,24 +80,25 @@ function restoreConfig() {
 		document.querySelector("#maxPageviewsFromRoot").value = globalConfig.settings.maxPageviewsFromRoot;
 
 		for(var i = 0; i < globalMaxBytes.length; i++) {
-			if(globalMaxBytes[i] >= globalConfig.settings.maxBytes) {
+			if(globalMaxBytes[i] == globalConfig.settings.maxBytes) {
 				document.querySelector("#maxBytes").value = i;
 			}
 		}
 		for(var i = 0; i < globalMaxLinkDepth.length; i++) {
-			if(globalMaxLinkDepth[i] >= globalConfig.settings.maxLinkDepth) {
+			if(globalMaxLinkDepth[i] == globalConfig.settings.maxLinkDepth) {
 				document.querySelector("#maxLinkDepth").value = i;
 			}
 		}
 		for(var i = 0; i < globalMaxNumberOfLinks.length; i++) {
-			if(globalMaxNumberOfLinks[i] >= globalConfig.settings.maxNumberOfLinksToClick) {
+			if(globalMaxNumberOfLinks[i] == globalConfig.settings.maxNumberOfLinksToClick) {
 				document.querySelector("#maxNumberOfLinksToClick").value = i;
 			}
 		}
-	}
 		
 		//Set Status
 		updateStatusButton();
+	}
+	
 		
 	function onError(error) {
     logData(error, "error");
