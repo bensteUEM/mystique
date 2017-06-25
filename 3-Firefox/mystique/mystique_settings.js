@@ -12,7 +12,7 @@ function resetConfig(e) {
 		topic: "configReset",
 		data: ""
 	});
-	logData("resetButton pressed in GUI");
+	logData("[SettingsPopUp] Config reset triggered");
 	window.close();
 }
 
@@ -104,7 +104,6 @@ function restoreConfig() {
     logData(error, "error");
   }
 }
-  
 
 /** On Off Button pressed load browser settings*/
 function toggleState() {	

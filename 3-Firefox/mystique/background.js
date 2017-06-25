@@ -19,7 +19,7 @@ function loadValues(result) {
 		initConfig();
     }
 	
-	logData("[MessageHandler] - Status: " + config.settings.functionality)
+	logData("[InitProcess] - Running state retrieved from config: " + config.settings.functionality)
 		if (config.settings.functionality == true){
 			resetSession();
 			sessionHandler();
@@ -142,7 +142,6 @@ function messageReceived(message, sender, sendResponse){
 	
 	if (message.topic == "links" && sender.tab.id == tabId) {
 		logData("[MessageHandler] - " + message.data.length + " links received from CS")
-		logData("[MessageHandler] - " + config.settings.followLinkOnDomainOnly +"=domainonly "+ config.settings.maxNumberOfLinksToClick + "=%toclick")
 		filteredLinksFromCS = getLinksDomainPercentage(message.data,config.settings.followLinkOnDomainOnly,config.settings.maxNumberOfLinksToClick)
 		logData("[MessageHandler] - " + filteredLinksFromCS.length + " links remain after filtering")
 	}
@@ -391,7 +390,7 @@ function logData(data, level) {
 @param followLinkOnDomainOnly to filter only to same Domain links
 */
 function getLinksDomain(allLinks,followLinkOnDomainOnly){
-	logData("getLinksDomain- followLinkOnDomainOnly is"+followLinkOnDomainOnly);
+	logData("[LinkFilter]- FollowLinkOnDomainOnly: " + followLinkOnDomainOnly);
     linksDetected = allLinks;
 	var array = [];
 	for(var i=0; i<linksDetected.length; i++) {
@@ -403,7 +402,6 @@ function getLinksDomain(allLinks,followLinkOnDomainOnly){
 		}
 
 	}
-	logData("getLinksDomain- has "+array.length);
 	return array;
 }
 
@@ -418,7 +416,7 @@ function getLinksDomainPercentage(allLinks,followLinkOnDomainOnly,maxNumberOfLin
 	var array = [];
 	let allDomainLinks = getLinksDomain(allLinks,followLinkOnDomainOnly);
 	let numberToChoose = Math.round(maxNumberOfLinksToClick*Math.random()*allDomainLinks.length);
-	logData("numbers to Chose "+numberToChoose + " of "+ allDomainLinks.length + " from should "+ maxNumberOfLinksToClick);
+	logData("[LinkFilter] Choose " + numberToChoose + " of "+ allDomainLinks.length + " links (maxNumberOfLinksToClick: " + maxNumberOfLinksToClick + ")");
 	
 	if ((allDomainLinks.length <= numberToChoose) || (allDomainLinks.length<0)){	
 		return 	allDomainLinks;
