@@ -41,7 +41,7 @@ var urlLib = {
 
     approveURL: function(url, config) {
     	// Check if the URL has a valid pattern
-    	var pattern = /^http|^https|^\/|^.\/|^..\/|^javascript/;
+    	var pattern = /^http|^https|^\/|^.\/|^..\//;
     	var match = pattern.test(url);
     	if(!match) {
     		return false;
