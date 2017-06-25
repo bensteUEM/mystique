@@ -15,7 +15,7 @@
 <div class="form_container">
     <form>
         <button type="submit">Save</button>
-		<button type="submit">Reset</button>
+		<button type="reset">Reset</button>
 
         <div class="form_input_area">
             <div class="settings_item">
@@ -71,11 +71,16 @@
                 <textarea type="text" id="wishlist" col="20" rows="7"></textarea>
                 <span class="description">Keywords that you want to use in your queries</span>
             </div>
-            <div class="settings_item">
+			<div class="settings_item">
                 <p class="label">Persona</p>
                 <select id="personaKey">
                 </select>
                 <span class="description">Who do you want to be?</span>
+            </div>
+			<div class="settings_item">
+                <p class="label">Keywords</p>
+                <span type="text" id="keywords"></span>
+                <span class="description">Keywords that are related to the selected persona</span>
             </div>
         </div>
     </form>
