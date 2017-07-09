@@ -4,20 +4,41 @@ var wl = ["abacus", "abbey", "abdomen", "ability", "abolishment", "abroad", "acc
 var startingUrl = ["https://de.wikipedia.org/wiki/Wikipedia:Hauptseite"];
 
 //This is started with the run of the application
-var getting = browser.storage.local.get("config");
+browser.tabs.onUpdated.addListener(handleUpdated);
+
+var getting = browser.storage.local.get(["config", "tabUrl"]);
 getting.then(loadValues, onError);
 logData("[InitProcess] - Browser config object requested");
+
+function handleUpdated(changedTabId, changeInfo, tabInfo) {
+	if (changedTabId == tabId && changeInfo.url) {
+		logData("[LocalStorage] - Storing updated tab URL (" + changeInfo.url + ")")
+		saveValues({
+			tabUrl: changeInfo.url
+		});
+	}  
+}
 
 /**
 * function loaded when action for loading the config is executed
 */
 function loadValues(result) {
     config = result.config;
-	logData("[InitProcess] - Config loaded from browser - " + config);
+    
+	logData("[InitProcess] - Config loaded from browser");
+	logData(config);
+	logData("[InitProcess] - TabUrl loaded from browser");
+	logData(result.tabUrl)
 
 	if(config == null) {
 		initConfig();
     }
+	if(result.tabUrl == null) {
+		setTabId(-1);
+	}
+	else {
+		reuseTabIfExisting(result.tabUrl);
+	}
 	
 	logData("[InitProcess] - Running state retrieved from config: " + config.settings.functionality)
 		if (config.settings.functionality == true){
@@ -34,21 +55,54 @@ function initConfig(){
 	let personaKeys = Object.keys(config.personas);
 	config.selectedPersonaKey = personaKeys[Math.floor(Math.random()*personaKeys.length)];
 	logData("[InitProcess] - Opted to use " + config.selectedPersonaKey + " by picking random");
-	saveValues();
+	saveValues({config: config});
+}
+
+function setTabId(id){
+	tabId = id;
+}
+
+function reuseTabIfExisting(tabUrl) {
+	var querying = browser.tabs.query({
+		url: tabUrl,
+		pinned: true
+	}).then(function(tabs){
+		// on success
+		if (tabs.length > 1) {
+			logData("The tab to be reused by the extension could not be indentified unambiguously", "error");
+			setTabId(-1);
+		}
+		else{
+			logData("[InitProcess] - Tab with ID " + tabs[0].id + " will be reused");
+			setTabId(tabs[0].id);
+		}
+	}, function(error){
+		// on error
+		logData("Error on querying tabs " + error, "error");
+	});
 }
 
 /** save currently saved config to browser config
 */
-function saveValues(){
-    logData("[ConfigStorage] - Trying to save " + config);
-    var setting = browser.storage.local.set({config});
-    setting.then(null,onError);
+function saveValues(object){
+    logData("[LocalStorage] - Trying to store data");
+    logData(object);
+    
+	browser.storage.local.set(
+		object
+	).then(function(){
+		// on success
+		logData("[LocalStorage] - Data successfully stored");
+	}, function(error){
+		// on error
+		logData("[LocalStorage] - Data could not be stored (" + error + ")", "error");
+	});
 }
 
 // functionality to open a given URL in a separate tab object 
 
 var loggingActive = true
-var tabId = -1
+var tabId
 var windowId = -1
 var lastUrlRequested = null
 var runInNewWindow = false
@@ -128,7 +182,7 @@ function resetSession() {
 		logData("[SessionHandler] - Plugin tab closed");
 	}, onError);
 	
-	tabId = -1
+	setTabId(-1);
 	windowId = -1
 	lastUrlRequested = null
 	numberOfCollectedLinks = 0
@@ -157,7 +211,7 @@ function messageReceived(message, sender, sendResponse){
 	}
 	else if (message.topic == "configUpdate"){
 	    config = message.data
-	    saveValues();
+	    saveValues({config: config});
 	}
 	else if (message.topic == "configReset"){
 	    initConfig();
@@ -317,7 +371,7 @@ function maintainAddOnTab(url, windowId) {
 	
 	function onTabProcessed(tab) {
 		 
-		tabId = tab.id
+		setTabId(tab.id);
 		logData('[TabManager] - Tab updated - ID: ' + tab.id +
 				' / SELECTED: ' + tab.selected +
 				' / PINNED: ' + tab.pinned +
@@ -357,7 +411,7 @@ function sendMessageToContentScript(command){
 }
 
 function reopenTab(){
-	tabId = -1
+	setTabId(-1);
 	openUrl(lastUrlRequested, runInNewWindow)
 }
 
