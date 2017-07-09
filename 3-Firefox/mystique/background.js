@@ -363,7 +363,8 @@ function maintainAddOnTab(url, windowId) {
 		creating.then(onTabProcessed, onError);
 	} else {
 		var updatingTab = browser.tabs.update(tabId, {
-			url: url
+			url: url,
+			muted: true
 		});
 		
 		updatingTab.then(onTabProcessed, onUpdateTabError)
